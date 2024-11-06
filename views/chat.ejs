@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Mockup</title>
+    <link rel="stylesheet" type="text/css" href="/styles.css">
+    <style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }    
+    
+    body {
+        display: flex;
+        height: 100vh;
+        color: #333;
+
+    
+    }
+    .sidebar {
+        width: 250px;
+        background-color: #d6d4d4;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .new-chat {
+        padding: 10px;
+        background-color: #e0f7fa;
+        color: #00796b;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .section-title {
+        font-weight: bold;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .chat-list .chat-item {
+        padding: 8px;
+        font-size: 14px;
+        color: #555;
+        cursor: pointer;
+    }
+
+    .feature-box {
+        background-color: #e0f7fa;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        color: #00796b;
+    }
+
+    .profile {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .profile-icon {
+        background-color: #000;
+        color: #fff;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+    }
+
+
+    .main-content {
+        flex: 1;
+        padding: 40px;
+        background-color: #fff;
+        text-align: center;
+    }
+
+    .main-content h1 {
+        font-size: 36px;
+        margin-bottom: 10px;
+    }
+
+    .upgrade {
+        font-size: 14px;
+        color: #888;
+    }
+
+    .upgrade a {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .search-bar {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 20px 0;
+    }
+
+    .search-bar input {
+        width: 300px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .send-btn {    
+        padding: 10px 15px;
+        border: none;
+        color: #fff;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .suggestions button {    
+        margin: 5px;
+        padding: 10px;
+        background-color: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    footer {
+        margin-top: 20px;
+        font-size: 12px;
+    }
+
+    footer a {
+        color: #888;
+        text-decoration: none;
+        margin: 0 5px;
+    }
+
+    footer a:hover {
+        text-decoration: underline;
+    }
+
+    
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">HC</div>
+        <button class="new-chat" >New Chat</button>
+        <div class="section-title">Recent Chats</div>
+        <div class="chat-list">
+            <div class="chat-item">Custom Star Rating Input...</div>
+        
+        </div>
+        <!-- <div class="feature-box">
+            <span>New Feature</span>
+            <p>We've improved v0's ability to generate code from uploaded images</p> -->
+        </div>
+        <!-- <div class="profile">
+            <div class="profile-icon">S</div>
+            <span>spencers20</span> -->
+            
+        </div>
+    </div>
+    <div class="main-content">
+        <h1>Hello  how may i help you</h1>
+        
+        <div class="search-bar">
+            <input id = "question" type="text" placeholder="Ask me a question...">
+            <button id = "btn" type="submit" class="send-btn" >check</button>
+        </div>
+        <div class="suggestions">
+            <button id = "btn2">Book appointment with doctor</button>
+            
+        </div>
+        <footer>
+         
+        </footer>
+    </div>
+    <script src="/script.js"></script>
+    <script src ="/script2.js"></script>
+    
+</body>
+</html>
