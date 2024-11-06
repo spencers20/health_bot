@@ -137,6 +137,39 @@
         border-radius: 5px;
         cursor: pointer;
     }
+    .response {
+      margin-top: 20px;
+      opacity: 0;
+      position: absolute;
+      top: 20px;
+      /* left: 20px; */
+      transition: all 0.5s ease;
+    }
+
+    .top-right-message {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      font-weight: bold;
+    }
+
+    .bottom-input {
+      position: fixed;
+      bottom: 20px;
+    }
+
+
+    .container {
+      /* display: flex; */
+      flex:1;
+      flex-direction: column;
+      padding:40px;
+      align-items: center;
+      text-align: center;
+      transition: all 0.5s ease;
+    }
+
+
 
     footer {
         margin-top: 20px;
@@ -175,17 +208,19 @@
             
         </div>
     </div>
-    <div class="main-content">
-        <h1>Hello  how may i help you</h1>
+    <div class="container">
+        <h1 id="intro">Hello  how may i help you</h1>
         
         <div class="search-bar">
             <input id = "question" type="text" placeholder="Ask me a question...">
-            <button id = "btn" type="submit" class="send-btn" >check</button>
+            <button id = "btn" type="submit" class="send-btn" style="visibility: hidden;">check</button>
         </div>
         <div class="suggestions">
             <button id = "btn2">Book appointment with doctor</button>
             
         </div>
+
+        <div class="response" id="response"> Response will appear here </div>
         <footer>
          
         </footer>
