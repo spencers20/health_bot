@@ -63,7 +63,8 @@ app.post('/ask',
         const {message}=req.body
 
         const data={
-            question : message
+            question : message,
+            chatId : '2244fb1a-03ba-492b-ae8e-de9a9823eb91'
         }
         
         const response = await fetch(
