@@ -57,6 +57,55 @@ router.post('/chat',
                 _id:req.user.googleId
             })
 
+            async function newchat(){
+                const flowisedata={
+                    question:message
+                }
+                const results=sendToFLowise(flowisedata)
+
+                const chatId=data.findOne({chatId:results.chatId})
+
+                if (chatId){
+                    const flowisedata={
+                        question:message,
+                        chatId:results.chatId
+                    }
+                    const result2=await sendToFLowise(flowisedata)
+
+                    if(result2){
+                        chatnew=[
+                            {
+                                role:"human",
+                                content:result2.question
+                            },
+                            {
+                                role:"ai",
+                                content:result2.text
+                            },
+                            {
+                                chattime:new Date()
+                            }                        
+                        ]
+                        await data.bulkWrite([{
+                            updateOne:{
+                                filter: {chatId:result2.chatId},
+                                update: {
+                                    $push: {messages:chatnew},
+                                    $set:{updatedAt:new Date()}
+                           }}
+                        
+                    }])
+                        
+                    }
+
+                }
+
+
+
+
+                
+            }
+
             if (!objectid){
                 const flowisedata={
                     question:message
