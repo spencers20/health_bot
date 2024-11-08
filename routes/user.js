@@ -1,6 +1,7 @@
 const express=require('express')
 const router=express.Router()
 const {getdb}=require('../config/database')
+const { ObjectId } = require('mongodb')
 
 
 router.use( async (req, res,next)=>{
@@ -33,45 +34,62 @@ router.get('/',
 router.post('/chat',
     async (req , res)=>{
         try{
-        const{ message}=req.body
-        const flowisedata={
-            question:message,
-            chatId:'2244fb1a-03ba-492b-ae8e-de9a9823eb91',
-        }
+            const db=await getdb()
+            const data=db.collection('data')
+            
+            async(flowisedata)=>{
+                const{ message}=req.body
+                const flowisedata={
+                    question:message
+                    chatId:''
+                    
+                }
+                
+            }
 
-        const response = await fetch(
-            "http://20.86.249.39:3000/api/v1/prediction/45f5a627-3b9d-4f90-a7df-597c1729b0f1",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(flowisedata)
-            }    
-        );
-        const result = await response.json()
+            const objectid=data.findOne({
+                _id:ObjectId(req.user.googleId)
+            })
 
-        const sessiondata={
-            userId:req.user.googleId,
-            SessionId:result.sessionId,
-            chatId:result.chatId,
-            chatMessageId:result.chatMessageId,
-            messages:[
-                {type:"human", content:result.question},
-                {type:"ai", content:result.text}
-            ],
-            createdAt:new Date(),
-            updatedAt:new Date()
-        }
+            if (!objectid){
+                
+
+            }
+
+            
+            
+
+            const response = await fetch(
+                "http://20.86.249.39:3000/api/v1/prediction/45f5a627-3b9d-4f90-a7df-597c1729b0f1",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(flowisedata)
+                }    
+            );
+            const result = await response.json()
+
+            const sessiondata={
+                userId:req.user.googleId,
+                SessionId:result.sessionId,
+                chatId:result.chatId,
+                chatMessageId:result.chatMessageId,
+                messages:[
+                    {type:"human", content:result.question},
+                    {type:"ai", content:result.text}
+                ],
+                createdAt:new Date(),
+                updatedAt:new Date()
+            }
         
-        const db=await getdb()
-        const data=db.collection('data')
-        const added =await  data.insertOne(sessiondata)
-        if (added.acknowledged){
-            console.log("data added succesfully")
-            alert(`done , data added to database successfully`)
-        }
-
+            
+            const added =await  data.insertOne(sessiondata)
+            if (added.acknowledged){
+                console.log("data added succesfully")
+                alert(`done , data added to database successfully`)
+            }
        }catch(e){
         console.log({chat_error:`${e}`})
        }
