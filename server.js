@@ -65,7 +65,7 @@ app.post('/ask',
         const data={
             question : message,
             chatId : '2244fb1a-03ba-492b-ae8e-de9a9823eb91',
-            userId:'1234567'
+            
         }
         
         const response = await fetch(
@@ -88,6 +88,7 @@ app.post('/ask',
         console.log(result)
     
         res.status(200).json(result)
+        return result
     
     }catch(e){
         res.json({error:`${e}`})

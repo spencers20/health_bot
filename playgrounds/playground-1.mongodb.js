@@ -9,7 +9,8 @@ use('logs');
 //     }
 // ])
 
-db.users.find()
+// db.users.find()
+db.data.find()
 
 
 

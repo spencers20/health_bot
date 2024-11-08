@@ -32,60 +32,79 @@ router.get('/',
 )
 
 router.post('/chat',
-    async (req , res)=>{
+    async (req , res,next)=>{
         try{
             const db=await getdb()
             const data=db.collection('data')
-            
-            async(flowisedata)=>{
-                const{ message}=req.body
-                const flowisedata={
-                    question:message
-                    chatId:''
-                    
-                }
+            const{ message}=req.body
+            async function sendToFLowise(flowisedata){
+                const response = await fetch(
+                    "http://20.86.249.39:3000/api/v1/prediction/45f5a627-3b9d-4f90-a7df-597c1729b0f1",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(flowisedata)
+                    }    
+                );
+                const result = await response.json()
+                return result
+                
                 
             }
-
-            const objectid=data.findOne({
-                _id:ObjectId(req.user.googleId)
+            const objectid=await data.findOne({
+                _id:req.user.googleId
             })
 
             if (!objectid){
+                const flowisedata={
+                    question:message
+                }
                 
+                const results=await sendToFLowise(flowisedata)
 
-            }
+                const log={
+                    _id:req.user.googleId,
+                    chats:[
+                        {
+                            chatId:results.chatId,
+                            chatMessageId:results.chatMessageId,
+                            messages:[
+                                {
+                                    onechat:[
+                                        {
+                                            type:'human',
+                                            content: results.question
+                                        },
+                                        {
+                                            type:'ai',
+                                            content:results.text
 
-            
-            
+                                        },
+                                        {
+                                            chattime:new Date()
+                                        }
+                                    ]
+                                }
+                            ],
+                            createdAt : new Date(),
+                            updatedAt :new Date ()
+                        }
+                    ]
+                }
 
-            const response = await fetch(
-                "http://20.86.249.39:3000/api/v1/prediction/45f5a627-3b9d-4f90-a7df-597c1729b0f1",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(flowisedata)
-                }    
-            );
-            const result = await response.json()
+                const inserttodb=await data.insertOne(log)
+                if(inserttodb.acknowledged){
+                    console.log('added successfully')
+                }
 
-            const sessiondata={
-                userId:req.user.googleId,
-                SessionId:result.sessionId,
-                chatId:result.chatId,
-                chatMessageId:result.chatMessageId,
-                messages:[
-                    {type:"human", content:result.question},
-                    {type:"ai", content:result.text}
-                ],
-                createdAt:new Date(),
-                updatedAt:new Date()
-            }
-        
-            
-            const added =await  data.insertOne(sessiondata)
+                next()
+            } 
+
+            const results=await sendToFLowise(flowisedata)
+            const chatId = await data.findOne()
+
             if (added.acknowledged){
                 console.log("data added succesfully")
                 alert(`done , data added to database successfully`)
