@@ -33,7 +33,7 @@ app.use(express.json())
 
 app.get('/',(req , res)=>{
     console.log('entered')
-    res.render('chat.ejs')
+    res.render('index.ejs')
 })
 
 

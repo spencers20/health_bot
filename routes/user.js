@@ -19,8 +19,9 @@ router.get('/',
         console.log(req.user)
         const db= await getdb()
         const users=db.collection('users')
+        const userId=req.user.googleId
 
-        const details=await users.findOne({googleId:req.user.googleId})
+        const details=await users.findOne({googleId:userId})
 
         if(!details){
             throw new Error("no user found")
@@ -31,139 +32,195 @@ router.get('/',
     }
 )
 
+//function to send the payload to flowise
+async function sendToFLowise(flowisedata){
+    console.log('making call to flowise...')
+    console.log(flowisedata)
+    const response = await fetch(
+        "http://20.86.249.39:3000/api/v1/prediction/45f5a627-3b9d-4f90-a7df-597c1729b0f1",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(flowisedata)
+        }    
+    );
+    const result = await response.json()
+    console.log('results:',result)
+    return result
+    
+    
+}
+//function to get new chatId and save to db for every new chat
+async function startnewchat(userId,message){
+    console.log("starting a new chat....")
+    //payload to be sent to flowise without chatId
+    const flowisedata={
+        question:message
+    }
+    const results=await sendToFLowise(flowisedata)
+
+    //saving the new chat in a database
+    const chattoadd={
+        chatId:results.chatId,
+        chatMessageId:results.chatMessageId,
+        messages:[
+            {
+                conversation:[
+                    {
+                        role:"human",
+                        content:results.question,
+                    
+                    } ,
+                    {
+                        role:"ai",
+                        content:results.text,
+                        
+                    },
+                    {
+                        chattime:new Date()
+                    }]
+            }],
+        createdAt:new Date(),
+        updatedAt:new Date()
+        }
+        
+    const db=await getdb()
+    const data=db.collection('data')
+    const result=await data.bulkWrite([
+        {
+            updateOne:{
+                filter:{
+                    _id:userId
+                },
+                update:{
+                    $set:{activechatId:results.chatId},
+                    $push:{chats:chattoadd}
+                }
+            }
+        }
+    ])
+    if (result.acknowledged){
+        console.log("added to the database successfully")
+    }
+
+    return results
+
+}
+
+//function of every new conversation 
+async function conversations(userId,chatId,message){
+    console.log("starting a new conversation....")
+    //payload to be sent to flowise with a chatId
+    const flowisedata={ 
+        question:message,
+        chatId:chatId
+    }
+    const results=await sendToFLowise(flowisedata)
+
+    //calling the database function
+    db=await getdb()
+    const data=db.collection('data')
+
+ //checking the existence of a chatId in the database
+    const findchatId=await data.findOne({
+        _id:userId,
+        'chats.chatId':chatId
+    })
+//throw an error if no chatId is found
+    if (!findchatId){
+        throw new Error({chatIderror:"chatId not found"})
+    }
+//save the new conversation to the db
+    const newconversation={
+        conversation:[
+            {
+                role:"human",
+                content:results.question,
+            
+            } ,
+            {
+                role:"ai",
+                content:results.text,
+                
+            },
+            {
+                chattime:new Date()
+            }
+        ],
+      
+    }
+//update the messages in the db
+    const result=await data.bulkWrite([{
+        updateOne:{
+            filter:{
+                _id:userId,
+                'chats.chatId':chatId
+            },
+            update:{
+                $push:{'chats.$.messages':newconversation},
+                $set:{updatedAt:new Date()}
+
+            }
+        }
+    }])
+
+    if (result.acknowledged){
+        console.log('conversation saved')
+  
+}
+
+    return results 
+}
+
+
 router.post('/chat',
-    async (req , res,next)=>{
+    async (req , res)=>{
         try{
             const db=await getdb()
             const data=db.collection('data')
             const{ message}=req.body
-            async function sendToFLowise(flowisedata){
-                const response = await fetch(
-                    "http://20.86.249.39:3000/api/v1/prediction/45f5a627-3b9d-4f90-a7df-597c1729b0f1",
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(flowisedata)
-                    }    
-                );
-                const result = await response.json()
-                return result
-                
-                
-            }
+            const userId=req.user.googleId
+            console.log(userId)
+            let flowiseResponse
+          
+            //check if the user had a conversation before
             const objectid=await data.findOne({
-                _id:req.user.googleId
+                _id:userId
             })
-
-            async function newchat(){
-                const flowisedata={
-                    question:message
-                }
-                const results=sendToFLowise(flowisedata)
-
-                const chatId=data.findOne({chatId:results.chatId})
-
-                if (chatId){
-                    const flowisedata={
-                        question:message,
-                        chatId:results.chatId
-                    }
-                    const result2=await sendToFLowise(flowisedata)
-
-                    if(result2){
-                        chatnew=[
-                            {
-                                role:"human",
-                                content:result2.question
-                            },
-                            {
-                                role:"ai",
-                                content:result2.text
-                            },
-                            {
-                                chattime:new Date()
-                            }                        
-                        ]
-                        await data.bulkWrite([{
-                            updateOne:{
-                                filter: {chatId:result2.chatId},
-                                update: {
-                                    $push: {messages:chatnew},
-                                    $set:{updatedAt:new Date()}
-                           }}
-                        
-                    }])
-                        
-                    }
-
-                }
-
-
-
-
-                
-            }
-
+// if not then save the user to the database and initialize them with a new chat
             if (!objectid){
-                const flowisedata={
-                    question:message
-                }
-                
-                const results=await sendToFLowise(flowisedata)
+                const newuser=data.insertOne({_id:userId})
 
-                const log={
-                    _id:req.user.googleId,
-                    chats:[
-                        {
-                            chatId:results.chatId,
-                            chatMessageId:results.chatMessageId,
-                            messages:[
-                                {
-                                    onechat:[
-                                        {
-                                            type:'human',
-                                            content: results.question
-                                        },
-                                        {
-                                            type:'ai',
-                                            content:results.text
-
-                                        },
-                                        {
-                                            chattime:new Date()
-                                        }
-                                    ]
-                                }
-                            ],
-                            createdAt : new Date(),
-                            updatedAt :new Date ()
-                        }
-                    ]
-                }
-
-                const inserttodb=await data.insertOne(log)
-                if(inserttodb.acknowledged){
-                    console.log('added successfully')
-                }
-
-                next()
-            } 
-
-            const results=await sendToFLowise(flowisedata)
-            const chatId = await data.findOne()
-
-            if (added.acknowledged){
-                console.log("data added succesfully")
-                alert(`done , data added to database successfully`)
+                if (newuser.acknowledged){
+                flowiseResponse=await startnewchat(userId,message)
+                }   
             }
+            // check if theres an active chatId existing in the database
+            const activechatId=await data.findOne({
+                _id:userId,
+                activechatId:{ $exists: true }
+            })
+// if theres an activechatId  call the conversations function , if not then call the startnewchat function
+            if (activechatId){
+                console.log('existing active chatId',activechatId.activechatId)
+                const chatId=activechatId.activechatId
+                flowiseResponse= await conversations(userId,chatId,message)
+            } else {
+                flowiseResponse=await startnewchat(userId,message)
+            }
+
+            res.status(200).json({flowiseResponse})
+            return flowiseResponse
+            
        }catch(e){
         console.log({chat_error:`${e}`})
        }
+      
 
     }
+    
 )
 
 module.exports = router
-

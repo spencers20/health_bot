@@ -24,7 +24,7 @@ async function sendmessage() {
         intro.style.opacity= 0
 
 
-        const response= await fetch('/ask',{
+        const response= await fetch('/user/chat',{
             method:'POST',
             headers:{
                 'Content-Type':'application/json'

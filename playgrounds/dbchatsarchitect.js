@@ -84,18 +84,21 @@ use('logs')
 //     }
 // )
 
-db.data.find(
-    {
-        _id: ObjectId('672d4d9dfa6fc8be7a24f65d'),
-        'chats.chatId':'124u4iioioiuh444'
-    },
-    {
-        chats :{
-            $elemMatch: {
-               chatId: '124u4iioioiuh444'
-            }
-        }
-    }
+// db.data.find(
+//     {
+//         _id: ObjectId('672d4d9dfa6fc8be7a24f65d'),
+//         'chats.chatId':'124u4iioioiuh444'
+//     },
+//     {
+//         chats :{
+//             $elemMatch: {
+//                chatId: '124u4iioioiuh444'
+//             }
+//         }
+//     }
 
+// )
 
-)
+db.data.insertOne({
+    _id:1234566
+})

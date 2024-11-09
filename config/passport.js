@@ -17,6 +17,7 @@ async  function (accessToken, refreshToken, profile, done){
         const db=await getdb();
         const User =db.collection('users')
         const user= await User.findOne({googleId:profile.id})
+        const data=db.collection('data')
         
         // console.log(userid)
 
@@ -30,6 +31,7 @@ async  function (accessToken, refreshToken, profile, done){
             const details=await User.insertOne(google_details)
             console.log(details)
 
+            
             // if (details.acknowledged){
             //     console.log(details)
             // }
@@ -37,6 +39,8 @@ async  function (accessToken, refreshToken, profile, done){
             const newuser=await User.findOne({googleId:profile.id})
             return done(null,newuser)
         }
+
+
 
         return done(null,user)
     }catch(e){
