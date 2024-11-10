@@ -211,8 +211,8 @@ router.post('/chat',
                 flowiseResponse=await startnewchat(userId,message)
             }
 
-            res.status(200).json({flowiseResponse})
-            return flowiseResponse
+            res.status(200).json(flowiseResponse)
+            // return flowiseResponse
             
        }catch(e){
         console.log({chat_error:`${e}`})
