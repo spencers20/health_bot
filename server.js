@@ -38,7 +38,7 @@ app.use(express.json())
 
 app.get('/',(req , res)=>{
     console.log('entered')
-    res.render('index.ejs')
+    res.render('symptom.ejs')
 })
 
 app.get('*',(req,res)=>{
