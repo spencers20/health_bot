@@ -6,6 +6,7 @@
                 overflow:hidden;
                 display: flex;
                 height: 100vh;
+                background-color: #f5f5f5; 
             }
 
             .sidebar {
@@ -14,7 +15,7 @@
                 position: fixed;
                 z-index: 1;
                 top: 0;
-                left: 0;
+                right: 0;
                 background-color: #e4ecec;
                 overflow-x: hidden;
                 padding-top: 20px;
@@ -23,7 +24,47 @@
                 color: white;
                 margin-left: 20px;
             }
-            </style>
+            .container {
+                background-color: white;
+                top:15%;
+                bottom:15%;
+                left:8%;
+                right:25%;
+                shape-outside: margin-box;
+                overflow:hidden;
+                position:fixed;
+                display:flex;
+
+            }
+
+            .containerheader {
+                position: absolute;
+                top: 35px; /* Distance from the top */
+                width: 100%; /* Length of the line */
+                height: 2px;
+                background-color: black;
+    
+                 /* Center line horizontally */
+            }
+
+            .headers {
+                position:absolute;
+                top:0;
+                width:100%;
+                justify-content:space-around;
+                font-size: 16px;
+                display:flex;
+
+            }
+            .h1 {
+                position:absolute;
+                text-align: center;
+                width:100%;
+                top:50px;
+                
+            }
+
+            </style> 
 
     </head>
     <body>
@@ -33,5 +74,31 @@
         <div class="sidebar">
             <h1>symptoms</h1>
         </div>
+
+        <div class="container">
+            <div class="containerheader"></div>
+            <div class="headers">
+                <p>INFO</p>
+                <p>SYMPTOMS</p>
+                <p>CONDITION</p>
+                 <p>TREATMENT</p>
+            </div>
+            <div  class="h1">
+                <p style="font-size: 30px; "> MYHC Symptom checker</p>
+                <p style="font-size: 18px; " >Identify potential health conditions and corresponding treatments based on your symptoms</p>
+                <p style="font-size:13px"> This tool is not a replacement for professional medical advice. </p>
+
+            </div>
+            <div style="width:70%; display:flex; justify-content: center; gap: 20px; text-align: center; bottom:200px; position:absolute">
+                <p style="font-size:18px ;left : 20px" >Age</p>
+                <input type="text" style="width:10% ; height: 50px; font-size: 16px; text-align: center;">
+                <p style="font-size:18px">Gender</p>
+                <button id="male" style="width: 80px; height: 50px; background-color: rgb(223, 255, 255);" onclick="this.style.backgroundColor = 'rgb(169, 240, 240)' ">Male</button>
+                <button id="female" style="width: 80px; height: 50px;background-color: rgb(223, 255, 255);" onclick="this.style.backgroundColor = 'rgb(169, 240, 240)'">Female</button>
+            </div>
+
+        </div>
+
+
     </body>
 </html>
