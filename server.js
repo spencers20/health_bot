@@ -3,9 +3,9 @@ const {savesession,getcollection,initializecollection }= require('./config/datab
 const app=express()
 const session = require("express-session");
 const passport = require("passport");
-require('./config/passport')
-const google=require('./routes/google') //calling the google. route
 require('dotenv').config()
+const google=require('./routes/google') //calling the google. route
+require('./config/passport')
 const user=require('./routes/user')
 const path=require('path')
 
@@ -21,7 +21,12 @@ app.use(express.static(path.join(__dirname,'public')))
 
 
 // Set up session management and passport globally
-app.use(session({ secret: process.env.SECRET_KEY, resave: false, saveUninitialized: true }));
+app.use(session({ 
+    secret: process.env.SECRET_KEY, 
+    resave: false, 
+    saveUninitialized: true,
+    cookie: {secure :process.env.NODE_ENV === 'production'}
+ }));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -36,6 +41,9 @@ app.get('/',(req , res)=>{
     res.render('index.ejs')
 })
 
+app.get('*',(req,res)=>{
+    res.sendFile(path.join(__dirname,'views','index.ejs'))
+})
 
 
 app.get('/get/:id',

@@ -15,7 +15,7 @@ async function sendmessage() {
 
         const topRightMessage=document.createElement('div')
         topRightMessage.classList.add('userMessage')
-        topRightMessage.textContent= input.value
+        topRightMessage.textContent= input.value 
         chatContainer.appendChild(topRightMessage)
 
         input.classList.add('bottom-input')
