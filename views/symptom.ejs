@@ -36,6 +36,8 @@
                 display:flex;
 
             }
+            
+
 
             .containerheader {
                 position: absolute;
@@ -63,6 +65,38 @@
                 top:50px;
                 
             }
+            .checksymptom {
+                position:absolute;
+                top:50px;
+                width:100%;
+               }
+            /* .symptomconfirm {
+                position :absolute;
+                left:60px;
+                width :40%;
+                background-color: aliceblue; 
+                top: 180px;
+                
+            } */
+            .symptms {
+        align-self: flex-start;
+        /* background-color:#fcfdf9 ; */
+        margin: 0;
+        padding: 0;
+        line-height: 1.5;
+        font-size: 16px;
+        /* border-radius:  5px;
+        max-width: 95%; */
+
+       }
+
+       .results{
+        align-self: flex-start;
+        margin-top: 5px;
+        margin:0;
+        line-height: 1.5;
+        font-size: 16px;
+       }
 
             </style> 
 
@@ -79,10 +113,11 @@
             <div class="containerheader"></div>
             <div class="headers">
                 <p>INFO</p>
-                <p>SYMPTOMS</p>
+                <p onclick="document.getElementById('information').style.visibility='hidden'">SYMPTOMS</p>
                 <p>CONDITION</p>
                  <p>TREATMENT</p>
             </div>
+            <div  id="information" style="visibility: hidden;">
             <div  class="h1">
                 <p style="font-size: 30px; "> MYHC Symptom checker</p>
                 <p style="font-size: 18px; " >Identify potential health conditions and corresponding treatments based on your symptoms</p>
@@ -96,8 +131,29 @@
                 <button id="male" style="width: 80px; height: 50px; background-color: rgb(223, 255, 255);" onclick="this.style.backgroundColor = 'rgb(169, 240, 240)' ">Male</button>
                 <button id="female" style="width: 80px; height: 50px;background-color: rgb(223, 255, 255);" onclick="this.style.backgroundColor = 'rgb(169, 240, 240)'">Female</button>
             </div>
+        </div>
+        <div id="symptoms" style="visibility:visible">
+            <div class="checksymptom">
+                <p style=" text-align:center; font-size:20px" > CHECK SYMPTOMS</p>
+                <div style ="width:100%">
+                <input id ="symptominput" type="text" placeholder="symptoms" style="position:absolute; left:60px; width:40%; height: 80px;">
+                <div class="conditions" style="position:absolute; right:50px; width:40%; height: 350px; background-color:  #87dfdf;">
+                   <p style=" text-align:center; font-size:20px" >CHECK SYMPTOMS</p>
+                </div>
+            </div> 
+            <div class="symptomconfirm" style="position :absolute;left:60px;width :40%;background-color: aliceblue; top: 180px; ">
+                <!-- <p style=" text-align:center; font-size:20px" >CHECK SYMPTOMS</p> -->
+                <button id="checkbtn" style="visibility: hidden; position: absolute;right:60px;  width:20%; height: 40px; margin-top: 10px;">CHECK</button>
+            </div>
+            
+            
+
+            </div>
 
         </div>
+
+        </div>
+        <script src="/symptomscript.js"></script>
 
 
     </body>

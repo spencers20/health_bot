@@ -68,11 +68,11 @@ app.get('/get/:id',
 app.post('/ask',
     async(req , res)=>{
     try{
+        console.log('asked')
         const {message}=req.body
 
         const data={
             question : message,
-            chatId : '2244fb1a-03ba-492b-ae8e-de9a9823eb91',
             
         }
         
@@ -91,8 +91,8 @@ app.post('/ask',
         // savesession(response)
         const result = await response.json();
         // console.log( `response: ${result.text}`)
-        const saved = await savesession(result)
-        console.log(saved)
+        // const saved = await savesession(result)
+        // console.log(saved)
         console.log(result)
     
         res.status(200).json(result)
