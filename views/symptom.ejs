@@ -117,20 +117,33 @@
                 <p>CONDITION</p>
                  <!-- <p>TREATMENT</p> -->
             </div>
-            <div  id="information" style="visibility: hidden;">
-            <div  class="h1">
+            <div  id="information" style="visibility: visible;">
+            <div  class="h1"> 
+                <div>
                 <p style="font-size: 30px; "> MYHC Symptom checker</p>
                 <p style="font-size: 18px; " >Identify potential health conditions and corresponding treatments based on your symptoms</p>
-                <p style="font-size:13px"> This tool is not a replacement for professional medical advice. </p>
-
+                <div style="margin-bottom: 1px; ">
+                <div style="display: flex; justify-content: center; gap: 10px;" >
+                <p style="font-size:15px "> This tool is not a replacement for professional medical advice. </p>
+                    <p style="font-size:13px" onclick=" document.getElementById('disclaimer').style.visibility='visible'">read more</p>
+                </div>
+            <p id="disclaimer" style=" font-size:  14px; margin-top: 1px;visibility: hidden; margin-bottom: 1px;"> This tool is not intended to be a substitute for professional medical advice, <br>
+                Always seek the advice of your physician or other qualified health provider <br>
+                 with any questions you may have regarding a medical condition. <br>
+                Never disregard professional medical advice or delay in seeking it ! <br>
+                If you think you may have a medical emergency, call your doctor or 911 immediately. <br>
+                      Reliance on any information provided by this tool is solely at your own choice. 
+            </p>
             </div>
-            <div style="width:70%; display:flex; justify-content: center; gap: 20px; text-align: center; bottom:200px; position:absolute">
+        </div>
+            <div style="width:100%; display:flex; justify-content: center; gap: 20px; text-align: center; margin-top: 1px; position:absolute">
                 <p style="font-size:18px ;left : 20px" >Age</p>
                 <input type="text" style="width:10% ; height: 50px; font-size: 16px; text-align: center;">
                 <p style="font-size:18px">Gender</p>
                 <button id="male" style="width: 80px; height: 50px; background-color: rgb(223, 255, 255);" onclick="this.style.backgroundColor = 'rgb(169, 240, 240)' ">Male</button>
                 <button id="female" style="width: 80px; height: 50px;background-color: rgb(223, 255, 255);" onclick="this.style.backgroundColor = 'rgb(169, 240, 240)'">Female</button>
             </div>
+        </div> 
         </div>
         <div id="symptoms" style="visibility: hidden;">
             <div class="checksymptom">
@@ -141,7 +154,7 @@
                 <div class="conditions" style=" align-items: flex-start; max-height: 300px; background-color:  #edeeee; display:flex; overflow-y: auto; overscroll-behavior: contain; ">
                    <!-- <p id="managesymptomtittle" style=" text-align:center; font-size:20px ;margin-bottom: 5px" >MANAGE YOUR SYMPTOMS </p> -->
                 </div>
-                <div id="moreinfo" style=" visibility:hidden;margin-top:  10 px;font-size: 20px; right: 30px;color: #87dfdf;">more information</div>
+                <span id="moreinfo" style=" visibility:hidden;margin-top:  10 px;font-size: 16px; right: 30px;color: #87dfdf;">more information</span>
                 </div>
             </div> 
             
