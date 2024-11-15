@@ -16,6 +16,13 @@ console.log(symptominput.value)
 let addedsymptoms=[];
 let chatId;
 
+function formatTextToHTML(text) {
+    return text
+      .replace(/\n/g, '<br>') // Convert newlines to <br>
+      .replace(/\* (.+?)(\n|$)/g, '<li>$1</li>') // Convert * bullet points to <li>
+      .replace(/(?:<li>.+?<\/li>)+/g, '<ul>$&</ul>'); // Wrap <li> in <ul>
+  }
+
 symptominput.addEventListener('keydown' ,async( event)=>{
     console.log(event.key)
     if(event.key==='Enter'){
@@ -64,11 +71,24 @@ checkbtn.addEventListener('click',async()=>{
 
     const result=await response.json()
     console.log(result)
-
-    results.textContent=result.text
     chatId=result.chatId
-    // conditions.appendChild(results)
-    conditions.insertBefore(results,managesymptomtittle.nextSibling)
+
+    
+      
+    //   results.innerHTML = formatTextToHTML(text);
+
+    // function formatText(text) {
+    //     return text
+    //       .replace(/\+/g, '') // Remove plus signs
+    //       .replace(/^\* /gm, '  - ') // Replace bullet points with indented dash (-)
+    //       .replace(/^([A-Za-z])/gm, '    $1'); // Indent headings and normal text
+    //   }
+
+    const formattedText = formatTextToHTML(result.text);
+    // results.textContent=formattedText
+    results.innerHTML = formattedText;
+    conditions.appendChild(results)
+    // conditions.insertBefore(results,managesymptomtittle.nextSibling)
     moreinfo.style.visibility='visible'
 
 
@@ -101,8 +121,10 @@ moreinfo.addEventListener('click',async()=>{
     const results=await response.json()
     console.log(results)
 
+    const formattedText=formatTextToHTML(results.text)
+
     
-    aboutsymptom.textContent=results.text
+    aboutsymptom.innerHTML=formattedText
     moreinformation.appendChild(aboutsymptom)
 
     relatdconditions.style.visibility='visible' 

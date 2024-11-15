@@ -36,11 +36,11 @@ app.use('/user',user)
 
 app.use(express.json())
 
-app.get('/',(req , res)=>{
+app.get('/symptom',(req , res)=>{
     console.log('entered')
     res.render('index.ejs')
 })
-app.get('/symptom',(req , res)=>{
+app.get('/',(req , res)=>{
     console.log('entered')
     res.render('symptom.ejs')
     
