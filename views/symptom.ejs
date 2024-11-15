@@ -65,7 +65,7 @@
                 top:50px;
                 
             }
-            .checksymptom {
+            .checksymptom ,.symptomchecked{
                 position:absolute;
                 top:50px;
                 width:100%;
@@ -90,7 +90,7 @@
 
        }
 
-       .results{
+       .results,.aboutsymptom {
         align-self: flex-start;
         margin-top: 5px;
         margin:0;
@@ -112,10 +112,10 @@
         <div class="container">
             <div class="containerheader"></div>
             <div class="headers">
-                <p>INFO</p>
-                <p onclick="document.getElementById('information').style.visibility='hidden'">SYMPTOMS</p>
+                <p onclick="document.getElementById('information').style.visibility='visible', document.getElementById('symptoms').style.visibility='hidden'">INFO</p>
+                <p onclick="document.getElementById('information').style.visibility='hidden', document.getElementById('symptoms').style.visibility='visible'">SYMPTOMS</p>
                 <p>CONDITION</p>
-                 <p>TREATMENT</p>
+                 <!-- <p>TREATMENT</p> -->
             </div>
             <div  id="information" style="visibility: hidden;">
             <div  class="h1">
@@ -132,22 +132,40 @@
                 <button id="female" style="width: 80px; height: 50px;background-color: rgb(223, 255, 255);" onclick="this.style.backgroundColor = 'rgb(169, 240, 240)'">Female</button>
             </div>
         </div>
-        <div id="symptoms" style="visibility:visible">
+        <div id="symptoms" style="visibility: hidden;">
             <div class="checksymptom">
-                <p style=" text-align:center; font-size:20px" > CHECK SYMPTOMS</p>
+                <p style=" text-align:center; font-size:20px" > CHECK SYMPTOMS</p>  
                 <div style ="width:100%">
                 <input id ="symptominput" type="text" placeholder="symptoms" style="position:absolute; left:60px; width:40%; height: 80px;">
-                <div class="conditions" style="position:absolute; right:50px; width:40%; height: 350px; background-color:  #87dfdf;">
-                   <p style=" text-align:center; font-size:20px" >CHECK SYMPTOMS</p>
+                <div style=" flex-direction: column ; position: absolute ;width:40% ; right: 50px; ">
+                <div class="conditions" style=" align-items: flex-start; max-height: 300px; background-color:  #edeeee; display:flex; overflow-y: auto; overscroll-behavior: contain; ">
+                   <p id="managesymptomtittle" style=" text-align:center; font-size:20px ;margin-bottom: 5px" >MANAGE YOUR SYMPTOMS </p>
+                </div>
+                <div id="moreinfo" style=" visibility:hidden;margin-top:  10 px;font-size: 20px; right: 30px;color: #87dfdf;">more information</div>
                 </div>
             </div> 
+            
             <div class="symptomconfirm" style="position :absolute;left:60px;width :40%;background-color: aliceblue; top: 180px; ">
                 <!-- <p style=" text-align:center; font-size:20px" >CHECK SYMPTOMS</p> -->
                 <button id="checkbtn" style="visibility: hidden; position: absolute;right:60px;  width:20%; height: 40px; margin-top: 10px;">CHECK</button>
+                
             </div>
             
             
 
+            </div>
+
+        </div>
+
+        <div id="condition" style="visibility: hidden;">
+            <div class ="symptomchecked" style="width:70%; left:30px; position: absolute; display:flex ;flex-direction: column; ">
+                <div id="checkedsymptoms"> SYMPTOMS:</div>
+                 <!-- <input type="text" id="symptominput2" placeholder="symptoms"> -->
+                <div class="moreinformation" style="background-color: #87dfdf;  align-items: flex-start; max-height: 300px ;margin-bottom: 10px;overflow-y: auto; overscroll-behavior: contain; margin-top: 10px">
+                    <!-- Headaches can be caused by a variety of factors, including stress, poor posture, skipping meals, dehydration, and hormonal changes. There are several types of headaches, including tension headaches, migraines, and medication-overuse headaches. For tension headaches, you can try the following management strategies: * Rest and relaxation techniques * Painkillers such as paracetamol or ibuprofen * Drinking plenty of fluids to stay hydrated * Removing any stressors or triggers that may be contributing to the headache For migraines, you can try the following management strategies: * Rest and relaxation techniques * Painkillers such as triptans or ergots to help relieve pain and other symptoms * Avoiding triggers that may contribute to migraines, such as certain foods or stress * Drinking plenty of fluids to stay hydrated For medication-overuse headaches, you can try the following management strategies: * Stopping the medication that is causing the headache * Gradually reducing the dose of the medication to help prevent rebound headaches * Drinking plenty of fluids to stay hydrated * Engaging in relaxation techniques to reduce stress and anxiety It's important to note that headaches can be a symptom of an underlying medical condition, so if you're experiencing frequent or severe headaches, it's a good idea to speak with a healthcare professional to rule out any underlying issues. Please consult a doctor for further assistance. -->
+                </div>
+                <p  id='relatdconditions'style="font-size:16px ; margin-top: 10px; text-align: center;  visibility:hidden">related diseases</p>
+                
             </div>
 
         </div>

@@ -38,7 +38,12 @@ app.use(express.json())
 
 app.get('/',(req , res)=>{
     console.log('entered')
+    res.render('index.ejs')
+})
+app.get('/symptom',(req , res)=>{
+    console.log('entered')
     res.render('symptom.ejs')
+    
 })
 
 app.get('*',(req,res)=>{
@@ -68,7 +73,7 @@ app.get('/get/:id',
 app.post('/ask',
     async(req , res)=>{
     try{
-        console.log('asked')
+        console.log('asked...')
         const {message}=req.body
 
         const data={
