@@ -36,15 +36,15 @@ app.use('/user',user)
 
 app.use(express.json())
 
-app.get('/symptom',(req , res)=>{
+app.get('/',(req , res)=>{
     console.log('entered')
     res.render('index.ejs')
 })
-app.get('/',(req , res)=>{
-    console.log('entered')
-    res.render('symptom.ejs')
+// app.get('/symptomchecker',(req , res)=>{
+//     console.log('entered')
+//     res.render('symptom.ejs')
     
-})
+// })
 
 app.get('*',(req,res)=>{
     res.sendFile(path.join(__dirname,'views','index.ejs'))

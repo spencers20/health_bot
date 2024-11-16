@@ -11,7 +11,7 @@
 
             .sidebar {
                 height: 100%;
-                width:250px;
+                width:350px;
                 position: fixed;
                 z-index: 1;
                 top: 0;
@@ -28,8 +28,8 @@
                 background-color: white;
                 top:15%;
                 bottom:15%;
-                left:8%;
-                right:25%;
+                left:80px;
+                right:30%;
                 shape-outside: margin-box;
                 overflow:hidden;
                 position:fixed;
@@ -103,17 +103,26 @@
     </head>
     <body>
         <div>
-            <h1>Symptoms</h1>
+            <h1>Symptoms  checker</h1>
         </div>
         <div class="sidebar">
-            <h1>symptoms</h1>
+            <h1>tips</h1>
+
+            <div id="card" style="text-align:center ;display:flex; justify-content: center; flex-direction: column;">
+                <p style="margin-bottom: 1px; font-weight: bold; font-size: 18px;"> Prioritize Sleep</p> 
+                <p >
+                Get 7-9 hours of quality sleep each night.<br>
+                 Good sleep improves mental focus, boosts your immune system,  <br>
+                 and helps your body recover from daily stress.
+                </p>
+            </div>
         </div>
 
         <div class="container">
             <div class="containerheader"></div>
             <div class="headers">
-                <p onclick="document.getElementById('information').style.visibility='visible', document.getElementById('symptoms').style.visibility='hidden'">INFO</p>
-                <p onclick="document.getElementById('information').style.visibility='hidden', document.getElementById('symptoms').style.visibility='visible'">SYMPTOMS</p>
+                <p style="cursor: pointer;" onclick="document.getElementById('information').style.visibility='visible', document.getElementById('symptoms').style.visibility='hidden' ,document.getElementById('condition').style.visibility='hidden'">INFO</p>
+                <p style="cursor: pointer;" onclick="document.getElementById('information').style.visibility='hidden', document.getElementById('symptoms').style.visibility='visible',document.getElementById('condition').style.visibility='hidden'">SYMPTOMS</p>
                 <p>CONDITION</p>
                  <!-- <p>TREATMENT</p> -->
             </div>
@@ -125,7 +134,7 @@
                 <div style="margin-bottom: 1px; ">
                 <div style="display: flex; justify-content: center; gap: 10px;" >
                 <p style="font-size:15px "> This tool is not a replacement for professional medical advice. </p>
-                    <p style="font-size:13px" onclick=" document.getElementById('disclaimer').style.display='block'"> read more</p>
+                    <p id="readmore" style="font-size:13px ;cursor: pointer;" onclick=" document.getElementById('disclaimer').style.display='block'"> read more</p>
                 </div>
                 <div id="disclaimer" style=" font-size:  14px; margin-top: 1px;display:none; margin-bottom: 1px;">
                     <p > This tool is not intended to be a substitute for professional medical advice, <br>
@@ -140,15 +149,15 @@
         </div>
             <div style="width:100%; display:flex; justify-content: center; gap: 20px; text-align: center; margin-top: 1px; position:absolute">
                 <p style="font-size:18px ;left : 20px" >Age</p>
-                <input type="text" style="width:10% ; height: 50px; font-size: 16px; text-align: center;">
+                <input id="age" type="text" style="width:10% ; height: 50px; font-size: 16px; text-align: center;">
                 <p style="font-size:18px">Gender</p>
                 <button id="male" style="width: 60px; height: 50px; background-color: rgb(223, 255, 255);" onclick="this.style.backgroundColor = 'rgb(169, 240, 240)' ">Male</button>
                 <button id="female" style="width: 60px; height: 50px;background-color: rgb(223, 255, 255);" onclick="this.style.backgroundColor = 'rgb(169, 240, 240)'">Female</button>
+                <button id="continue" style="width:70px ; height: 50px; background-color: rgb(237, 255, 223); "> continue</button>
                 
             </div>
-            <div id ="continue" style="width:80px ; display:flex; position:">
-            <button >continue</button>
-            </div>
+            
+         
         </div> 
         </div>
         <div id="symptoms" style="visibility: hidden;">
@@ -159,8 +168,16 @@
                 <div style=" flex-direction: column ; position: absolute ;width:40% ; right: 50px; ">
                 <div class="conditions" style=" align-items: flex-start; max-height: 300px; background-color:  #edeeee; display:flex; overflow-y: auto; overscroll-behavior: contain; ">
                    <!-- <p id="managesymptomtittle" style=" text-align:center; font-size:20px ;margin-bottom: 5px" >MANAGE YOUR SYMPTOMS </p> -->
+                    <div id="userinformation" style="margin-left: 10px ;position:display">
+                        <p>YOUR INFORMATION</p>
+                        <p id="usernamename"> Name : <%=user.name %></p>
+                        <p id="userage">  </p>
+                        <p id="usergender"></p>
+                        <p id="loading" style="color: #1536a3;"></p>
+                    </div>
                 </div>
-                <span id="moreinfo" style=" visibility:hidden;margin-top:  10 px;font-size: 16px; right: 30px;color: #87dfdf;">more information</span>
+                <span id="moreinfo" style=" cursor: pointer;visibility:hidden;margin-top:  10 px;font-size: 16px; right: 30px;color: #87dfdf;">more information</span>
+                <p id="loadinginfo" style="visibility: hidden; color:aqua">checking information...</p>
                 </div>
             </div> 
             
@@ -170,21 +187,31 @@
                 
             </div>
             
-            
-
-            </div>
+                </div>
 
         </div>
 
         <div id="condition" style="visibility: hidden;">
-            <div class ="symptomchecked" style="width:70%; left:30px; position: absolute; display:flex ;flex-direction: column; ">
-                <div id="checkedsymptoms"> SYMPTOMS:</div>
+            <div class ="symptomchecked" style="width:100%; flex-direction: column; ">
+                <div id="checkedsymptoms" style="margin-bottom: 10px;"> SYMPTOMS:</div>
+                <div class="myinformation" style=" position:absolute; width: 30%;align-items: flex-start; max-height: 300px;  right:10px; background-color:  #edeeee; display:flex; overflow-y: auto; overscroll-behavior: contain; ">
+                    <!-- <p id="managesymptomtittle" style=" text-align:center; font-size:20px ;margin-bottom: 5px" >MANAGE YOUR SYMPTOMS </p> -->
+                     <div id="myinfo" style=" width: 100%; margin-left: 10px ;position:display">
+                         <p>YOUR INFORMATION</p>
+                         <p id="username"> Name :<%=user.name %></p>
+                         <p id="userages">  </p>
+                         <p id="usergenders"></p>
+                         <p id="yoursymptoms"></p>
+                         <p id="loading" style="color: #1536a3;"></p>
+                         <a href="/user"  id='relatdconditions'style=" cursor: pointer; color: #87dfdf;font-size:16px ; margin-top: 10px; text-align: center;  visibility:hidden"> check related conditions</a>
+                
+                     </div>
+                 </div>
                  <!-- <input type="text" id="symptominput2" placeholder="symptoms"> -->
-                <div class="moreinformation" style="background-color: #87dfdf;  align-items: flex-start; max-height: 300px ;margin-bottom: 10px;overflow-y: auto; overscroll-behavior: contain; margin-top: 10px">
+                <div class="moreinformation" style=" position: absolute; width: 60%;background-color: #87dfdf;  align-items: flex-start; max-height: 380px ;margin-bottom: 10px;overflow-y: auto; overscroll-behavior: contain; left:30px;">
                     <!-- Headaches can be caused by a variety of factors, including stress, poor posture, skipping meals, dehydration, and hormonal changes. There are several types of headaches, including tension headaches, migraines, and medication-overuse headaches. For tension headaches, you can try the following management strategies: * Rest and relaxation techniques * Painkillers such as paracetamol or ibuprofen * Drinking plenty of fluids to stay hydrated * Removing any stressors or triggers that may be contributing to the headache For migraines, you can try the following management strategies: * Rest and relaxation techniques * Painkillers such as triptans or ergots to help relieve pain and other symptoms * Avoiding triggers that may contribute to migraines, such as certain foods or stress * Drinking plenty of fluids to stay hydrated For medication-overuse headaches, you can try the following management strategies: * Stopping the medication that is causing the headache * Gradually reducing the dose of the medication to help prevent rebound headaches * Drinking plenty of fluids to stay hydrated * Engaging in relaxation techniques to reduce stress and anxiety It's important to note that headaches can be a symptom of an underlying medical condition, so if you're experiencing frequent or severe headaches, it's a good idea to speak with a healthcare professional to rule out any underlying issues. Please consult a doctor for further assistance. -->
                 </div>
-                <a   id='relatdconditions'style="font-size:16px ; margin-top: 10px; text-align: center;  visibility:hidden">related diseases</a>
-                
+               
             </div>
 
         </div>

@@ -32,6 +32,23 @@ router.get('/',
     }
 )
 
+router.get('/symptomchecker',async(req, res)=>{
+    const db=await getdb()
+    const users=db.collection('users')
+    const userId=req.user.googleId
+    const details=await users.findOne({googleId:userId})
+
+    if(!details){
+        throw new Error("no user found")
+    }
+    console.log(details)
+
+    res.render('symptom.ejs',{user : req.user})
+
+})
+
+
+
 //function to send the payload to flowise
 async function sendToFLowise(flowisedata){
     console.log('making call to flowise...')
