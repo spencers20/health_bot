@@ -7,6 +7,14 @@ const intro=document.getElementById('intro')
 const chatContainer=document.getElementById('chat-container')
 
 
+function formatTextToHTML(text) {
+    return text
+      .replace(/\n/g, '<br>') // Convert newlines to <br>
+      .replace(/\* (.+?)(\n|$)/g, '<li>$1</li>') // Convert * bullet points to <li>
+      .replace(/(?:<li>.+?<\/li>)+/g, '<ul>$&</ul>'); // Wrap <li> in <ul>
+  }
+
+
 async function sendmessage() {
     try{
 
@@ -34,12 +42,12 @@ async function sendmessage() {
         })
 
         const result=await response.json()
-        const txtresponse=result.text
+        const txtresponse=formatTextToHTML(result.text)
         console.log(txtresponse)
 
         const respons= document.createElement('div')
         respons.classList.add('response')
-        respons.textContent= 'Response: ' +txtresponse
+        respons.innerHTML= 'Response: <br> ' +txtresponse
         chatContainer.appendChild(respons)
 
         //reset the input area

@@ -177,7 +177,7 @@ async function conversations(userId,chatId,message){
             },
             update:{
                 $push:{'chats.$.messages':newconversation},
-                $set:{updatedAt:new Date()}
+                $set:{'chats.$.updatedAt':new Date()}
 
             }
         }
@@ -235,8 +235,9 @@ router.post('/chat',
         console.log({chat_error:`${e}`})
        }
       
-
     }
+    
+
     
 )
 

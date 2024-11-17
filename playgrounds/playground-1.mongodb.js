@@ -72,4 +72,8 @@ use('logs');
 // userId=" 100984849132378172203"
 
 // db.data.deleteOne({_id:userId})
-db.data.find()
+
+
+
+db.data.find({ "_id": "114910775523649856248"})
+// db.data.deleteOne({ "_id": "114910775523649856248"})

@@ -125,7 +125,7 @@ checkbtn.addEventListener('click',async()=>{
     results.classList.add('results')
     results.textContent=''
    
-    const response=await fetch('/ask',{
+    const response=await fetch('/user/chat',{
         method:'POST',
         headers:{
             'Content-Type':'application/json'
@@ -167,7 +167,7 @@ moreinfo.addEventListener('click',async()=>{
 
 
 
-    const response=await fetch('/ask',{
+    const response=await fetch('/user/chat',{
         method:'POST',
         headers:{
             'Content-Type':'application/json'
