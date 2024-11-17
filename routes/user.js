@@ -71,124 +71,145 @@ async function sendToFLowise(flowisedata){
 }
 //function to get new chatId and save to db for every new chat
 async function startnewchat(userId,message){
-    console.log("starting a new chat....")
-    //payload to be sent to flowise without chatId
-    const flowisedata={
-        question:message
-    }
-    const results=await sendToFLowise(flowisedata)
+    try{
 
-    //saving the new chat in a database
-    const chattoadd={
-        chatId:results.chatId,
-        chatMessageId:results.chatMessageId,
-        messages:[
-            {
-                conversation:[
-                    {
-                        role:"human",
-                        content:results.question,
-                    
-                    } ,
-                    {
-                        role:"ai",
-                        content:results.text,
-                        
-                    },
-                    {
-                        chattime:new Date()
-                    }]
-            }],
-        createdAt:new Date(),
-        updatedAt:new Date()
+        console.log("starting a new chat....")
+        //payload to be sent to flowise without chatId
+        const flowisedata={
+            question:message
         }
-        
-    const db=await getdb()
-    const data=db.collection('data')
-    const result=await data.bulkWrite([
-        {
-            updateOne:{
-                filter:{
-                    _id:userId
-                },
-                update:{
-                    $set:{activechatId:results.chatId},
-                    $push:{chats:chattoadd}
+        const results=await sendToFLowise(flowisedata)
+    
+        //saving the new chat in a database
+        const chattoadd={
+            chatId:results.chatId,
+            chatMessageId:results.chatMessageId,
+            messages:[
+                {
+                    conversation:[
+                        {
+                            role:"human",
+                            content:results.question,
+                        
+                        } ,
+                        {
+                            role:"ai",
+                            content:results.text,
+                            
+                        },
+                        {
+                            chattime:new Date()
+                        }]
+                }],
+            createdAt:new Date(),
+            updatedAt:new Date()
+            }
+            
+        const db=await getdb()
+        const data=db.collection('data')
+        const result=await data.bulkWrite([
+            {
+                updateOne:{
+                    filter:{
+                        _id:userId
+                    },
+                    update:{
+                        $set:{activechatId:results.chatId},
+                        $push:{chats:chattoadd}
+                    }
                 }
             }
+        ])
+        if (result.acknowledged){
+            console.log("added to the database successfully")
         }
-    ])
-    if (result.acknowledged){
-        console.log("added to the database successfully")
+    
+        return results
+    }catch(e){
+        console.error(`starting new chat error: ${e}`)
+    
     }
 
-    return results
 
 }
 
 //function of every new conversation 
-async function conversations(userId,chatId,message){
-    console.log("starting a new conversation....")
-    //payload to be sent to flowise with a chatId
-    const flowisedata={ 
-        question:message,
-        chatId:chatId
-    }
-    const results=await sendToFLowise(flowisedata)
+async function conversations(userId,message){
+    try{
 
-    //calling the database function
-    db=await getdb()
-    const data=db.collection('data')
+        console.log("starting a new conversation....")
+        //calling the database function
+        db=await getdb()
+        const data=db.collection('data')
 
- //checking the existence of a chatId in the database
-    const findchatId=await data.findOne({
-        _id:userId,
-        'chats.chatId':chatId
-    })
-//throw an error if no chatId is found
-    if (!findchatId){
-        throw new Error({chatIderror:"chatId not found"})
-    }
-//save the new conversation to the db
-    const newconversation={
-        conversation:[
-            {
-                role:"human",
-                content:results.question,
-            
-            } ,
-            {
-                role:"ai",
-                content:results.text,
+        const activechatId=await data.findOne({
+            _id:userId,
+            'activechatId':{$exists:true}
+        })
+
+        console.log('existing active chatId',activechatId.activechatId)
+        const chatId=activechatId.activechatId
+        //payload to be sent to flowise with a chatId
+        const flowisedata={ 
+            question:message,
+            chatId:chatId
+        }
+        const results=await sendToFLowise(flowisedata)
+    
+  
+    
+     //checking the existence of a chatId in the database
+        const findchatId=await data.findOne({
+            _id:userId,
+            'chats.chatId':chatId
+        })
+    //throw an error if no chatId is found
+        if (!findchatId){
+            throw new Error({chatIderror:"chatId not found"})
+        }
+    //save the new conversation to the db
+        const newconversation={
+            conversation:[
+                {
+                    role:"human",
+                    content:results.question,
                 
-            },
-            {
-                chattime:new Date()
+                } ,
+                {
+                    role:"ai",
+                    content:results.text,
+                    
+                },
+                {
+                    chattime:new Date()
+                }
+            ],
+          
+        }
+    //update the messages in the db
+        const result=await data.bulkWrite([{
+            updateOne:{
+                filter:{
+                    _id:userId,
+                    'chats.chatId':chatId
+                },
+                update:{
+                    $push:{'chats.$.messages':newconversation},
+                    $set:{'chats.$.updatedAt':new Date()}
+    
+                }
             }
-        ],
+        }])
+    
+        if (result.acknowledged){
+            console.log('conversation saved')
       
     }
-//update the messages in the db
-    const result=await data.bulkWrite([{
-        updateOne:{
-            filter:{
-                _id:userId,
-                'chats.chatId':chatId
-            },
-            update:{
-                $push:{'chats.$.messages':newconversation},
-                $set:{'chats.$.updatedAt':new Date()}
-
-            }
-        }
-    }])
-
-    if (result.acknowledged){
-        console.log('conversation saved')
-  
-}
-
-    return results 
+    
+        return results 
+    }catch(e){
+        console.error(`error in new conversation :${e}`)
+    }
 }
 
 
@@ -215,18 +236,19 @@ router.post('/chat',
                 }   
             }
             // check if theres an active chatId existing in the database
-            const activechatId=await data.findOne({
+            const activechatId=await data.countDocuments({
                 _id:userId,
-                activechatId:{ $exists: true }
+                activechatId:null
             })
 // if theres an activechatId  call the conversations function , if not then call the startnewchat function
-            if (activechatId){
-                console.log('existing active chatId',activechatId.activechatId)
-                const chatId=activechatId.activechatId
-                flowiseResponse= await conversations(userId,chatId,message)
-            } else {
+            if (activechatId > 0){
                 flowiseResponse=await startnewchat(userId,message)
+            } else {
+
+               flowiseResponse= await conversations(userId,message)
+
             }
+            
 
             res.status(200).json(flowiseResponse)
             // return flowiseResponse

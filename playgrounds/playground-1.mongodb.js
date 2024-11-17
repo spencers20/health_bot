@@ -73,7 +73,33 @@ use('logs');
 
 // db.data.deleteOne({_id:userId})
 
+const update=db.data.updateMany(
+    {"activechatId":{$exists:true}},
+    {$set:{"activechatId":null}}
+
+)
 
 
-db.data.find({ "_id": "114910775523649856248"})
-// db.data.deleteOne({ "_id": "114910775523649856248"})
+if (update.acknowledged){
+    db.data.find()
+}
+
+// const countexisting =db.data.countDocuments({"activechatId":null})
+
+
+// if (countexisting >0){
+//     const update=db.data.updateMany(
+//         {"activechatId":{$exists:true}},
+//         {$set:{"activechatId":"127"}}
+    
+//     )
+    
+//      if (update.acknowledged){
+//         db.data.find() }
+
+// } else{
+//     console.log ("all have values")
+// }
+
+// db.data.find({ "_id": "114910775523649856248"})
+// db.data.deleteMany({ "userId": "12345"})

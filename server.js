@@ -1,5 +1,5 @@
 const express=require('express')
-const {savesession,getcollection,initializecollection }= require('./config/database')
+const {savesession,getcollection,initializecollection ,resetactiveChatIds}= require('./config/database')
 const app=express()
 const session = require("express-session");
 const passport = require("passport");
@@ -8,6 +8,8 @@ const google=require('./routes/google') //calling the google. route
 require('./config/passport')
 const user=require('./routes/user')
 const path=require('path')
+const cron=require('node-cron')
+
 
 // const collection=require('./database')
 // const collection=savesession.collection
@@ -35,6 +37,17 @@ app.use('/google',google)
 app.use('/user',user)
 
 app.use(express.json())
+
+// Reseting activeChatIds Every day in the midnight
+
+try{
+    console.log('cron started...')
+    cron.schedule('0 0 * * *', resetactiveChatIds)
+   
+   
+} catch(e){
+    console.error(`error in cron : ${e}`)
+}
 
 app.get('/',(req , res)=>{
     console.log('entered')

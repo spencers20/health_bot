@@ -77,5 +77,25 @@ async function savesession(result){
     
 }
 
-module.exports={savesession, getcollection,initializecollection,getdb}
+async function resetactiveChatIds(){
+    try{
+    const activChats= await collection.countDocuments({"activechatId":{$exists:true}})
+    console.log(`activechatIds: ${activChats}`)
+
+    await collection.updateMany(
+        {"activechatId":{$exists:true}},
+        {$set:{"activechatId":null}}
+    
+    )
+    console.log(`Successfully Reset activeChatIds : ${activChats}`)
+    
+    console.log('cron schedule completed successfully')
+
+    }catch(e){
+        console.log("error in reseting activeChatId",e )
+    }
+} 
+
+
+module.exports={savesession, getcollection,initializecollection,getdb, resetactiveChatIds}
 // module.exports =savesession.collection
