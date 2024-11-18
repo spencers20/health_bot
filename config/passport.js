@@ -3,6 +3,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 require('dotenv').config()
 
+import {getdb} from './database'
 
 
 passport.use(new GoogleStrategy({

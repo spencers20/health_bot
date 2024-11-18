@@ -43,7 +43,7 @@ function getcollection(){
 }
 //  console.log(collection
 
-function getdb(){
+module.exports.getdb= function getdb(){
     if (!db){
         throw new error("database is not initialized")
     }
@@ -97,5 +97,5 @@ async function resetactiveChatIds(){
 } 
 
 
-module.exports={savesession, getcollection,initializecollection,getdb, resetactiveChatIds}
+module.exports={savesession, getcollection,initializecollection, resetactiveChatIds}
 // module.exports =savesession.collection

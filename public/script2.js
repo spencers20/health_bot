@@ -5,6 +5,10 @@ const question = document.getElementById('question')
 const btn2=document.getElementById('btn2')
 const intro=document.getElementById('intro')
 const chatContainer=document.getElementById('chat-container')
+const newchat=document.querySelector('.new-chat')
+const {getdb}=require('../config/database')
+
+import {getdb} from '../config/database'
 
 
 function formatTextToHTML(text) {
@@ -15,6 +19,7 @@ function formatTextToHTML(text) {
   }
 
 
+//function for sending a message
 async function sendmessage() {
     try{
 
@@ -62,6 +67,27 @@ async function sendmessage() {
     }
     
 }
+
+newchat.addEventListener('click',async()=>{
+    userId=req.user.googleId
+    const db=await getdb()
+    const datacollection=await db.collection('data')
+
+    const newchat=await datacollection.updateOne({
+        _id:userId
+    },
+    {
+        $set:{activechatId:null}
+    })
+    
+    if (newchat.acknowledged){
+        chatContainer.style.visibility='hidden'
+        console.log('new chat created')
+    }
+
+
+    
+})
 
 
 input.addEventListener('keydown',async(event)=>{
