@@ -157,12 +157,12 @@
         font-weight: bold;
         padding:10px;
         border-radius: 5px;
-        max-width: 60%;
+        max-width: 50%;
 
     }
 
     .bottom-input {
-      position: fixed;
+      position: absolute;
       bottom: 20px;
     }
 
@@ -233,7 +233,7 @@
     <div class="container">
         <h1 id="intro">Hello <%=user.name %>  how may i help you</h1>
         
-        <div id="chat-container" style="visibility: hidden;"></div>
+        <div id="chat-container" style="display: block;"></div>
         <div class="search-bar">
             <input id = "question" type="text" placeholder="Ask me a question...">
             <button id = "btn" type="submit" class="send-btn" style="visibility: hidden;">check</button>
@@ -249,7 +249,7 @@
         </footer>
     </div>
     <script src="/script.js"></script>
-    <script src ="/script2.js"></script>
+    <script type="module" src ="/script2.js"></script>
     
 </body>
 </html>

@@ -6,9 +6,9 @@ const btn2=document.getElementById('btn2')
 const intro=document.getElementById('intro')
 const chatContainer=document.getElementById('chat-container')
 const newchat=document.querySelector('.new-chat')
-const {getdb}=require('../config/database')
+// const {getdb}=require('../config/database')
+// import {getdb} from '../config/database'
 
-import {getdb} from '../config/database'
 
 
 function formatTextToHTML(text) {
@@ -24,7 +24,7 @@ async function sendmessage() {
     try{
 
 
-        chatContainer.style.visibility='visible'
+        chatContainer.style.display='block'
 
         const topRightMessage=document.createElement('div')
         topRightMessage.classList.add('userMessage')
@@ -65,28 +65,23 @@ async function sendmessage() {
 
 
     }
-    
+
 }
 
 newchat.addEventListener('click',async()=>{
-    userId=req.user.googleId
-    const db=await getdb()
-    const datacollection=await db.collection('data')
+    try{
+        chatContainer.style.display='none'
+        input.value=''
+        intro.style.opacity= 1
+        // input.classList.add('search-bar')
+        input.classList.remove('bottom-input')
+        btn2.style.visibility='visible'
+      
 
-    const newchat=await datacollection.updateOne({
-        _id:userId
-    },
-    {
-        $set:{activechatId:null}
-    })
-    
-    if (newchat.acknowledged){
-        chatContainer.style.visibility='hidden'
-        console.log('new chat created')
+    }catch(e){
+        console.log(`error in creating new chat in new-chat button: ${e}`)
     }
 
-
-    
 })
 
 
@@ -100,7 +95,6 @@ input.addEventListener('keydown',async(event)=>{
 
         //call the sendmessage function
         sendmessage()
-
 
     }
 })
