@@ -263,4 +263,32 @@ router.post('/chat',
     
 )
 
+router.put('/newchat',
+    async(req,res)=>{
+        try{
+            console.log('reseting activeChatId...')
+            const db=await getdb()
+            const data=db.collection('data')
+            const userId=req.user.googleId
+            const activechatId=await data.countDocuments({
+                _id:userId,
+                activechatId:{$exists:true}
+            })
+
+            if (activechatId>0){
+                await data.updateOne(
+                    {_id:userId},
+                    {$set :{activechatId:null}})
+                
+                console.log('chat reset successfully')
+                res.status(200).json({message:"chat reset successfully"})
+                }
+                
+            
+        } catch(e){
+            console.log('reseting activeChatId error',e)
+        }
+    }
+)
+
 module.exports = router

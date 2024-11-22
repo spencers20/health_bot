@@ -70,6 +70,7 @@ async function sendmessage() {
 
 newchat.addEventListener('click',async()=>{
     try{
+        await fetch('/user/newchat',{method:'PUT'})
         chatContainer.style.display='none'
         input.value=''
         intro.style.opacity= 1
