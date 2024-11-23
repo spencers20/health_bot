@@ -1,3 +1,4 @@
+
 const symptominput=document.getElementById('symptominput')
 const checksymptom =document.querySelector('.checksymptom')
 const symptomconfirm =document.querySelector('.symptomconfirm')
@@ -15,7 +16,8 @@ const male=document.getElementById('male')
 const female=document.getElementById('female')
 const age=document.getElementById('age')
 const buttons=document.getElementById('buttons')
-const clearIcon=document.querySelector('.clear-icon')
+const tip=document.getElementById('tip')
+const headertip=document.getElementById('headertip')
 
 
 console.log(symptominput.value)
@@ -35,6 +37,22 @@ function formatTextToHTML(text) {
       .replace(/\* (.+?)(\n|$)/g, '<li>$1</li>') // Convert * bullet points to <li>
       .replace(/(?:<li>.+?<\/li>)+/g, '<ul>$&</ul>'); // Wrap <li> in <ul>
   }
+  async function gettips(){
+    try{
+
+        const response =await fetch('/tips')
+        const results = await response.json()
+    
+        const randomtip=results[Math.floor(Math.random()*results.length)]
+     
+        headertip.textContent=randomtip.title
+        tip.textContent=randomtip.description
+
+    }catch(e){
+        console.error(`error in getting tips from api : ${e}`)
+    }
+}
+
 
 
 male.addEventListener('click',async()=>{
@@ -66,11 +84,15 @@ female.addEventListener('click',async()=>{
 })
 
 continu.addEventListener('click',async()=>{
+    console.log('clicked')
     //  userinfo.push(age.value)
+    
     console.log(userinfo)
     symptom.style.visibility='visible'
     document.getElementById('information').style.visibility='hidden'
-
+    await gettips()
+    setInterval(gettips,10000)
+    
     document.getElementById('userage').textContent=`Age :${userinfo.age}`
     document.getElementById('usergender').textContent=`Gender :${userinfo.gender}`
 
@@ -107,7 +129,7 @@ symptominput.addEventListener('keydown' ,async( event)=>{
             symptomtxt.textContent=symptominput.value
             
 
-            clearIcon.cloneNode(true)
+            const clearIcon=document.querySelector('.clear-icon').cloneNode(true) //clone it for reuse
             
             clearIcon.style.visibility='visible'
             clearIcon.style.cursor='pointer'
@@ -232,3 +254,7 @@ moreinfo.addEventListener('click',async()=>{
 
     
 })
+
+
+
+

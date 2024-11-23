@@ -1,5 +1,5 @@
 const express=require('express')
-const {savesession,getcollection,initializecollection ,resetactiveChatIds}= require('./config/database')
+const {savesession,getcollection,initializecollection ,resetactiveChatIds, getdb}= require('./config/database')
 const app=express()
 const session = require("express-session");
 const passport = require("passport");
@@ -51,7 +51,7 @@ try{
 
 app.get('/',(req , res)=>{
     console.log('entered')
-    res.render('symptom.ejs')
+    res.render('index.ejs')
 })
 // app.get('/symptomchecker',(req , res)=>{
 //     console.log('entered')
@@ -59,8 +59,23 @@ app.get('/',(req , res)=>{
     
 // })
 
-app.get('*',(req,res)=>{
-    res.sendFile(path.join(__dirname,'views','index.ejs'))
+
+
+app.get('/tips',async(req , res)=>{
+    try{
+        console.log('tips url entered...')
+        const db=await getdb()
+        const tipscollection=db.collection('tips')
+        const tipsindb= await tipscollection.find().toArray()
+        console.log(tipsindb)
+
+        res.status(200).json(tipsindb)
+
+    }catch(e){
+        console.error(`error in getting tips from db : ${e}`)
+    }
+
+    
 })
 
 
@@ -122,10 +137,13 @@ app.post('/ask',
     
     })
 
-
 // (async ()=>{
 //     await initializecollection()
 // })
+
+app.get('*',(req,res)=>{
+    res.sendFile(path.join(__dirname,'views','index.ejs'))
+})
 
 initializecollection().then(()=>{
 app.listen(3000 ,()=>{

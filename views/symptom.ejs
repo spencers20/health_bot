@@ -123,11 +123,9 @@
             <h1>tips</h1>
 
             <div id="card" style="text-align:center ;display:flex; justify-content: center; flex-direction: column;">
-                <p style="margin-bottom: 1px; font-weight: bold; font-size: 18px;"> Prioritize Sleep</p> 
-                <p >
-                Get 7-9 hours of quality sleep each night.<br>
-                 Good sleep improves mental focus, boosts your immune system,  <br>
-                 and helps your body recover from daily stress.
+                <p id ="headertip" style="margin-bottom: 1px; font-weight: bold; font-size: 18px;"> </p> 
+                <p id="tip" >
+               
                 </p>
             </div>
         </div>
@@ -140,7 +138,7 @@
                 <p>CONDITION</p>
                  <!-- <p>TREATMENT</p> -->
             </div>
-            <div  id="information" style="visibility: hidden;">
+            <div  id="information" style="visibility: visible;">
             <div  class="h1"> 
                 <div>
                 <p style="font-size: 30px; "> MYHC Symptom checker</p>
@@ -176,7 +174,7 @@
          
         </div> 
         </div>
-        <div id="symptoms" style="visibility: visible;">
+        <div id="symptoms" style="visibility: hidden;">
             <div class="checksymptom">
                 <p style=" text-align:center; font-size:20px" > CHECK SYMPTOMS</p>  
                 <div style ="width:100%">
@@ -186,7 +184,7 @@
                    <!-- <p id="managesymptomtittle" style=" text-align:center; font-size:20px ;margin-bottom: 5px" >MANAGE YOUR SYMPTOMS </p> -->
                     <div id="userinformation" style="margin-left: 10px ;position:display">
                         <p>YOUR INFORMATION</p>
-                        <p id="usernamename"> Name : </p>
+                        <p id="usernamename"> Name : <%=user.name %> </p>
                         <p id="userage">  </p>
                         <p id="usergender"></p>
                         <p id="loading" style="color: #1536a3;"></p>
@@ -225,7 +223,7 @@
                     <!-- <p id="managesymptomtittle" style=" text-align:center; font-size:20px ;margin-bottom: 5px" >MANAGE YOUR SYMPTOMS </p> -->
                      <div id="myinfo" style=" width: 100%; margin-left: 10px ;position:display">
                          <p>YOUR INFORMATION</p>
-                         <p id="username"> Name :</p>
+                         <p id="username"> Name : <%= user.name %></p>  
                          <p id="userages">  </p>
                          <p id="usergenders"></p>
                          <p id="yoursymptoms"></p>
