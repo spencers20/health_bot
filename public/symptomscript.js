@@ -14,6 +14,8 @@ const continu=document.getElementById('continue')
 const male=document.getElementById('male')
 const female=document.getElementById('female')
 const age=document.getElementById('age')
+const buttons=document.getElementById('buttons')
+const clearIcon=document.querySelector('.clear-icon')
 
 
 console.log(symptominput.value)
@@ -97,9 +99,36 @@ symptominput.addEventListener('keydown' ,async( event)=>{
             // addedsymptoms=symptominput.value
             checkbtn.style.visibility='visible'
             const addsymptoms=document.createElement('div')
-            addsymptoms.classList.add('symptms')
-            addsymptoms.textContent=symptominput.value
-            symptomconfirm.insertBefore(addsymptoms,checkbtn)
+            addsymptoms.classList.add('addsymptomss')
+           
+
+            const symptomtxt=document.createElement('span')
+            symptomtxt.classList.add('symptoms')
+            symptomtxt.textContent=symptominput.value
+            
+
+            clearIcon.cloneNode(true)
+            
+            clearIcon.style.visibility='visible'
+            clearIcon.style.cursor='pointer'
+             
+            clearIcon.addEventListener('click',()=>{
+                addsymptoms.remove()
+                const index=addedsymptoms.indexOf(symptominput.value.trim())
+
+                if(index > -1){
+                    addedsymptoms.splice(index,1)
+                }
+            })
+
+            clearIcon.removeAttribute('class') //avoid duplications
+
+            addsymptoms.appendChild(symptomtxt)
+            addsymptoms.appendChild(clearIcon)
+
+    
+            
+            symptomconfirm.insertBefore(addsymptoms,buttons)
             
 
         }else{

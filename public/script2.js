@@ -19,6 +19,9 @@ function formatTextToHTML(text) {
   }
 
 
+let topRightMessage
+let respons
+
 //function for sending a message
 async function sendmessage() {
     try{
@@ -26,7 +29,7 @@ async function sendmessage() {
 
         chatContainer.style.display='block'
 
-        const topRightMessage=document.createElement('div')
+         topRightMessage=document.createElement('div')
         topRightMessage.classList.add('userMessage')
         topRightMessage.textContent= input.value 
         chatContainer.appendChild(topRightMessage)
@@ -50,7 +53,7 @@ async function sendmessage() {
         const txtresponse=formatTextToHTML(result.text)
         console.log(txtresponse)
 
-        const respons= document.createElement('div')
+        respons= document.createElement('div')
         respons.classList.add('response')
         respons.innerHTML= 'Response: <br> ' +txtresponse
         chatContainer.appendChild(respons)
@@ -63,7 +66,6 @@ async function sendmessage() {
 
         console.log(`error in sending message: ${e}`)
 
-
     }
 
 }
@@ -71,12 +73,15 @@ async function sendmessage() {
 newchat.addEventListener('click',async()=>{
     try{
         await fetch('/user/newchat',{method:'PUT'})
-        chatContainer.style.display='none'
+        chatContainer.style.opacity=0
+       
         input.value=''
         intro.style.opacity= 1
         // input.classList.add('search-bar')
         input.classList.remove('bottom-input')
         btn2.style.visibility='visible'
+        topRightMessage.textContent=''
+        respons.value=''
       
 
     }catch(e){

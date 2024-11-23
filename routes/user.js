@@ -14,6 +14,7 @@ router.use( async (req, res,next)=>{
 
 router.use(express.json())
 
+// the home url for the chat interface  returns the chat ejs
 router.get('/',
     async (req , res)=>{
         console.log(req.user)
@@ -31,7 +32,7 @@ router.get('/',
         res.render('chat.ejs',{user : req.user})
     }
 )
-
+// this url takes you to the symptom checker
 router.get('/symptomchecker',async(req, res)=>{
     const db=await getdb()
     const users=db.collection('users')
@@ -51,22 +52,27 @@ router.get('/symptomchecker',async(req, res)=>{
 
 //function to send the payload to flowise
 async function sendToFLowise(flowisedata){
-    console.log('making call to flowise...')
-    console.log(flowisedata)
-    const response = await fetch(
-        "http://20.86.249.39:3000/api/v1/prediction/45f5a627-3b9d-4f90-a7df-597c1729b0f1",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(flowisedata)
-        }    
-    );
-    const result = await response.json()
-    console.log('results:',result)
-    return result
-    
+    try{
+
+        console.log('making call to flowise...')
+        console.log(flowisedata)
+        const response = await fetch(
+            "http://20.86.249.39:3000/api/v1/prediction/45f5a627-3b9d-4f90-a7df-597c1729b0f1",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(flowisedata)
+            }    
+        );
+        const result = await response.json()
+        console.log('results:',result)
+        return result
+        
+    } catch(e){
+        console.error(` flowise  error : ${e}`)
+    }
     
 }
 //function to get new chatId and save to db for every new chat
