@@ -199,6 +199,12 @@ checkbtn.addEventListener('click',async()=>{
         moreinfo.style.visibility='visible'
 
     }
+
+    document.addEventListener('scroll', function (e) {
+        if (window.scrollY <= 0) {
+            window.scrollTo(0, 0); // Prevent scrolling above the top
+        }
+    });
     
 
     

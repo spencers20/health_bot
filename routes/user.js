@@ -57,7 +57,7 @@ async function sendToFLowise(flowisedata){
         console.log('making call to flowise...')
         console.log(flowisedata)
         const response = await fetch(
-            "http://20.86.249.39:3000/api/v1/prediction/45f5a627-3b9d-4f90-a7df-597c1729b0f1",
+            "http://4.175.112.210:3000/api/v1/prediction/45f5a627-3b9d-4f90-a7df-597c1729b0f1",
             {
                 method: "POST",
                 headers: {

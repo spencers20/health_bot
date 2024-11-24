@@ -8,7 +8,7 @@
                 box-sizing: border-box;
             } */
             body {
-                overflow:hidden;
+                /* overflow:hidden; */
                 display: flex;
                 flex-direction: column;
                 min-height: 100vh;
@@ -16,7 +16,7 @@
             }
 
             .sidebar {
-                height: 100%;
+               min-height: 100%;
                 width:350px;
                 position: fixed;
                 z-index: 1;
@@ -30,20 +30,39 @@
                 color: white;
                 margin-left: 20px;
             }
+
+            
+
             .container {
+                overflow-y: auto;
+                display: flex;
+                min-height: 100%;
+                flex-direction: column;
+                position: absolute;
+                overflow-y: visible;
+                
+                
+            }
+
+            .heading1{ 
+                width:100%;
+                top:20px;
+                position: absolute;
+                background-color: aqua;
+                margin-bottom: 10px;
+            }
+
+            .inside-container {
                 background-color: white;
-                top:15%;
-                bottom:15%;
+                margin-top: 20px;
+                min-height: 80%;
                 left:80px;
                 right:30%;
-                shape-outside: margin-box;
-                overflow-y: scroll;
+                shape-outside: margin-box; 
                 position:absolute;
                 display:flex;
 
             }
-            
-
 
             .containerheader {
                 position: absolute;
@@ -64,14 +83,14 @@
                 display:flex;
 
             }
-            .h1 {
+            .information {
                 position:absolute;
                 text-align: center;
                 width:100%;
                 top:50px;
                 
             }
-            .checksymptom ,.symptomchecked{
+            .checksymptom ,.condition{
                 position:absolute;
                 top:50px;
                 width:100%;
@@ -117,133 +136,140 @@
     </head>
     <body>
         <div>
-            <h1>Symptoms  checker</h1>
-        </div>
-        <div class="sidebar">
-            <h1>tips</h1>
-
-            <div id="card" style="text-align:center ;display:flex; justify-content: center; flex-direction: column;">
-                <p id ="headertip" style="margin-bottom: 1px; font-weight: bold; font-size: 18px;"> </p> 
-                <p id="tip" >
-               
-                </p>
-            </div>
-        </div>
-
-        <div class="container">
-            <div class="containerheader"></div>
-            <div class="headers">
-                <p id="infos" style="cursor: pointer;" onclick="document.getElementById('information').style.visibility='visible', document.getElementById('symptoms').style.visibility='hidden' ,document.getElementById('condition').style.visibility='hidden', document.getElementById('checkbtn').style.visibility='hidden'">INFO</p>
-                <p style="cursor: pointer;" onclick="document.getElementById('information').style.visibility='hidden', document.getElementById('symptoms').style.visibility='visible',document.getElementById('condition').style.visibility='hidden'">SYMPTOMS</p>
-                <p>CONDITION</p>
-                 <!-- <p>TREATMENT</p> -->
-            </div>
-            <div  id="information" style="visibility: visible;">
-            <div  class="h1"> 
-                <div>
-                <p style="font-size: 30px; "> MYHC Symptom checker</p>
-                <p style="font-size: 18px; " >Identify potential health conditions and corresponding treatments based on your symptoms</p>
-                <div style="margin-bottom: 1px; ">
-                <div style="display: flex; justify-content: center; gap: 10px;" >
-                <p style="font-size:15px "> This tool is not a replacement for professional medical advice. </p>
-                    <p id="readmore" style="font-size:13px ;cursor: pointer;" onclick=" document.getElementById('disclaimer').style.display='block'"> read more</p>
-                </div>
-                <div id="disclaimer" style=" font-size:  14px; margin-top: 1px;display:none; margin-bottom: 1px;">
-                    <p > This tool is not intended to be a substitute for professional medical advice, <br>
-                        Always seek the advice of your physician or other qualified health provider <br>
-                        with any questions you may have regarding a medical condition. <br>
-                        Never disregard professional medical advice or delay in seeking it ! <br>
-                        If you think you may have a medical emergency, call your doctor or 911 immediately. <br>
-                            Reliance on any information provided by this tool is solely at your own choice. 
+            <div class="sidebar">
+                <h1>tips</h1>
+    
+                <div id="card" style="text-align:center ;display:flex; justify-content: center; flex-direction: column;">
+                    <p id ="headertip" style="margin-bottom: 1px; font-weight: bold; font-size: 18px;"> </p> 
+                    <p id="tip" >
+                   
                     </p>
                 </div>
             </div>
-        </div>
-            <div style="width:100%; display:flex; justify-content: center; gap: 20px; text-align: center; margin-top: 1px; position:absolute">
-                <p style="font-size:18px ;left : 20px" >Age</p>
-                <input id="age" type="text" style="width:10% ; height: 50px; font-size: 16px; text-align: center;">
-                <p style="font-size:18px">Gender</p>
-                <button id="male" style="width: 60px; height: 50px; background-color: rgb(223, 255, 255);" onclick="this.style.backgroundColor = 'rgb(169, 240, 240)' ">Male</button>
-                <button id="female" style="width: 60px; height: 50px;background-color: rgb(223, 255, 255);" onclick="this.style.backgroundColor = 'rgb(169, 240, 240)'">Female</button>
-                <button id="continue" style="width:70px ; height: 50px; background-color: rgb(237, 255, 223); "> continue</button>
-               
-                  
-                
-            </div>
-            
-         
-        </div> 
-        </div>
-        <div id="symptoms" style="visibility: hidden;">
-            <div class="checksymptom">
-                <p style=" text-align:center; font-size:20px" > CHECK SYMPTOMS</p>  
-                <div style ="width:100%">
-                <input id ="symptominput" type="text" placeholder="symptoms" style="position:absolute; left:60px; width:40%; height: 80px;">
-                <div style=" flex-direction: column ; position: absolute ;width:40% ; right: 50px; ">
-                <div class="conditions" style=" align-items: flex-start; max-height: 300px; background-color:  #edeeee; display:flex; overflow-y: auto; overscroll-behavior: contain; ">
-                   <!-- <p id="managesymptomtittle" style=" text-align:center; font-size:20px ;margin-bottom: 5px" >MANAGE YOUR SYMPTOMS </p> -->
-                    <div id="userinformation" style="margin-left: 10px ;position:display">
-                        <p>YOUR INFORMATION</p>
-                        <p id="usernamename"> Name : <%=user.name %> </p>
-                        <p id="userage">  </p>
-                        <p id="usergender"></p>
-                        <p id="loading" style="color: #1536a3;"></p>
+
+            <div class="container">
+
+             <div class="heading1" >
+                    <h1>Symptoms  checker</h1>
+             </div>
+
+            <div class="inside-container" style="visibility: visible;">
+                <div class="containerheader"></div>
+                <div class="headers">
+                    <p id="infos" style="cursor: pointer;" onclick="document.getElementById('information').style.visibility='visible', document.getElementById('symptoms').style.visibility='hidden' ,document.getElementById('condition').style.visibility='hidden', document.getElementById('checkbtn').style.visibility='hidden'">INFO</p>
+                    <p style="cursor: pointer;" onclick="document.getElementById('information').style.visibility='hidden', document.getElementById('symptoms').style.visibility='visible',document.getElementById('condition').style.visibility='hidden'">SYMPTOMS</p>
+                    <p>CONDITION</p>
+                     <!-- <p>TREATMENT</p> -->
+                </div>
+                <!-- <div  id="information" style="visibility: visible;"> -->
+                <div  class="information" stle="visibility: visible;"> 
+                    <div>
+                    <p style="font-size: 30px; "> MYHC Symptom checker</p>
+                    <p style="font-size: 18px; " >Identify potential health conditions and corresponding treatments based on your symptoms</p>
+                    <div style="margin-bottom: 1px; ">
+                    <div style="display: flex; justify-content: center; gap: 10px;" >
+                    <p style="font-size:15px "> This tool is not a replacement for professional medical advice. </p>
+                        <p id="readmore" style="font-size:13px ;cursor: pointer;" onclick=" document.getElementById('disclaimer').style.display='block'"> read more</p>
+                    </div>
+                    <div id="disclaimer" style=" font-size:  14px; margin-top: 1px;display:none; margin-bottom: 1px;">
+                        <p > This tool is not intended to be a substitute for professional medical advice, <br>
+                            Always seek the advice of your physician or other qualified health provider <br>
+                            with any questions you may have regarding a medical condition. <br>
+                            Never disregard professional medical advice or delay in seeking it ! <br>
+                            If you think you may have a medical emergency, call your doctor or 911 immediately. <br>
+                                Reliance on any information provided by this tool is solely at your own choice. 
+                        </p>
                     </div>
                 </div>
-                <span id="moreinfo" style=" cursor: pointer;visibility:hidden;margin-top:  10 px;font-size: 16px; right: 30px;color: #87dfdf;">more information</span>
-                <p id="loadinginfo" style="visibility: hidden; color:aqua">checking information...</p>
-                </div>
+            </div>
+                <div style="width:100%; display:flex; justify-content: center; gap: 20px; text-align: center; margin-top: 1px; position:absolute">
+                    <p style="font-size:18px ;left : 20px" >Age</p>
+                    <input id="age" type="text" style="width:10% ; height: 50px; font-size: 16px; text-align: center;">
+                    <p style="font-size:18px">Gender</p>
+                    <button id="male" style="width: 60px; height: 50px; background-color: rgb(223, 255, 255);" onclick="this.style.backgroundColor = 'rgb(169, 240, 240)' ">Male</button>
+                    <button id="female" style="width: 60px; height: 50px;background-color: rgb(223, 255, 255);" onclick="this.style.backgroundColor = 'rgb(169, 240, 240)'">Female</button>
+                    <button id="continue" style="width:70px ; height: 50px; background-color: rgb(237, 255, 223); "> continue</button>
+                   
+             
             </div> 
-            <!-- svg icon for clearing  'x' -->
-            <div class="clear-icon" style="visibility: hidden;"> 
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
-                    <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
             </div>
             
-            <div class="symptomconfirm" style="position :absolute;left:60px;width :40%;background-color: aliceblue; top: 180px; ">
-                <!-- <p style=" text-align:center; font-size:20px" >CHECK SYMPTOMS</p> -->
-
-                
-                 <div id=buttons style="flex-direction: column; gap: 30px; width:100%; position:absolute; margin-top:10px">
-                    <button  style="height: 40px ;width:25%" onclick="document.getElementById('information').style.visibility='visible', document.getElementById('symptoms').style.visibility='hidden' ,document.getElementById('condition').style.visibility='hidden', document.getElementById('checkbtn').style.visibility='hidden'" >BACK</button>
-                    <button id="checkbtn" style="visibility:hidden; height: 40px ;width:25%">CHECK</button>
-                 </div>
-                
-            </div>
-            
+                <div class="symptoms" style="visibility: hidden;">
+                    <p style=" text-align:center; font-size:20px" > CHECK SYMPTOMS</p>  
+                    <div style ="width:100%">
+                    <input id ="symptominput" type="text" placeholder="symptoms" style="position:absolute; left:60px; width:40%; height: 80px;">
+                    <div style=" flex-direction: column ; position: absolute ;width:40% ; right: 50px; ">
+                    <div class="conditions" style=" align-items: flex-start; max-height: 300px; background-color:  #edeeee; display:flex; overflow-y: auto; overscroll-behavior: contain; ">
+                       <!-- <p id="managesymptomtittle" style=" text-align:center; font-size:20px ;margin-bottom: 5px" >MANAGE YOUR SYMPTOMS </p> -->
+                        <div id="userinformation" style="margin-left: 10px ;position:display">
+                            <p>YOUR INFORMATION</p>
+                            <p id="usernamename"> Name :  </p>
+                            <p id="userage">  </p>
+                            <p id="usergender"></p>
+                            <p id="loading" style="color: #1536a3;"></p>
+                        </div>
+                    </div>
+                    <span id="moreinfo" style=" cursor: pointer;visibility:hidden;margin-top:  10 px;font-size: 16px; right: 30px;color: #87dfdf;">more information</span>
+                    <p id="loadinginfo" style="visibility: hidden; color:aqua">checking information...</p>
+                    </div>
+                </div> 
+                <!-- svg icon for clearing  'x' -->
+                <div class="clear-icon" style="visibility: hidden;"> 
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
                 </div>
-
-        </div>
-
-        <div id="condition" style="visibility: hidden;">
-            <div class ="symptomchecked" style="width:100%; flex-direction: column; ">
-                <div id="checkedsymptoms" style="margin-bottom: 10px;"> SYMPTOMS:</div>
-                <div class="myinformation" style=" position:absolute; width: 30%;align-items: flex-start; max-height: 300px;  right:10px; background-color:  #edeeee; display:flex; overflow-y: auto; overscroll-behavior: contain; ">
-                    <!-- <p id="managesymptomtittle" style=" text-align:center; font-size:20px ;margin-bottom: 5px" >MANAGE YOUR SYMPTOMS </p> -->
-                     <div id="myinfo" style=" width: 100%; margin-left: 10px ;position:display">
-                         <p>YOUR INFORMATION</p>
-                         <p id="username"> Name : <%= user.name %></p>  
-                         <p id="userages">  </p>
-                         <p id="usergenders"></p>
-                         <p id="yoursymptoms"></p>
-                         <p id="loading" style="color: #1536a3;"></p>
-                         <a href="/user"  id='relatdconditions'style=" cursor: pointer; color: #87dfdf;font-size:16px ; margin-top: 10px; text-align: center;  visibility:hidden"> check related conditions</a>
                 
+                <div class="symptomconfirm" style="position :absolute;left:60px;width :40%;background-color: aliceblue; top: 180px; ">
+                    <!-- <p style=" text-align:center; font-size:20px" >CHECK SYMPTOMS</p> -->
+    
+                    
+                     <div id=buttons style="flex-direction: column; gap: 30px; width:100%; position:absolute; margin-top:10px">
+                        <button  style="height: 40px ;width:25%" onclick="document.getElementById('information').style.visibility='visible', document.getElementById('symptoms').style.visibility='hidden' ,document.getElementById('condition').style.visibility='hidden', document.getElementById('checkbtn').style.visibility='hidden'" >BACK</button>
+                        <button id="checkbtn" style="visibility:hidden; height: 40px ;width:25%">CHECK</button>
                      </div>
-                 </div>
-                 <!-- <input type="text" id="symptominput2" placeholder="symptoms"> -->
-                <div class="moreinformation" style=" position: absolute; width: 60%;background-color: #87dfdf;  align-items: flex-start; max-height: 380px ;margin-bottom: 10px;overflow-y: auto; overscroll-behavior: contain; left:30px;">
-                    <!-- Headaches can be caused by a variety of factors, including stress, poor posture, skipping meals, dehydration, and hormonal changes. There are several types of headaches, including tension headaches, migraines, and medication-overuse headaches. For tension headaches, you can try the following management strategies: * Rest and relaxation techniques * Painkillers such as paracetamol or ibuprofen * Drinking plenty of fluids to stay hydrated * Removing any stressors or triggers that may be contributing to the headache For migraines, you can try the following management strategies: * Rest and relaxation techniques * Painkillers such as triptans or ergots to help relieve pain and other symptoms * Avoiding triggers that may contribute to migraines, such as certain foods or stress * Drinking plenty of fluids to stay hydrated For medication-overuse headaches, you can try the following management strategies: * Stopping the medication that is causing the headache * Gradually reducing the dose of the medication to help prevent rebound headaches * Drinking plenty of fluids to stay hydrated * Engaging in relaxation techniques to reduce stress and anxiety It's important to note that headaches can be a symptom of an underlying medical condition, so if you're experiencing frequent or severe headaches, it's a good idea to speak with a healthcare professional to rule out any underlying issues. Please consult a doctor for further assistance. -->
+                    
                 </div>
-               
+                
+                    </div>
+    
+            
+    
+            <!-- <div id="condition" style="visibility: hidden;"> -->
+                <div class ="condition" style="width:100%; flex-direction: column; ">
+                    <div id="checkedsymptoms" style="margin-bottom: 10px;"> SYMPTOMS:</div>
+                    <div class="myinformation" style=" position:absolute; width: 30%;align-items: flex-start; max-height: 300px;  right:10px; background-color:  #edeeee; display:flex; overflow-y: auto; overscroll-behavior: contain; ">
+                        <!-- <p id="managesymptomtittle" style=" text-align:center; font-size:20px ;margin-bottom: 5px" >MANAGE YOUR SYMPTOMS </p> -->
+                         <div id="myinfo" style=" width: 100%; margin-left: 10px ;position:display">
+                             <p>YOUR INFORMATION</p>
+                             <p id="username"> Name : </p>  
+                             <p id="userages">  </p>
+                             <p id="usergenders"></p>
+                             <p id="yoursymptoms"></p>
+                             <p id="loading" style="color: #1536a3;"></p>
+                             <a href="/user"  id='relatdconditions'style=" cursor: pointer; color: #87dfdf;font-size:16px ; margin-top: 10px; text-align: center;  visibility:hidden"> check related conditions</a>
+                    
+                         </div>
+                     </div>
+                     <!-- <input type="text" id="symptominput2" placeholder="symptoms"> -->
+                    <div class="moreinformation" style=" position: absolute; width: 60%;background-color: #87dfdf;  align-items: flex-start; max-height: 380px ;margin-bottom: 10px;overflow-y: auto; overscroll-behavior: contain; left:30px;">
+                        <!-- Headaches can be caused by a variety of factors, including stress, poor posture, skipping meals, dehydration, and hormonal changes. There are several types of headaches, including tension headaches, migraines, and medication-overuse headaches. For tension headaches, you can try the following management strategies: * Rest and relaxation techniques * Painkillers such as paracetamol or ibuprofen * Drinking plenty of fluids to stay hydrated * Removing any stressors or triggers that may be contributing to the headache For migraines, you can try the following management strategies: * Rest and relaxation techniques * Painkillers such as triptans or ergots to help relieve pain and other symptoms * Avoiding triggers that may contribute to migraines, such as certain foods or stress * Drinking plenty of fluids to stay hydrated For medication-overuse headaches, you can try the following management strategies: * Stopping the medication that is causing the headache * Gradually reducing the dose of the medication to help prevent rebound headaches * Drinking plenty of fluids to stay hydrated * Engaging in relaxation techniques to reduce stress and anxiety It's important to note that headaches can be a symptom of an underlying medical condition, so if you're experiencing frequent or severe headaches, it's a good idea to speak with a healthcare professional to rule out any underlying issues. Please consult a doctor for further assistance. -->
+                    </div>
+                   
+                </div>
+    
+            
+    
             </div>
 
-        </div>
+          <!-- <p id="ccontainer" style="margin-top: 10px;">
+            Health Condition:** Ataxia\n\n**Symptoms:**\n- Falling over more often\n- Inability to walk in a straight line\n- Becoming more clumsy\n- Slurred speech\n- Problems with swallowing which can cause choking or coughing\n- Tremors or shaking\n- Fatigue or tiredness\n- Problems with sight like blurred or jumpy vision caused by difficulty controlling eye movements\n\n**Treatment:**\nThere is no cure for ataxia, but treatments are available to help with symptoms and, in some cases, improve or stop the condition from getting worse if the underlying cause is treatable.\n\n**Treating the underlying cause:**\n- Ataxia with vitamin E deficiency can often be improved with vitamin E supplements.\n- Episodic ataxia can often be improved by taking a medication called acetazolamide and by avoiding triggers like caffeine, stress, and alcohol.\n- Acquired ataxia can sometimes be treated if the specific cause is something like an infection where antibiotics or antiviral treatment might help.\n\nPlease visit your doctor for further assistance."
+         
+          </p> -->
 
+        </div>
         </div>
         <script src="/symptomscript.js"></script>
-
 
     </body>
 </html>
