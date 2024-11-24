@@ -297,14 +297,14 @@ router.put('/newchat',
     }
 )
 
-app.get('/gethistory', async(req, res)=>{
+router.get('/gethistory', async(req, res)=>{
     try{
 
         const db=await getdb()
         const data=db.collection('data')
         const userchats=await data.findOne(
             {_id:req.user.googleId}
-        ).toArray()
+        ). sort({createAt:-1}).toArray()
         console.log(userchats)
         res.status(200).json(userchats)
     }catch(e){

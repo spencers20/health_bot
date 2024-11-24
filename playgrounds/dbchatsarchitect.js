@@ -102,3 +102,22 @@ use('logs')
 db.data.insertOne({
     _id:1234566
 })
+
+// getting the chats arranged in from the most recent
+db.data.aggregate([
+    {$match: {
+      _id:"100984849132378172203"
+    }},
+    {$unwind: "$chats"},
+    {$sort: {
+      "chats.updatedAt": -1
+    }},
+    {$group: {
+        _id: "$_id",
+        chats: {
+            $push: "$chats"
+        }
+    }}
+
+
+])

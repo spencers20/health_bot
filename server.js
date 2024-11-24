@@ -78,6 +78,40 @@ app.get('/tips',async(req , res)=>{
     
 })
 
+app.get('/history',async (req,res)=>{
+    try{
+
+        const db=await getdb();
+        const datacollection=db.collection('data')
+        const data= await datacollection.aggregate([
+            {$match:{
+                _id :"100984849132378172203"
+            }},
+            { $unwind : "$chats"
+
+            },
+            { $sort :{
+                "chats.updatedAt":-1
+            }
+             },
+             {$group:{
+                _id:"_id",
+                chats:{
+                    $push:"chats"}
+             }
+             }
+        ])
+
+        res.status(200).json(data)
+
+    }catch(e){
+        console.error(`error in getting data from db : ${e}`)
+        res.status(500).json({errorgettingdata: `${e}`}) 
+    }
+
+
+})
+
 
 app.get('/get/:id',
     async(req , res)=>{
