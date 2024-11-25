@@ -129,6 +129,7 @@ symptominput.addEventListener('keydown' ,async( event)=>{
             addedsymptoms.push(symptominput.value.trim()) //add any symptom added by the user into the array
             // addedsymptoms=symptominput.value
             checkbtn.style.visibility='visible'
+            
             const addsymptoms=document.createElement('div')
             addsymptoms.classList.add('addsymptomss')
            
@@ -158,8 +159,9 @@ symptominput.addEventListener('keydown' ,async( event)=>{
             addsymptoms.appendChild(clearIcon)
 
     
-            
-            symptomconfirm.insertBefore(addsymptoms,buttons)
+            symptomconfirm.style.display='block'
+            symptomconfirm.appendChild(addsymptoms)
+            // symptomconfirm.insertBefore(addsymptoms,buttons)
             
 
         }else{
