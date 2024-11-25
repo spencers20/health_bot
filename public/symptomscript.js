@@ -6,7 +6,7 @@ const checkbtn=document.getElementById('checkbtn')
 const conditions=document.querySelector('.conditions')
 const moreinfo=document.getElementById('moreinfo')
 const condition=document.getElementById('condition')
-const symptom=document.getElementById('symptoms')
+const symptom=document.querySelector('.symptoms')
 const checkedsymptoms=document.getElementById('checkedsymptoms')
 const moreinformation=document.querySelector('.moreinformation')
 const managesymptomtittle=document.getElementById('managesymptomtittle')
@@ -37,6 +37,15 @@ function formatTextToHTML(text) {
       .replace(/\* (.+?)(\n|$)/g, '<li>$1</li>') // Convert * bullet points to <li>
       .replace(/(?:<li>.+?<\/li>)+/g, '<ul>$&</ul>'); // Wrap <li> in <ul>
   }
+
+  function toggleDisclaimer() {
+    const disclaimer = document.getElementById('disclaimer');
+    if (disclaimer.style.display === 'none' || disclaimer.style.display === '') {
+        disclaimer.style.display = 'block';
+    } else {
+        disclaimer.style.display = 'none';
+    }
+}
   async function gettips(){
     try{
 
@@ -89,7 +98,7 @@ continu.addEventListener('click',async()=>{
     
     console.log(userinfo)
     symptom.style.visibility='visible'
-    document.getElementById('information').style.visibility='hidden'
+    document.querySelector('.information').style.visibility='hidden'
     await gettips()
     setInterval(gettips,10000)
     
@@ -125,13 +134,13 @@ symptominput.addEventListener('keydown' ,async( event)=>{
            
 
             const symptomtxt=document.createElement('span')
-            symptomtxt.classList.add('symptoms')
+            symptomtxt.classList.add('symptms')
             symptomtxt.textContent=symptominput.value
             
 
             const clearIcon=document.querySelector('.clear-icon').cloneNode(true) //clone it for reuse
             
-            clearIcon.style.visibility='visible'
+            clearIcon.style.display='block'
             clearIcon.style.cursor='pointer'
              
             clearIcon.addEventListener('click',()=>{

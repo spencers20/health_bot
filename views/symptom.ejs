@@ -8,11 +8,11 @@
                 box-sizing: border-box;
             } */
             body {
-                /* overflow:hidden; */
                 display: flex;
                 flex-direction: column;
                 min-height: 100vh;
                 background-color: #f5f5f5; 
+                overscroll-behavior: none;
             }
 
             .sidebar {
@@ -38,34 +38,39 @@
                 display: flex;
                 min-height: 100%;
                 flex-direction: column;
-                position: absolute;
                 overflow-y: visible;
-                
+                position: relative;
+                align-items: stretch;
                 
             }
 
             .heading1{ 
                 width:100%;
                 top:20px;
-                position: absolute;
+                position: relative;
                 background-color: aqua;
-                margin-bottom: 10px;
+    
             }
 
             .inside-container {
                 background-color: white;
-                margin-top: 20px;
-                min-height: 80%;
-                left:80px;
-                right:30%;
-                shape-outside: margin-box; 
-                position:absolute;
+                margin-top:80px;
+                /* margin-right:30%; */
+                width:60%;
+                margin-left:70px;
+                position: relative;
+                /* min-height: 50vh; */
+                flex-direction: column;
+                z-index: 1;
+                /* overflow-y: visible; */
+     
                 display:flex;
 
             }
 
             .containerheader {
-                position: absolute;
+                position: relative;
+                margin-bottom: 1px;
                 top: 35px; /* Distance from the top */
                 width: 100%; /* Length of the line */
                 height: 2px;
@@ -75,7 +80,7 @@
             }
 
             .headers {
-                position:absolute;
+                position:relative;
                 top:0;
                 width:100%;
                 justify-content:space-around;
@@ -84,17 +89,27 @@
 
             }
             .information {
-                position:absolute;
+                /* position:relative; */
                 text-align: center;
                 width:100%;
                 top:50px;
                 
             }
-            .checksymptom ,.condition{
-                position:absolute;
+            .symptoms {
+                /* position:relative; */
+                flex-direction: column;
+                top:50px;
+                width:100%;
+
+            }
+
+            .condition{
+                /* position:relative; */
                 top:50px;
                 width:100%;
                } 
+
+               
             /* .symptomconfirm {
                 position :absolute;
                 left:60px;
@@ -129,6 +144,7 @@
         font-size: 16px;
        }
 
+
        
 
             </style> 
@@ -153,23 +169,23 @@
                     <h1>Symptoms  checker</h1>
              </div>
 
-            <div class="inside-container" style="visibility: visible;">
+            <div class="inside-container" >
                 <div class="containerheader"></div>
                 <div class="headers">
-                    <p id="infos" style="cursor: pointer;" onclick="document.getElementById('information').style.visibility='visible', document.getElementById('symptoms').style.visibility='hidden' ,document.getElementById('condition').style.visibility='hidden', document.getElementById('checkbtn').style.visibility='hidden'">INFO</p>
-                    <p style="cursor: pointer;" onclick="document.getElementById('information').style.visibility='hidden', document.getElementById('symptoms').style.visibility='visible',document.getElementById('condition').style.visibility='hidden'">SYMPTOMS</p>
-                    <p>CONDITION</p>
+                    <p id="infos" style="cursor: pointer;" onclick="document.querySelector('.information').style.display='block', document.querySelector('.symptoms').style.display='none' ,document.getElementById('condition').style.visibility='hidden', document.getElementById('checkbtn').style.visibility='hidden'">INFO</p>
+                    <p style="cursor: pointer;" onclick="document.querySelector('.information').style.display='none', document.querySelector('.symptoms').style.display='block',document.querySelector('.condition').style.visibility='hidden'">SYMPTOMS</p>
+                    <p style="cursor: pointer; " onclick="document.querySelector('.information').style.visibility='hidden', document.querySelector('.symptoms').style.visibility='hidden',document.querySelector('.condition').style.visibility='visible'">CONDITION</p>
                      <!-- <p>TREATMENT</p> -->
                 </div>
                 <!-- <div  id="information" style="visibility: visible;"> -->
-                <div  class="information" stle="visibility: visible;"> 
+                <div  class="information" style="display:block"> 
                     <div>
-                    <p style="font-size: 30px; "> MYHC Symptom checker</p>
+                    <p style="font-size: 30px;"> MYHC Symptom checker</p>
                     <p style="font-size: 18px; " >Identify potential health conditions and corresponding treatments based on your symptoms</p>
                     <div style="margin-bottom: 1px; ">
                     <div style="display: flex; justify-content: center; gap: 10px;" >
                     <p style="font-size:15px "> This tool is not a replacement for professional medical advice. </p>
-                        <p id="readmore" style="font-size:13px ;cursor: pointer;" onclick=" document.getElementById('disclaimer').style.display='block'"> read more</p>
+                        <p id="readmore" style="font-size:13px ;cursor: pointer;" onclick=" toggleDisclaimer() "> read more</p>
                     </div>
                     <div id="disclaimer" style=" font-size:  14px; margin-top: 1px;display:none; margin-bottom: 1px;">
                         <p > This tool is not intended to be a substitute for professional medical advice, <br>
@@ -182,7 +198,7 @@
                     </div>
                 </div>
             </div>
-                <div style="width:100%; display:flex; justify-content: center; gap: 20px; text-align: center; margin-top: 1px; position:absolute">
+                <div style="width:100%; display:flex; justify-content: center; gap: 20px; text-align: center; margin-top: 1px; margin-bottom: 30px;">
                     <p style="font-size:18px ;left : 20px" >Age</p>
                     <input id="age" type="text" style="width:10% ; height: 50px; font-size: 16px; text-align: center;">
                     <p style="font-size:18px">Gender</p>
@@ -194,15 +210,15 @@
             </div> 
             </div>
             
-                <div class="symptoms" style="visibility: hidden;">
+                <div class="symptoms" style="display:none  ">
                     <p style=" text-align:center; font-size:20px" > CHECK SYMPTOMS</p>  
-                    <div style ="width:100%">
-                    <input id ="symptominput" type="text" placeholder="symptoms" style="position:absolute; left:60px; width:40%; height: 80px;">
-                    <div style=" flex-direction: column ; position: absolute ;width:40% ; right: 50px; ">
-                    <div class="conditions" style=" align-items: flex-start; max-height: 300px; background-color:  #edeeee; display:flex; overflow-y: auto; overscroll-behavior: contain; ">
-                       <!-- <p id="managesymptomtittle" style=" text-align:center; font-size:20px ;margin-bottom: 5px" >MANAGE YOUR SYMPTOMS </p> -->
-                        <div id="userinformation" style="margin-left: 10px ;position:display">
-                            <p>YOUR INFORMATION</p>
+                    <div style ="width:100% ;  display:flex; flex-direction: row; justify-content: space-between; margin-bottom: 1px; ">
+                    <input id ="symptominput" type="text" placeholder="symptoms" style=" position: relative;left:60px;  width: 30%; height: 60px; margin-right: 10px;">
+                    <div style="  margin-right: 5px; width:50% " >
+                    <div class="conditions" style=" flex-direction: column;  align-items:flex-start ; max-height: 300px; background-color:  #edeeee; display:flex; overflow-y: auto; overscroll-behavior: contain; ">
+                       <!-- <p id="managesymptomtittle" style="position: relative; text-align:center; font-size:20px ;margin-bottom: 5px" >MANAGE YOUR SYMPTOMS </p>  -->
+                        <div id="userinformation" style="margin-left: 10px ;">
+                          <p>YOUR INFORMATION</p>
                             <p id="usernamename"> Name :  </p>
                             <p id="userage">  </p>
                             <p id="usergender"></p>
@@ -211,32 +227,33 @@
                     </div>
                     <span id="moreinfo" style=" cursor: pointer;visibility:hidden;margin-top:  10 px;font-size: 16px; right: 30px;color: #87dfdf;">more information</span>
                     <p id="loadinginfo" style="visibility: hidden; color:aqua">checking information...</p>
-                    </div>
-                </div> 
+                    </div> 
+                </div>  
+                <p>suisisi</p>
                 <!-- svg icon for clearing  'x' -->
-                <div class="clear-icon" style="visibility: hidden;"> 
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
-                        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                </div>
-                
-                <div class="symptomconfirm" style="position :absolute;left:60px;width :40%;background-color: aliceblue; top: 180px; ">
-                    <!-- <p style=" text-align:center; font-size:20px" >CHECK SYMPTOMS</p> -->
+          
+                <div class="symptomconfirm" style=" display: flex; margin:0px;margin-left:60px;width :40%;background-color: aliceblue;  ">
+                    <p style=" text-align:center; font-size:20px" >CHECK SYMPTOMS</p>
+                   <div class="clear-icon" style="display: none;"> 
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+                            <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                    </div> 
     
                     
-                     <div id=buttons style="flex-direction: column; gap: 30px; width:100%; position:absolute; margin-top:10px">
-                        <button  style="height: 40px ;width:25%" onclick="document.getElementById('information').style.visibility='visible', document.getElementById('symptoms').style.visibility='hidden' ,document.getElementById('condition').style.visibility='hidden', document.getElementById('checkbtn').style.visibility='hidden'" >BACK</button>
-                        <button id="checkbtn" style="visibility:hidden; height: 40px ;width:25%">CHECK</button>
+                      <div id=buttons style="flex-direction: column; gap: 30px; width:100%; position:relative; margin-top:10px">
+                        <button  style="height: 40px ;width:25%" onclick="document.querySelector('.information').style.visibility='visible', document.querySelector('.symptoms').style.visibility='hidden' ,document.querySelector('condition').style.visibility='hidden', document.getElementById('checkbtn').style.display=''" >BACK</button>
+                        <button id="checkbtn" style="visibility:hidde; height: 40px ;width:25%">CHECK</button>
                      </div>
                     
-                </div>
+                </div> 
                 
-                    </div>
+                    </div> 
     
             
     
             <!-- <div id="condition" style="visibility: hidden;"> -->
-                <div class ="condition" style="width:100%; flex-direction: column; ">
+                <div class ="condition" style="width:100%; flex-direction: column; visibility: hidden; ">
                     <div id="checkedsymptoms" style="margin-bottom: 10px;"> SYMPTOMS:</div>
                     <div class="myinformation" style=" position:absolute; width: 30%;align-items: flex-start; max-height: 300px;  right:10px; background-color:  #edeeee; display:flex; overflow-y: auto; overscroll-behavior: contain; ">
                         <!-- <p id="managesymptomtittle" style=" text-align:center; font-size:20px ;margin-bottom: 5px" >MANAGE YOUR SYMPTOMS </p> -->
