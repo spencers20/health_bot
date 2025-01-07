@@ -51,7 +51,7 @@ try{
 
 app.get('/',(req , res)=>{
     console.log('entered')
-    res.render('symptom.ejs')
+    res.render('history.ejs')
 })
 // app.get('/symptomchecker',(req , res)=>{
 //     console.log('entered')
@@ -70,7 +70,7 @@ app.get('/tips',async(req , res)=>{
         console.log(tipsindb)
 
         res.status(200).json(tipsindb)
-
+ 
     }catch(e){
         console.error(`error in getting tips from db : ${e}`)
     }

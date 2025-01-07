@@ -5,7 +5,7 @@ const symptomconfirm =document.querySelector('.symptomconfirm')
 const checkbtn=document.getElementById('checkbtn')
 const conditions=document.querySelector('.conditions')
 const moreinfo=document.getElementById('moreinfo')
-const condition=document.getElementById('condition')
+const condition=document.querySelector('.condition')
 const symptom=document.querySelector('.symptoms')
 const checkedsymptoms=document.getElementById('checkedsymptoms')
 const moreinformation=document.querySelector('.moreinformation')
@@ -18,6 +18,7 @@ const age=document.getElementById('age')
 const buttons=document.getElementById('buttons')
 const tip=document.getElementById('tip')
 const headertip=document.getElementById('headertip')
+
 
 
 console.log(symptominput.value)
@@ -97,8 +98,8 @@ continu.addEventListener('click',async()=>{
     //  userinfo.push(age.value)
     
     console.log(userinfo)
-    symptom.style.visibility='visible'
-    document.querySelector('.information').style.visibility='hidden'
+    symptom.style.display='block'
+    document.querySelector('.information').style.display='none'
     await gettips()
     setInterval(gettips,10000)
     
@@ -246,8 +247,8 @@ moreinfo.addEventListener('click',async()=>{
     const results=await response.json()
     console.log(results)
     if( response.ok){
-        symptom.style.visibility='hidden'
-        condition.style.visibility='visible'
+        symptom.style.display='none'
+        condition.style.display='block'
         
         const aboutsymptom=document.createElement('div')
         aboutsymptom.classList.add('aboutsymptom')
