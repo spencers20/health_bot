@@ -7,7 +7,7 @@
         .history-upbar{
             width: 100%;
             height: 70px;
-            top:20px;
+            /* top:20px; */
             position: fixed;
             background-color: aqua;
             display: flex;
@@ -30,9 +30,9 @@
             left :0px;
             position:fixed;
             z-index: 5;
-            display:flex;
-            align-items: center;
-            justify-content: center;
+            /* display:flex; */
+            /* align-items: center; */
+            /* justify-content: center; */
             
         
         }
@@ -51,7 +51,21 @@
             height: 2px;
             background-color: rgb(150, 146, 146);
         }
-        
+        .entries{
+            display: flex;
+            
+            margin-top: 10px;
+            margin-right: 20px;
+            cursor: pointer;
+           
+            border-bottom-style: solid;
+            border-bottom-width: thin;
+            height: 35px;
+            /* border-right-style: solid;
+            border-right-width:thin; */
+            /* width:%; */
+            
+        }
 
     </style>
 
@@ -60,7 +74,68 @@
     
     
     <div class="history-sidebar">
-       <p>hello </p>
+        <div style="top:0px; height: 70px; align-items: center; display:flex; flex-direction: column; border-bottom-style: solid; border-bottom-width: thin;margin-right: 20px;">
+            <p style="font-size:20px ;margin-bottom:1px;">MY Health Journal</p>
+            <p style="font-size: 14px;margin-top: 0px;"> keep record of your wellbeing</p>
+        </div>
+
+        <div class="entries">
+            <svg  style="margin-bottom:10px; margin-left:20px "xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Circle -->
+                <circle cx="12" cy="12" r="10"></circle>
+                <!-- Vertical Line of Plus -->
+                <line x1="12" y1="8" x2="12" y2="16"></line>
+                <!-- Horizontal Line of Plus -->
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+              </svg>
+              
+
+              <span style="margin-left :10px ;font-size: 17px; margin-bottom: 10px;"> New entry</span>
+              
+
+        </div>
+
+        <div class="entries" >
+            <svg style="margin-left:20px"xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- First Line -->
+                <line x1="4" y1="7" x2="20" y2="7"></line>
+                <!-- Second Line -->
+                <line x1="4" y1="12" x2="20" y2="12"></line>
+                <!-- Third Line -->
+                <line x1="4" y1="17" x2="20" y2="17"></line>
+              </svg>
+
+              <span style="margin-left :10px ;font-size: 17px; margin-bottom: 10px;"> View Entire History</span>
+              
+        </div>
+
+        <div class="entries" >
+            <svg style="margin-left:20px" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+              </svg>
+              
+
+              <span style="margin-left :10px ;font-size: 17px; margin-bottom: 10px;"> Starred History</span>
+              
+        </div>
+
+        <div class="entries" >
+            <svg  style="margin-left:20px"xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24">
+                <!-- Clipboard -->
+                <rect x="12" y="4" width="40" height="56" rx="4" ry="4" fill="#f0f0f0" stroke="#000" stroke-width="2"/>
+                <rect x="12" y="4" width="40" height="10" rx="2" ry="2" fill="#a0a0a0"/>
+                
+                <!-- Checkmark -->
+                <path d="M20 32l8 8 16-16" stroke="#28a745" stroke-width="4" fill="none"/>
+              </svg>
+              
+              
+              
+
+              <span style="margin-left :10px ;font-size: 17px; margin-bottom: 10px;"> Check Symptom</span>
+              
+        </div>
+
 
 
     </div>
@@ -68,7 +143,7 @@
     <div class="history-main">
 
         <div class ="history-upbar">
-            <p style=" text-align: center ; font-size: 30px; font-weight: bold;"> History Journal<p>
+            <p style=" text-align: center ; font-size: 30px; font-weight: bold;"> myafya365<p>
            
     
         </div>

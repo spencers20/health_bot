@@ -313,4 +313,12 @@ router.get('/gethistory', async(req, res)=>{
 
 })
 
+router.get('/storehistory', async(req, res)=>{
+    try{
+        const db=await getdb()
+        const history=db.collection('history')
+
+    }
+})
+
 module.exports = router
