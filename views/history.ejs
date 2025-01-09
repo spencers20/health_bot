@@ -11,8 +11,8 @@
             position: fixed;
             background-color: aqua;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            /* justify-content: center;
+            align-items: center; */
             /* z-index: 10; */
         }
         .history-main{
@@ -79,7 +79,7 @@
             <p style="font-size: 14px;margin-top: 0px;"> keep record of your wellbeing</p>
         </div>
 
-        <div class="entries">
+        <div id="newentry" class="entries">
             <svg  style="margin-bottom:10px; margin-left:20px "xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <!-- Circle -->
                 <circle cx="12" cy="12" r="10"></circle>
@@ -119,7 +119,7 @@
               
         </div>
 
-        <div class="entries" >
+        <div class="entries" onclick="window.location.href='/user/symptomchecker'">
             <svg  style="margin-left:20px"xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24">
                 <!-- Clipboard -->
                 <rect x="12" y="4" width="40" height="56" rx="4" ry="4" fill="#f0f0f0" stroke="#000" stroke-width="2"/>
@@ -127,7 +127,7 @@
                 
                 <!-- Checkmark -->
                 <path d="M20 32l8 8 16-16" stroke="#28a745" stroke-width="4" fill="none"/>
-              </svg>
+              </svg>   
               
               
               
@@ -143,15 +143,24 @@
     <div class="history-main">
 
         <div class ="history-upbar">
-            <p style=" text-align: center ; font-size: 30px; font-weight: bold;"> myafya365<p>
-           
+
+            <p style=" margin-left:600px; text-align: center ; font-size: 30px; font-weight: bold;"> myafya365
+                <p>
+            <p style="margin-left:400px; font-size:20px"> <%=user.name%></p>
+
+    
     
         </div>
     
       
     
         <div class="history-container">
-           <input id="symptom-title" type="text" placeholder="title" style="width:100%; height: 50px; font-size: 25px; border:none; outline:none;">
+            <div style="display:flex; justify-content: space-between; width:100%;" > 
+                <input id="symptom-title" type="text" placeholder="title" style=" height: 50px; font-size: 25px; border:none; outline:none;">
+                <span  id="save" style="font-size:18px; color:blue; cursor:pointer"> 
+                    save
+                </span>
+            </div>
            <div class="border-line"></div>
            <div class="calender" style="margin-top: 10px; ">
                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
@@ -164,7 +173,7 @@
 
            </div>
            <div class="border-line"></div>
-           <textarea name="description" id=" describe" placeholder="describe how you feel" style="width:100%; height: 300px; border:none; outline:none;margin-top: 10px; font-size: 16px;"></textarea>
+           <textarea  id="describe"name="description"  placeholder="describe how you feel" style="width:100%; height: 300px; border:none; outline:none;margin-top: 10px; font-size: 16px;"></textarea>
         </div>
     </div>
  

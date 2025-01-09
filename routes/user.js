@@ -48,6 +48,21 @@ router.get('/symptomchecker',async(req, res)=>{
 
 })
 
+// route to history
+router.get('/historyentry',async(req, res)=>{
+    const db=await getdb()
+    const users=db.collection('users')
+    const userId=req.user.googleId
+    const details=await users.findOne({googleId:userId})
+
+    if(!details){  
+        throw new Error("no user found")
+    }
+    console.log(details)
+
+    res.render('history.ejs',{user : req.user}) 
+})
+
 
 
 //function to send the payload to flowise
@@ -313,11 +328,58 @@ router.get('/gethistory', async(req, res)=>{
 
 })
 
-router.get('/storehistory', async(req, res)=>{
+
+
+router.post('/storehistory', async(req, res)=>{
     try{
+        console.log('storing history...')
         const db=await getdb()
         const history=db.collection('history')
+        const {tittle, description}=req.body
+        const userId=req.user.googleId
 
+        const objectId=await history.findOne({
+            _id:userId
+        })
+
+        if (!objectId){
+            await history.insertOne({_id:userId})
+        }
+        const date=new Date()
+
+        const result=await history.bulkWrite ([
+            {
+                updateOne:{
+                   filter:{_id:userId},
+                   update:{
+                    $push:{
+                        histories :[{
+                            date:date,
+                            tittle:tittle,
+                            description:description
+                    }]
+                    }
+                   }
+                }
+
+            }
+        ])
+
+        if (result.acknowledged){
+            console.log('history stored successfully')
+        }
+
+        // console.log('history stored successfully')
+        res.status(200).json({message:"history stored successfully"})
+
+        
+
+        
+
+
+    }
+    catch(e){
+        console.error(`error in storing history ${e}`)
     }
 })
 
