@@ -63,6 +63,11 @@ function formatTextToHTML(text) {
     }
 }
 
+document.addEventListener('DOMContentLoaded',async()=>{
+    await gettips()
+    setInterval(gettips,10000)
+
+})
 
 
 male.addEventListener('click',async()=>{
@@ -100,8 +105,8 @@ continu.addEventListener('click',async()=>{
     console.log(userinfo)
     symptom.style.display='block'
     document.querySelector('.information').style.display='none'
-    await gettips()
-    setInterval(gettips,10000)
+    // await gettips()
+    // setInterval(gettips,10000)
     
     document.getElementById('userage').textContent=`Age :${userinfo.age}`
     document.getElementById('usergender').textContent=`Gender :${userinfo.gender}`

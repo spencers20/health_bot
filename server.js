@@ -51,7 +51,7 @@ try{
 
 app.get('/',(req , res)=>{
     console.log('entered')
-    res.render('index.ejs')
+    res.render('entries.ejs')
 })
 // app.get('/symptomchecker',(req , res)=>{
 //     console.log('entered')
@@ -67,7 +67,7 @@ app.get('/tips',async(req , res)=>{
         const db=await getdb()
         const tipscollection=db.collection('tips')
         const tipsindb= await tipscollection.find().toArray()
-        console.log(tipsindb)
+        // console.log(tipsindb)
 
         res.status(200).json(tipsindb)
  
@@ -144,7 +144,7 @@ app.post('/ask',
         }
         
         const response = await fetch(
-            "http://20.86.249.39:3000/api/v1/prediction/45f5a627-3b9d-4f90-a7df-597c1729b0f1",
+            "http://20.4.189.12:3000/api/v1/prediction/45f5a627-3b9d-4f90-a7df-597c1729b0f1",
             {
                 method: "POST",
                 headers: {

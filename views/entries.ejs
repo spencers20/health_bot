@@ -1,0 +1,165 @@
+<html lang="en">
+<head>
+   <style>
+    .header{
+        top:0;
+        position: fixed;
+        width: 100%;
+        min-height: 200px;
+        background-color: rgb(248, 248, 248);
+        /* display: flex; */
+        /* flex-direction: column; */
+
+   
+
+    }
+    .header_container{
+        width:100%;
+        height:60px;
+        display:flex;
+        justify-content: center;
+        align-items: center;
+        background-color:rgb(248, 200, 200);
+        /* position: absolute; */
+    }
+    .infoheader{
+        position:absolute;
+        /* background-color: aquamarine; */
+        width:50%;
+        height:70px;
+        margin-left:25%;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+
+      
+
+    }
+    .filter{
+        position:absolute;
+        /* background-color: rgb(173, 143, 223); */
+        width:50%;
+        min-height:70px;
+        margin-left:25%;
+        margin-top: 70px;
+    
+      
+    }
+    .filtercontainer{
+        display:flex;
+        /* height:40px; */
+        /* width: 50px; */
+      
+        /* background-color: rgb(207, 203, 203); */
+        flex-direction:column;
+        margin-right:20px;
+       
+            /* align-items: center;
+            justify-content: center; */
+        position: relative;
+        
+
+    }
+
+   </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header_container">
+            <p>Myafya365</p>
+        </div>
+        <div class="infoheader">
+            <div style="display: flex; flex-direction: column; left:5px">
+                <p>Spencers Journal</p>
+
+                <div style=" display: flex;">
+                    <span style="border-right-style: solid; border-right-width:thin ">
+                       <span style="margin-right:4px;">3 total entries</span> 
+                    </span>
+                    <span id="currentdate" style="margin-left:4px;"></span>
+
+                </div>
+                 
+            </div>
+            <div style="display: flex;  right:5px">
+                <p style="margin-right: 5px;cursor: pointer;">download</p>
+                <p style="cursor: pointer;">new entry</p>
+            </div>
+
+
+        </div>
+        <div class="filter" style="display: flex;">
+            
+            <div class="filtercontainer"id="entriestype" >
+                <div style="margin-top:0px; margin-left:20px ">entry type</div>
+                <div style="cursor: pointer; border: 1px solid black ; padding:5px; display: flex; justify-content: space-between; width:150px ;  margin-top:10px;"> 
+                   <div style="display:flex; flex-direction: column;position:relative;width:100% ">
+                    <span id="allentries" style=" background-color: azure; ">all entries</span>
+                    <span id="symptoms" style="margin-top: 5px; display:none   ">symptoms diary</span>
+                    <span  id = "checkups" style="margin-top: 10px; display:none">daily diary</span>
+
+                   </div>
+                   <div style=" margin-right:3px ; margin-top: 5px;">
+                    <svg class="v-icon" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 16L6 10h12L12 16z" fill="black"></path>
+                    </svg>
+                </div>
+                
+                </div>
+
+            </div>
+            
+
+           <div class="filtercontainer" id="duration" >
+            <div style="margin-top:0px; margin-left : 20px ">since</div>
+            <div style="cursor: pointer; border: 1px solid black ; padding:5px; display: flex; justify-content: space-between; width:150px ;  margin-top:10px;"> 
+               <div style="display:flex; flex-direction: column;position:relative;width:100% ">
+                <span id="alltime" style=" background-color: azure; ">all time</span>
+                <span  id = "weektime" style="margin-top: 10px; display:none">last 7 days</span>
+                <span  id = "monthtime" style="margin-top: 10px; display:none">last 30 days</span>
+                <span  id = "yeartime" style="margin-top: 10px; display:none">last 1 year</span>
+                <span  id = "customtime" style="margin-top: 10px; display: none; ">custom</span>
+
+                </div>
+                <div style=" margin-right:3px ; margin-top: 5px;">
+                    <svg class="v-icon" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 16L6 10h12L12 16z" fill="black"></path>
+                    </svg>
+                </div>
+
+            </div>
+            </div>
+
+            <div class="filtercontainer" id="entryclassification" >
+                <div style="margin-top:0px; margin-left: 20px;">entry classification</div>
+                <div style="cursor: pointer; border: 1px solid black ; padding:5px; display: flex; justify-content: space-between; width:150px ;  margin-top:10px;"> 
+                   <div style="display:flex; flex-direction: column;position:relative;width:100% ">
+                    <span id="allentry" style=" background-color: azure; ">all entries</span>
+                    <span  id = "starred" style="margin-top: 10px; display:none ">starred entry</span>
+                    <span  id = "bin" style="margin-top: 10px; display:none ">archived entry</span>
+                    
+    
+                    </div>
+                    <div style=" margin-right:3px ; margin-top: 5px;">
+                        <svg class="v-icon" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 16L6 10h12L12 16z" fill="black"></path>
+                        </svg>
+                    </div>
+    
+                </div>
+                </div>
+    
+            
+
+        </div>
+      
+        
+    
+        </div>
+    </div>
+    <div class="entries"></div>
+
+    <script src="/entryscript.js"></script>
+    
+</body>
+</html>

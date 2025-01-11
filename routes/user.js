@@ -2,6 +2,7 @@ const express=require('express')
 const router=express.Router()
 const {getdb}=require('../config/database')
 const { ObjectId } = require('mongodb')
+const Groq=require('groq-sdk')
 
 
 router.use( async (req, res,next)=>{
@@ -14,7 +15,7 @@ router.use( async (req, res,next)=>{
 
 router.use(express.json())
 
-// the home url for the chat interface  returns the chat ejs
+
 router.get('/',
     async (req , res)=>{
         console.log(req.user)
@@ -34,6 +35,8 @@ router.get('/',
 )
 // this url takes you to the symptom checker
 router.get('/symptomchecker',async(req, res)=>{
+    // await gettips()
+    // setInterval(gettips,10000)
     const db=await getdb()
     const users=db.collection('users')
     const userId=req.user.googleId
@@ -72,7 +75,7 @@ async function sendToFLowise(flowisedata){
         console.log('making call to flowise...')
         console.log(flowisedata)
         const response = await fetch(
-            "http://4.175.112.210:3000/api/v1/prediction/45f5a627-3b9d-4f90-a7df-597c1729b0f1",
+                "http://20.4.189.12:3000/api/v1/prediction/45f5a627-3b9d-4f90-a7df-597c1729b0f1",
             {
                 method: "POST",
                 headers: {
@@ -90,6 +93,36 @@ async function sendToFLowise(flowisedata){
     }
     
 }
+
+//get summaries from the users input
+async function getsummary(message){
+    const  groq = new Groq({api_key:process.env.GROQ_API_KEY})
+    try{
+
+        const chatCompletions=await groq.chat.completions.create({
+            messages :[
+                {
+                    role:"user",
+                    content:`You are a health assistant ;given the following text: ${message}  generate a brief  summary of the text`
+                            `do not suggest any possible cause / possible disease for the text. just give a summary of the text`
+                            `start with phrases like "you are experiencing...", "you were feeling...", "you have been feeling..." or other related phrases`
+                }
+            ],
+            model:"llama-3.3-70b-versatile",
+            temperature:4,
+        })
+        console.log(`chatCompletions: ${chatCompletions}`)
+
+        const summary=chatCompletions.choices[0]?.message?.content || "No summary found"
+
+        return summary
+    } catch(e){
+        console.log(`error in generating summaries ${e}`)
+    }
+
+
+}
+
 //function to get new chatId and save to db for every new chat
 async function startnewchat(userId,message){
     try{
@@ -100,6 +133,8 @@ async function startnewchat(userId,message){
             question:message
         }
         const results=await sendToFLowise(flowisedata)
+        const summary=await getsummary(message)//get summary
+
     
         //saving the new chat in a database
         const chattoadd={
@@ -109,15 +144,11 @@ async function startnewchat(userId,message){
                 {
                     conversation:[
                         {
-                            role:"human",
-                            content:results.question,
+                            symptomquestion:results.question,
+                            response:results.text,
+                            summary:summary,
                         
                         } ,
-                        {
-                            role:"ai",
-                            content:results.text,
-                            
-                        },
                         {
                             chattime:new Date()
                         }]
@@ -175,6 +206,7 @@ async function conversations(userId,message){
             question:message,
             chatId:chatId
         }
+        const summary=await getsummary(message)
         const results=await sendToFLowise(flowisedata)
     
   
@@ -193,14 +225,11 @@ async function conversations(userId,message){
             conversation:[
                 {
                     role:"human",
-                    content:results.question,
+                    symptomquestion:results.question,
+                    response:results.text,
+                    summary:summary,
                 
                 } ,
-                {
-                    role:"ai",
-                    content:results.text,
-                    
-                },
                 {
                     chattime:new Date()
                 }
@@ -233,7 +262,6 @@ async function conversations(userId,message){
     }
 }
 
-
 router.post('/chat',
     async (req , res)=>{
         try{
@@ -254,6 +282,7 @@ router.post('/chat',
 
                 if (newuser.acknowledged){
                 flowiseResponse=await startnewchat(userId,message)
+                
                 }   
             }
             // check if theres an active chatId existing in the database
@@ -336,6 +365,9 @@ router.post('/storehistory', async(req, res)=>{
         const db=await getdb()
         const history=db.collection('history')
         const {tittle, description}=req.body
+        const message=description
+        console.log(`messages: ${message}`)
+        const summary=await getsummary(message)
         const userId=req.user.googleId
 
         const objectId=await history.findOne({
@@ -356,7 +388,8 @@ router.post('/storehistory', async(req, res)=>{
                         histories :[{
                             date:date,
                             tittle:tittle,
-                            description:description
+                            description:description,
+                            summary:summary
                     }]
                     }
                    }
