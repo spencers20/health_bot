@@ -86,8 +86,7 @@ async function gethistory(){
     try{
 
         const historydetails=await fetch('/entries')
-       
-        const results=await historydetails.json()
+        const results =await historydetails.json()
         const entries=document.querySelector('.entries')
     
         results.forEach(doc=>{

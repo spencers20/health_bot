@@ -343,7 +343,7 @@ router.post('/chat',
 
                 if (newuser.acknowledged){
                 flowiseResponse=await startnewchat(userId,message)
-                
+            
                 }   
             }
             // check if theres an active chatId existing in the database
