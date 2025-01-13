@@ -78,6 +78,47 @@ app.get('/tips',async(req , res)=>{
     
 })
 
+app.get('/entries', async(req,res)=>{
+    try{
+        console.log('entries url entered...')
+        const db=await getdb()
+        const collection=db.collection('history')
+        const entries=await collection.aggregate([
+            { $match:{_id:"100984849132378172203"}
+
+            },
+            {
+                $unwind:"$histories"
+            },
+            {
+                $sort:{"histories.date":-1}
+            },
+            {
+                $group:{
+                    _id:"_id",
+                    histories:{
+                        $push:{
+                            date:"$histories.date",
+                            tittle:"$histories.tittle",
+                            description:"$histories.description",
+                            summary:"$histories.summary"
+                        }
+                    }
+                }
+            }
+        ]).toArray()
+        console.log(entries)
+
+        // return entries
+        res.status(200).json(entries)
+        console.log("entries retrieved successful")
+      
+
+    } catch(e){
+        console.log(`error in getting entries : ${e}`)
+    }
+})
+
 app.get('/history',async (req,res)=>{
     try{
 

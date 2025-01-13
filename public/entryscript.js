@@ -1,3 +1,4 @@
+
 const currentdate=document.getElementById('currentdate')
 // const entrytype=document.getElementById('entrytype')
 const duration =document.getElementById('duration')
@@ -13,6 +14,8 @@ const customtime=document.getElementById('customtime')
 const bin=document.getElementById('bin')
 const starred=document.getElementById('starred')
 const allentry=document.getElementById('allentry')
+const tittle=document.getElementById('title')
+const description=document.getElementById('description')
 
 
 const date=new Date()
@@ -61,8 +64,9 @@ duration.addEventListener('click',()=>{
 
 })
 
-entryclassification.addEventListener('click',()=>{
+entryclassification.addEventListener('click',async()=>{
     try{
+        // await gethistory()
         if(bin.style.display=='none' || starred.style.display=='none' || allentry.style.display=='none'){
             bin.style.display='block'
             starred.style.display='block'
@@ -73,8 +77,83 @@ entryclassification.addEventListener('click',()=>{
             // allentry.style.display='none'
         }
     } catch(e){
-        console.log(e)
+        console.log("error in entryclassification",e)
     }
 }
 )
+
+async function gethistory(){
+    try{
+
+        const historydetails=await fetch('/entries')
        
+        const results=await historydetails.json()
+        const entries=document.querySelector('.entries')
+    
+        results.forEach(doc=>{
+            doc.histories.forEach(entry=>{
+
+                entryDiv=document.createElement('div')
+                entryDiv.classList.add('entry_history')
+                
+                
+                const entrycheckbox=document.createElement('input')
+                entrycheckbox.type='checkbox'
+                entrycheckbox.style.marginBottom='5px'
+                entryDiv.appendChild(entrycheckbox)
+
+
+                entry_details=document.createElement('div')
+                entry_details.classList.add('entrydetails')
+                entryDiv.appendChild(entry_details)
+
+                entry_tittle=document.createElement('span')
+                entry_tittle.style.marginLeft='10px'
+                entry_tittle.style.marginBottom='5px'
+                entry_tittle.style.fontSize='18px'
+                entry_tittle.style.fontWeight='100'
+                entry_tittle.style.fontFamily='serif'
+                entry_tittle.innerHTML=entry.tittle
+                entry_details.appendChild(entry_tittle)
+
+                entry_description=document.createElement('span')
+                entry_description.style.marginLeft='10px'
+                entry_description.style.marginBottom='5px'
+                entry_description.style.width='300px'
+                const stringentrydesc=String(entry.description)
+                const words= stringentrydesc.split(' ')
+                entry_description.innerHTML=words.slice(0,7).join(' ')+'...'
+                // console.log(words.slice(0,7).join(' ')+'...')
+                entry_details.appendChild(entry_description)
+
+                entry_date=document.createElement('span')
+                entry_date.style.marginLeft='150px'
+                entry_date.style.marginBottom='5px'
+                entry_date.innerHTML=entry.date
+                entryDiv.appendChild(entry_date)
+
+                entries.appendChild(entryDiv)
+
+
+
+
+
+                console.log("date",entry.date)
+                console.log("tittle",entry.tittle)
+                console.log("description",entry.description)    
+    
+    
+            })
+        })
+        console.log(results)
+    } catch(e){
+        console.log("error calling history",e)
+    }
+
+}
+
+document.addEventListener('DOMContentLoaded',async()=>{
+    await gethistory()
+})
+
+

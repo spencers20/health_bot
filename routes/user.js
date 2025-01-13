@@ -67,6 +67,67 @@ router.get('/historyentry',async(req, res)=>{
 })
 
 
+router.get('/checkhistory', async(req, res)=>{
+    try{
+        const db = await getdb()
+        const users=db.collection('users')
+        const userId=req.user.googleId
+        const details=await users.findOne({googleId:userId})
+
+        if(!details){
+            throw new Error("no user found")
+        }
+
+        res.render('entries.ejs',{user : req.user})
+
+    }catch(e){
+        error(`error in getting history ${e}`)
+
+
+    }
+})
+
+router.get('/myhistory',async(req,res)=>{
+    try{
+        const db=await getdb()
+        const collection=db.collection('history')
+        const userId=req.user.googleId
+
+        const history=collection.aggregate([
+            {
+                $match:{_id:userId}
+            },
+            {
+                $unwind:"$histories"
+            },
+            {
+                $sort:{"histories.date":-1}
+            },
+            {
+                $group:{
+                    _id:"_id",
+                    histories:{
+                        $push:{
+                            date:"$histories.date",
+                            tittle:"$histories.tittle",
+                            description:"$histories.description",
+                            summary:"$histories.summary"
+                        }
+                    }
+                }
+            }
+        ])
+
+        if (history) {
+            res.status(200).json(history)
+        }
+        
+
+    }catch(e){
+
+    }
+})
+
 
 //function to send the payload to flowise
 async function sendToFLowise(flowisedata){
@@ -103,7 +164,7 @@ async function getsummary(message){
             messages :[
                 {
                     role:"user",
-                    content:`You are a health assistant ;given the following text: ${message}  generate a brief  summary of the text`
+                    content:`You are a health assistant ;given the following text: ${message}  generate a brief 1 sentence only summary of the text`
                             `do not suggest any possible cause / possible disease for the text. just give a summary of the text`
                             `start with phrases like "you are experiencing...", "you were feeling...", "you have been feeling..." or other related phrases`
                 }
