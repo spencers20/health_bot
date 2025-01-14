@@ -83,6 +83,10 @@
         flex-direction:column;
     }
 
+    .entry-checkbox{
+        margin-bottom: 5px;
+    }
+
 
    </style>
 </head>
@@ -97,7 +101,7 @@
                 <span style="font-size: 22px; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">Spencers Journal</span>
                 <div style=" display: flex;margin-top: 0px;">
                     <span style="border-right-style: solid; border-right-width:thin ">
-                       <span style="margin-right:4px;">3 total entries</span> 
+                       <span id="totalentries" style="margin-right:4px;"></span> 
                     </span>
                     <span id="currentdate" style="margin-left:4px;"></span>
 
@@ -192,9 +196,9 @@
         
    
     <div class="entries" style="margin-top:10px; width:100%; ">
-        <div id="selection" style ="background-color: rgb(195, 195, 231);display: flex; width: 60%; margin-left: 20%; border-bottom: 1px solid black; min-height:50px; display:none ">
+        <div id="selection" style ="background-color: rgb(195, 195, 231);display: flex; width: 60%; margin-left: 20%; border-bottom: 1px solid black; min-height:50px; display:none;      ">
             <div style="margin-top:10px">
-                <span style="font-size: 18px; "> 5 selected entries</span>
+                <span id="countstatement" style="font-size: 18px; "> </span>
             </div>
 
             <div style="cursor: pointer; margin-left:400px;margin-top:10px">
@@ -231,7 +235,7 @@
         
         <div class="heading" style="background-color: aqua; display:flex;    width:60% ; margin-left:20% ; border-bottom:1px solid black">
          
-            <input  style="margin-bottom:5px" id="checkbox" type="checkbox" onclick="document.getElementById('selection').style.display='flex'">
+            <input  style="margin-bottom:5px" id="checkbox" type="checkbox" >
             <span style="margin-left: 20px; margin-bottom:5px">entries</span>
             <span style="margin-left: 500px; margin-bottom:5px">Date</span>
         </div>

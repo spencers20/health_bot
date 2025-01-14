@@ -16,6 +16,7 @@ const starred=document.getElementById('starred')
 const allentry=document.getElementById('allentry')
 const tittle=document.getElementById('title')
 const description=document.getElementById('description')
+const selection=document.getElementById('selection')
 
 
 const date=new Date()
@@ -98,8 +99,9 @@ async function gethistory(){
                 
                 const entrycheckbox=document.createElement('input')
                 entrycheckbox.type='checkbox'
-                entrycheckbox.style.marginBottom='5px'
+                entrycheckbox.classList.add('entry-checkbox')
                 entryDiv.appendChild(entrycheckbox)
+                entrycheckbox.addEventListener('change',checkboxbar)
 
 
                 entry_details=document.createElement('div')
@@ -144,6 +146,8 @@ async function gethistory(){
     
             })
         })
+
+        updateallcheckboxes()
         console.log(results)
     } catch(e){
         console.log("error calling history",e)
@@ -153,6 +157,68 @@ async function gethistory(){
 
 document.addEventListener('DOMContentLoaded',async()=>{
     await gethistory()
+
+    const checkbox=document.getElementById('checkbox')
+    checkbox.addEventListener('change',handleselect)
+    countunchecked()
 })
 
+// const allcheckboxes=document.querySelectorAll('.entry-checkbox')
+let allcheckboxes
 
+const updateallcheckboxes=()=>{
+    allcheckboxes=document.querySelectorAll('.entry-checkbox')
+    console.log('updated checkboxes', allcheckboxes)
+    return allcheckboxes
+
+}
+
+
+const countstatement=document.getElementById('countstatement')
+
+
+const countunchecked=()=>{
+    updateallcheckboxes()
+    const uncheckedcount=Array.from(allcheckboxes).filter(checkbox=>!checkbox.checked).length
+    const totalentries=document.getElementById('totalentries')
+    totalentries.innerHTML=`${uncheckedcount} total entries`
+}
+//count all selected entries
+const countchecked=()=>{
+    updateallcheckboxes()
+    const checkedcount=Array.from(allcheckboxes).filter(checkbox=>checkbox.checked).length
+    countstatement.innerHTML=`${checkedcount} selected entries`
+    console.log('checkedcount:',checkedcount)
+    return checkedcount
+
+}
+
+// handle the main checkbox to check all checkboxes
+function handleselect(event){
+    console.log('handleselect function entered...', event.target.checked)
+    allcheckboxes.forEach(checkbox=>{
+        checkbox.checked=event.target.checked
+    })
+    const count=countchecked()
+    console.log('count ',count)
+
+    if (checkbox.checked==true){
+                selection.style.display='flex'
+     } 
+    else{
+                selection.style.display='none'
+    }
+                
+    
+}
+function checkboxbar(){
+    console.log('checkboxbar function entered...')
+    const count=countchecked()
+    console.log('count ',count)
+    if (count > 0){
+        selection.style.display='flex'
+    } else{
+        selection.style.display='none'
+       
+    }
+}
