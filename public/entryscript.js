@@ -100,8 +100,25 @@ async function gethistory(){
                 const entrycheckbox=document.createElement('input')
                 entrycheckbox.type='checkbox'
                 entrycheckbox.classList.add('entry-checkbox')
+                entrycheckbox.setAttribute('details.date',entry.date)
+                entrycheckbox.setAttribute('datails.tittle', entry.tittle)
+
+
+                
+                // entrycheckbox.addEventListener('change', (event)=>{
+                //     console.log('event listener entered')
+                //     checkboxbar()
+                //     const checkbox=event.target
+                //     if (checkbox.checked){
+                //         console.log('checkbox ticked')
+                //         console.log('the date of the tick', checkbox.getAttribute('details.date'))
+                //     }
+                //     else{
+                //         console.log('checkbox unchecked')
+                //     }
+                // })
+                    
                 entryDiv.appendChild(entrycheckbox)
-                entrycheckbox.addEventListener('change',checkboxbar)
 
 
                 entry_details=document.createElement('div')
@@ -211,14 +228,14 @@ function handleselect(event){
                 
     
 }
-function checkboxbar(){
-    console.log('checkboxbar function entered...')
-    const count=countchecked()
-    console.log('count ',count)
-    if (count > 0){
-        selection.style.display='flex'
-    } else{
-        selection.style.display='none'
+// function checkboxbar(){
+//     console.log('checkboxbar function entered...')
+//     const count=countchecked()
+//     console.log('count ',count)
+//     if (count > 0){
+//         selection.style.display='flex'
+//     } else{
+//         selection.style.display='none'
        
-    }
-}
+//     }
+// }
