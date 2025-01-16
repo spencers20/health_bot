@@ -18,6 +18,7 @@ const tittle=document.getElementById('title')
 const description=document.getElementById('description')
 const selection=document.getElementById('selection')
 const starsvg=document.getElementById('starsvg')
+const deletesvg=document.getElementById('deletesvg')
 
 const date=new Date()
 const options={weekday:'long',day:'numeric',month:'numeric',year:'numeric'}
@@ -112,7 +113,8 @@ async function gethistory(){
                     console.log('event listener entered')
                     checkboxbar()
                     const checkbox=event.target
-                    const date =checkbox.getAttribute('details.tittle')
+                    const date =checkbox.getAttribute('details.date')
+                    // const date=new Date(date)
                     if (checkbox.checked){
                         if (!keydate.includes(date)){
                             keydate.push(date)
@@ -276,10 +278,26 @@ starsvg.addEventListener('click',async()=>{
         })
 
         if (results.ok){
-            console.log('starred entry succesful')
+           const updated=results.json
+           if (updated.success){
+            const pathElement=starsvg.querySelector('path')
+            pathElement.setAttribute("fill","black")
+           }
         }
     } catch(e){
         console.log('error to send keydates to updates: ',e)
     }
     
+})
+//delete selected entries
+deletesvg.addEventListener('click',async()=>{
+    console.log('keydates', keydate)
+    console.log("delete key pressed")
+    const results=await fetch('/delete',{
+        method:'POST',
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify(keydate)
+    })
 })

@@ -153,6 +153,9 @@ app.get('/history',async (req,res)=>{
 })
 
 
+//delete data 
+
+
 app.get('/get/:id',
     async(req , res)=>{
         try{
@@ -172,6 +175,39 @@ app.get('/get/:id',
     }
 )
 
+app.post('/delete',async(req,res)=>{
+    try{
+        const keydates=req.body
+        // console.log(req.body)
+        const db=await getdb()
+        const collection=db.collection('history')
+        console.log('keydates in delete', keydates)
+
+        for(const dates of keydates){
+            const date=new Date(dates)
+            console.log(date)
+
+            const deleteresult=await collection.updateOne(
+                {
+                _id:"100984849132378172203",
+                "histories.date":date,
+                "histories":{$elemMatch:{date:date}}
+                },
+                {
+                    $pull:{ "histories":{date:date}}
+                }
+         
+        )
+        if(deleteresult.modifiedCount>0){
+            console.log("deleted successfully")
+            res.status(200).json({success:true})
+        }
+        }
+    }catch(e){
+        console.log('errror in deleting data ', e)
+    }
+})
+
 app.post('/updates',async(req,res)=>{
     try{
 
@@ -179,41 +215,35 @@ app.post('/updates',async(req,res)=>{
         // keydates=keydates.
         const db=await getdb()
         const collection=db.collection('history')
-        console.log(keydates)
+        console.log("keydates", keydates)
+        for(const dates of keydates){
+            date= new Date(dates)
+            console.log(date)
+             
+            const results=await collection.updateOne(
+                {_id:"100984849132378172203",
+                    "histories.date":date,
+                    "histories":{$elemMatch:{date:date}}
+                },
+                {
+                    $set:{"histories.$.status":"starred"}
+                }
+            )
 
-        try{
-            date1=new Date("2025-01-10T20:24:32.348Z")
-            date2=new Date("2025-01-08T19:47:24.924Z")
-            date3=new Date("2025-01-11T11:57:55.761Z")
-            console.log(date1)
-        
-            
-            keys=[date1,date2,date3]
-        
-             for(const date of keys){
-            await   db.history.updateOne(
-                            {
-                            _id:"112134851760110233085",
-                            "histories.date":date,
-                            "histories":{$elemMatch:{date:date}}
-                               
-                            },
-                            {$set :{"histories.$.status":"starred"}}
-                        )
-                    }
-                }          
-            
-        catch(e){
-            console.log("error ",e)
-        }
+            if (results.modifiedCount>0){
+                console.log("updated data")
+                res.status(200).json({success:true})
+            }
 
+            } 
 
-        res.status(200).json({message:'update successful'})
 
     }catch(e){
         console.log('error in updating',e)
     }
 })
+
+
 
 app.post('/ask',
     async(req , res)=>{
