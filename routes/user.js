@@ -164,13 +164,11 @@ async function getsummary(message){
             messages :[
                 {
                     role:"user",
-                    content:`You are a health assistant ;given the following text: ${message}  generate a brief 1 sentence only summary of the text`
-                            `do not suggest any possible cause / possible disease for the text. just give a summary of the text`
-                            `start with phrases like "you are experiencing...", "you were feeling...", "you have been feeling..." or other related phrases`
+                    content: `You are a health assistant; given the following text: ${message}, generate a brief 1-sentence summary of the text. Do not suggest any possible cause or disease for the text; just give a summary of the text. Start with phrases like "you are experiencing...", "you were feeling...", "you have been feeling...", or other related phrases.`
                 }
             ],
             model:"llama-3.3-70b-versatile",
-            temperature:4,
+            temperature:1,
         })
         console.log(`chatCompletions: ${chatCompletions}`)
 
@@ -460,11 +458,12 @@ router.post('/storehistory', async(req, res)=>{
         ])
 
         if (result.acknowledged){
-            console.log('history stored successfully')
+            console.log('history stored successfull')
+            res.status(200).json(result)
         }
 
         // console.log('history stored successfully')
-        res.status(200).json({message:"history stored successfully"})
+        
 
         
 

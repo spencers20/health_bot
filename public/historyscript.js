@@ -14,17 +14,23 @@ save.addEventListener('click',async()=>{
             description:describe.value
         }
         
-        await fetch('/user/storehistory',{
+        const results= await fetch('/user/storehistory',{
             method:'POST',
             headers:{
                 'Content-Type':'application/json'
             },
             body:JSON.stringify(message)
         })
+
+        
+        console.log( "saved history results",results)
+        
+        save.style.color="green"  
+        save.innerHTML="Saved" 
+
         // const results=await result.json()
         // console.log(results)
-        save.style.color="green"  
-        save.innerHTML="Saved"  
+    
         // save.innerHTML="Saved"
         
 

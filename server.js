@@ -60,7 +60,6 @@ app.get('/',(req , res)=>{
 // })
 
 
-
 app.get('/tips',async(req , res)=>{
     try{
         console.log('tips url entered...')
@@ -182,24 +181,32 @@ app.post('/updates',async(req,res)=>{
         const collection=db.collection('history')
         console.log(keydates)
 
-        const result = await collection.find({
-            'histories.tittle': 'ear clogged' // Find documents where any date in 'histories.date' matches one of the keydates
-        }).toArray();
+        try{
+            date1=new Date("2025-01-10T20:24:32.348Z")
+            date2=new Date("2025-01-08T19:47:24.924Z")
+            date3=new Date("2025-01-11T11:57:55.761Z")
+            console.log(date1)
+        
+            
+            keys=[date1,date2,date3]
+        
+             for(const date of keys){
+            await   db.history.updateOne(
+                            {
+                            _id:"112134851760110233085",
+                            "histories.date":date,
+                            "histories":{$elemMatch:{date:date}}
+                               
+                            },
+                            {$set :{"histories.$.status":"starred"}}
+                        )
+                    }
+                }          
+            
+        catch(e){
+            console.log("error ",e)
+        }
 
-        console.log("Find results:", result);
-
-
-        const inserts=keydates.map(date=>({
-            updateMany:{
-                filter: { 'histories': { $elemMatch: { tittle: date } } },  // Adjusted filter for nested arrays
-                update: { $set: { 'histories.$[elem].status': 'starred' } },
-                arrayFilters: [{ 'elem.tittle': date }] 
-            }
-        }))
-    
-        const results=await collection.bulkWrite(inserts)
-
-        console.log("entry succesful", results)
 
         res.status(200).json({message:'update successful'})
 
@@ -256,9 +263,9 @@ app.get('*',(req,res)=>{
 })
 
 initializecollection().then(()=>{
-app.listen(3001 ,()=>{
+app.listen(3000 ,()=>{
   
-    console.log("listening at :http://localhost:3001")
+    console.log("listening at :http://localhost:3000")
 })
 })
 
