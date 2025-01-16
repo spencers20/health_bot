@@ -173,6 +173,41 @@ app.get('/get/:id',
     }
 )
 
+app.post('/updates',async(req,res)=>{
+    try{
+
+        const keydates=req.body.keydate
+        // keydates=keydates.
+        const db=await getdb()
+        const collection=db.collection('history')
+        console.log(keydates)
+
+        const result = await collection.find({
+            'histories.tittle': 'ear clogged' // Find documents where any date in 'histories.date' matches one of the keydates
+        }).toArray();
+
+        console.log("Find results:", result);
+
+
+        const inserts=keydates.map(date=>({
+            updateMany:{
+                filter: { 'histories': { $elemMatch: { tittle: date } } },  // Adjusted filter for nested arrays
+                update: { $set: { 'histories.$[elem].status': 'starred' } },
+                arrayFilters: [{ 'elem.tittle': date }] 
+            }
+        }))
+    
+        const results=await collection.bulkWrite(inserts)
+
+        console.log("entry succesful", results)
+
+        res.status(200).json({message:'update successful'})
+
+    }catch(e){
+        console.log('error in updating',e)
+    }
+})
+
 app.post('/ask',
     async(req , res)=>{
     try{

@@ -17,7 +17,7 @@ const allentry=document.getElementById('allentry')
 const tittle=document.getElementById('title')
 const description=document.getElementById('description')
 const selection=document.getElementById('selection')
-
+const starsvg=document.getElementById('starsvg')
 
 const date=new Date()
 const options={weekday:'long',day:'numeric',month:'numeric',year:'numeric'}
@@ -83,6 +83,8 @@ entryclassification.addEventListener('click',async()=>{
 }
 )
 
+let keydate=[];
+
 async function gethistory(){
     try{
 
@@ -100,23 +102,31 @@ async function gethistory(){
                 const entrycheckbox=document.createElement('input')
                 entrycheckbox.type='checkbox'
                 entrycheckbox.classList.add('entry-checkbox')
+                //set attribute to get the checked details
                 entrycheckbox.setAttribute('details.date',entry.date)
-                entrycheckbox.setAttribute('datails.tittle', entry.tittle)
+                entrycheckbox.setAttribute('details.tittle', entry.tittle)
 
 
                 
-                // entrycheckbox.addEventListener('change', (event)=>{
-                //     console.log('event listener entered')
-                //     checkboxbar()
-                //     const checkbox=event.target
-                //     if (checkbox.checked){
-                //         console.log('checkbox ticked')
-                //         console.log('the date of the tick', checkbox.getAttribute('details.date'))
-                //     }
-                //     else{
-                //         console.log('checkbox unchecked')
-                //     }
-                // })
+                entrycheckbox.addEventListener('change', (event)=>{
+                    console.log('event listener entered')
+                    checkboxbar()
+                    const checkbox=event.target
+                    const date =checkbox.getAttribute('details.tittle')
+                    if (checkbox.checked){
+                        if (!keydate.includes(date)){
+                            keydate.push(date)
+                        }
+                    }
+                    else{
+                        const index =keydate.indexOf(date)
+
+                        if(index !==-1){
+                            keydate.splice(index,1)
+                        }
+                        console.log('checkbox unchecked')
+                    }
+                })
                     
                 entryDiv.appendChild(entrycheckbox)
 
@@ -213,29 +223,63 @@ const countchecked=()=>{
 // handle the main checkbox to check all checkboxes
 function handleselect(event){
     console.log('handleselect function entered...', event.target.checked)
+    const date =checkbox.getAttribute('details.date')
     allcheckboxes.forEach(checkbox=>{
         checkbox.checked=event.target.checked
+       
     })
     const count=countchecked()
     console.log('count ',count)
+   
 
     if (checkbox.checked==true){
                 selection.style.display='flex'
+                // if (!keydate.includes(date)){
+                //     keydate.push(date)
+                // }
      } 
     else{
+        const index=keydate.indexOf(date)
+        if(index !==-1){
+            keydate.splice(index,1)
+        }
                 selection.style.display='none'
     }
                 
     
 }
-// function checkboxbar(){
-//     console.log('checkboxbar function entered...')
-//     const count=countchecked()
-//     console.log('count ',count)
-//     if (count > 0){
-//         selection.style.display='flex'
-//     } else{
-//         selection.style.display='none'
+
+// function for each checkbox...to count the checked checkbox and open the selection display
+function checkboxbar(){
+    console.log('checkboxbar function entered...')
+    const count=countchecked()
+    console.log('count ',count)
+    if (count > 0){
+        selection.style.display='flex'
+    } else{
+        selection.style.display='none'
        
-//     }
-// }
+    }
+}
+// starred saving
+starsvg.addEventListener('click',async()=>{
+    try{
+        console.log('starsvg entered...')
+        console.log('starred clicked')
+        console.log('starred dates',keydate)
+        const results=await fetch('/updates',{
+            method: 'POST',
+            headers: {
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({keydate})
+        })
+
+        if (results.ok){
+            console.log('starred entry succesful')
+        }
+    } catch(e){
+        console.log('error to send keydates to updates: ',e)
+    }
+    
+})

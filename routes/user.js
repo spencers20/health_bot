@@ -446,13 +446,13 @@ router.post('/storehistory', async(req, res)=>{
                    filter:{_id:userId},
                    update:{
                     $push:{
-                        histories :[{
+                        histories :{
                             date:date,
                             tittle:tittle,
                             description:description,
                             summary:summary
-                    }]
-                    }
+                    }            
+                   }
                    }
                 }
 
