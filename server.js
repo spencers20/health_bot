@@ -9,6 +9,9 @@ require('./config/passport')
 const user=require('./routes/user')
 const path=require('path')
 const cron=require('node-cron')
+const Pdfdocument=require('pdfkit')
+const fs =  require('fs');
+const { get } = require('http');
 
 
 // const collection=require('./database')
@@ -58,6 +61,8 @@ app.get('/',(req , res)=>{
 //     res.render('symptom.ejs')
     
 // })
+
+
 
 
 app.get('/tips',async(req , res)=>{
@@ -174,6 +179,36 @@ app.get('/get/:id',
         }
     }
 )
+app.get('/download', async(req,res)=>{
+    try{
+
+        const keydates=req.query.keydate
+        const db=await getdb()
+        const collection=db.collection('history')
+        console.log('keydates to download', keydates)
+        
+    
+        for(const dates of keydates){
+            const date=new Date(dates)
+            console.log(date)
+    
+            // data = await collection.findOne(
+            //     {
+            //         _id:"100984849132378172203",
+            //         "histories.date":date
+            //     },
+            //     {
+            //         "histories":{$elemMatch:{date:date}}
+            //     }
+            // ) 
+        } 
+        // console.log('data to download',data)
+    }catch(e){
+        console.log('error in downloading data',)
+    }
+    
+
+})
 
 app.post('/delete',async(req,res)=>{
     try{

@@ -19,6 +19,7 @@ const description=document.getElementById('description')
 const selection=document.getElementById('selection')
 const starsvg=document.getElementById('starsvg')
 const deletesvg=document.getElementById('deletesvg')
+const downloadsvg=document.getElementById('downloadsvg')
 
 const date=new Date()
 const options={weekday:'long',day:'numeric',month:'numeric',year:'numeric'}
@@ -184,6 +185,7 @@ async function gethistory(){
 
 }
 
+
 document.addEventListener('DOMContentLoaded',async()=>{
     await gethistory()
 
@@ -300,4 +302,21 @@ deletesvg.addEventListener('click',async()=>{
         },
         body:JSON.stringify(keydate)
     })
+})
+
+//download selected data to pdf
+downloadsvg.addEventListener('click',async()=>{
+    try{
+        console.log('download key pressed...')
+        const params=keydate.map(date=>`keydate=${encodeURIComponent(date)}`).join('$')
+        await fetch(`/download?${params}`,{
+            method:'GET',
+            headers:{
+                'Content-Type':'application/json'
+            },
+         
+        })
+    }catch(e){
+        console.log('error in the downloadsvg',e)
+    }
 })
