@@ -181,17 +181,40 @@ app.get('/get/:id',
 )
 app.get('/download', async(req,res)=>{
     try{
+        let keydatess
 
         const keydates=req.query.keydate
         const db=await getdb()
         const collection=db.collection('history')
         console.log('keydates to download', keydates)
+        console.log(Array.isArray(keydates))
+        
+        if(!Array.isArray(keydates)){
+            keydatess=[keydates]
+            console.log(Array.isArray(keydatess))
+            console.log("array keydates",keydatess)
+
+            for(const datess of keydatess){
+                const date=new Date(datess)
+                console.log(date)
+
+                const downloaddata =await collection.find({
+                    _id:"100984849132378172203",
+                    "histories.date":date
+                },
+                {
+                    "histories":{$elemMatch:{date:date}}
+                }
+            )
+            console.log("downloaddata", downloaddata)
+            }
+        }
         
     
-        for(const dates of keydates){
-            const date=new Date(dates)
-            console.log(date)
-    
+        // for(const dates of keydatess){
+        //     const date=new Date(dates)
+        //     console.log(date)
+
             // data = await collection.findOne(
             //     {
             //         _id:"100984849132378172203",
@@ -201,10 +224,10 @@ app.get('/download', async(req,res)=>{
             //         "histories":{$elemMatch:{date:date}}
             //     }
             // ) 
-        } 
+        // } 
         // console.log('data to download',data)
     }catch(e){
-        console.log('error in downloading data',)
+        console.log('error in downloading data',e)
     }
     
 
@@ -328,9 +351,9 @@ app.get('*',(req,res)=>{
 })
 
 initializecollection().then(()=>{
-app.listen(3000 ,()=>{
+app.listen(3001 ,()=>{
   
-    console.log("listening at :http://localhost:3000")
+    console.log("listening at :http://localhost:3001")
 })
 })
 
