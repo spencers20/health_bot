@@ -209,6 +209,7 @@ const mergehistories= (data)=>{
 
 const generatepdf=(data,res)=>{
     try{
+        console.log("generatepdf function entered...")
         if (!data || data.length === 0) {
             return res.status(404).json({ error: 'No data to generate PDF' });
         }
@@ -318,6 +319,7 @@ app.get('/download', async(req,res)=>{
             }
 
             console.log('Found data for multiple dates:', results);
+            // mergedData=mergehistories(results)
             generatepdf(results, res);
         }
     } catch(error) {

@@ -316,6 +316,25 @@ downloadsvg.addEventListener('click',async()=>{
             },
          
         })
+        .then(response=>{
+            if(!response.ok){
+                throw new Error('the response was not ok')
+            }
+            return response.blob()
+        }).then(blob=>{
+                const url=window.URL.createObjectURL(blob)
+                const a= document.createElement('a')
+                a.style.display="flex"
+                a.href=url 
+                a.download='histories.pdf'
+
+                document.body.appendChild(a)
+                a.click()
+
+                window.URL.revokeObjectURL(url)
+                document.body.removeChild(a)
+
+        })
     }catch(e){
         console.log('error in the downloadsvg',e)
     }
