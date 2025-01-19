@@ -183,23 +183,25 @@ app.get('/get/:id',
 //funtion to merge the data  (historis) of the same _id
 const mergehistories= (data)=>{
     try{
-        const mergedhistory={}
+        console.log("merged history entered...")
+        const mergedData={}
     
         data.forEach((item) => {
-            if(!mergedhistory[item._id]){
-                mergedhistory[item._id]={
+            if(!mergedData[item._id]){
+                mergedData[item._id]={
                     _id:item._id,
                     histories:[]
                 }
             }
     
-            mergedhistory[item._id]=[
-                ...mergedhistory[item._id].histories,
+            mergedData[item._id]=[
+                ...mergedData[item._id].histories,
                 ...item.histories
             ]
         });
+        console.log("merged data")
 
-        return Object.values(mergedhistory)
+        return Object.values(mergedData)
     }catch(e){
         console.log("error in merging the history", e)
     }
