@@ -308,7 +308,7 @@ deletesvg.addEventListener('click',async()=>{
 downloadsvg.addEventListener('click',async()=>{
     try{
         console.log('download key pressed...')
-        const params=keydate.map(date=>`keydate=${encodeURIComponent(date)}`).join('$')
+        const params=keydate.map(date=>`keydate=${encodeURIComponent(date)}`).join('&')
         await fetch(`/download?${params}`,{
             method:'GET',
             headers:{

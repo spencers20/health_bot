@@ -1,4 +1,5 @@
 const express=require('express')
+const PDFDocument = require('pdfkit')
 const {savesession,getcollection,initializecollection ,resetactiveChatIds, getdb}= require('./config/database')
 const app=express()
 const session = require("express-session");
@@ -9,7 +10,6 @@ require('./config/passport')
 const user=require('./routes/user')
 const path=require('path')
 const cron=require('node-cron')
-const Pdfdocument=require('pdfkit')
 const fs =  require('fs');
 const { get } = require('http');
 
@@ -179,58 +179,149 @@ app.get('/get/:id',
         }
     }
 )
+
+//funtion to merge the data  (historis) of the same _id
+const mergehistories= (data)=>{
+    try{
+        const mergedhistory={}
+    
+        data.forEach((item) => {
+            if(!mergedhistory[item._id]){
+                mergedhistory[item._id]={
+                    _id:item._id,
+                    histories:[]
+                }
+            }
+    
+            mergedhistory[item._id]=[
+                ...mergedhistory[item._id].histories,
+                ...item.histories
+            ]
+        });
+
+        return Object.values(mergedhistory)
+    }catch(e){
+        console.log("error in merging the history", e)
+    }
+}
+
+const generatepdf=(data,res)=>{
+    try{
+        if (!data || data.length === 0) {
+            return res.status(404).json({ error: 'No data to generate PDF' });
+        }
+
+        console.log('Generating PDF with data:', JSON.stringify(data, null, 2));
+        
+        const doc = new PDFDocument();
+        
+        // Set headers on the response object, not the PDF document
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", "attachment; filename=histories.pdf");
+        doc.pipe(res);
+    
+        doc.fontSize(20).text("Health  History Report", {align: 'center', underline: true}).moveDown(1);
+    
+        data.forEach((item,index)=>{
+            doc.fontSize(16)
+                .text(`ID: ${item._id}`,{align:"center"})
+                .moveDown(1);
+
+            item.histories.forEach((history)=>{
+                const date = new Date(history.date).toLocaleDateString();
+    
+                doc.fontSize(14)
+                    .text(`Date: ${date}`, {fontWeight: "bold"})
+                    .text(`Title: ${history.tittle || 'No title'}`)
+                    .text(`${history.description || 'No description'}`)
+                    .moveDown(1);
+            });
+    
+            if (index < data.length - 1) {
+                doc.addPage();
+            }
+        });
+    
+        doc.end();
+        console.log('PDF generation completed');
+
+    } catch(e){
+        console.log('error downloading function',e);
+        res.status(500).json({ error: 'Error generating PDF' });
+    }
+}
+
 app.get('/download', async(req,res)=>{
     try{
-        let keydatess
+        const keydates = req.query.keydate;
+        if (!keydates) {
+            return res.status(400).json({ error: 'No dates provided' });
+        }
 
-        const keydates=req.query.keydate
-        const db=await getdb()
-        const collection=db.collection('history')
-        console.log('keydates to download', keydates)
-        console.log(Array.isArray(keydates))
-        
-        if(!Array.isArray(keydates)){
-            keydatess=[keydates]
-            console.log(Array.isArray(keydatess))
-            console.log("array keydates",keydatess)
+        const db = await getdb();
+        const history = db.collection('history');
 
-            for(const datess of keydatess){
-                const date=new Date(datess)
-                console.log(date)
+        if (!Array.isArray(keydates)) {
+            // Handle single date
+            const parsedDate = new Date(keydates);
+            if (isNaN(parsedDate.getTime())) {
+                return res.status(400).json({ error: 'Invalid date format' });
+            }
 
-                const downloaddata =await collection.find({
-                    _id:"100984849132378172203",
-                    "histories.date":date
+            console.log('Searching for date:', parsedDate);
+            const data = await history.findOne(
+                {
+                    _id: "100984849132378172203",
+                    "histories.date": parsedDate
                 },
                 {
-                    "histories":{$elemMatch:{date:date}}
+                    projection: {
+                        histories: { $elemMatch: { date: parsedDate }}
+                    }
                 }
-            )
-            console.log("downloaddata", downloaddata)
+            );
+
+            if (!data) {
+                return res.status(404).json({ error: 'No data found for the specified date' });
             }
+
+            console.log('Found data:', data);
+            generatepdf([data], res);
+        } else {
+            // Handle multiple dates
+            const results = [];
+            for(const dateStr of keydates) {
+                const parsedDate = new Date(dateStr);
+                if (!isNaN(parsedDate.getTime())) {
+                    console.log('Searching for date:', parsedDate);
+                    const data = await history.findOne(
+                        {
+                            _id: "100984849132378172203",
+                            "histories.date": parsedDate
+                        },
+                        {
+                            projection: {
+                                histories: { $elemMatch: { date: parsedDate }}
+                            }
+                        }
+                    );
+                    if (data) {
+                        results.push(data);
+                    }
+                }
+            }
+            
+            if (results.length === 0) {
+                return res.status(404).json({ error: 'No data found for any of the specified dates' });
+            }
+
+            console.log('Found data for multiple dates:', results);
+            generatepdf(results, res);
         }
-        
-    
-        // for(const dates of keydatess){
-        //     const date=new Date(dates)
-        //     console.log(date)
-
-            // data = await collection.findOne(
-            //     {
-            //         _id:"100984849132378172203",
-            //         "histories.date":date
-            //     },
-            //     {
-            //         "histories":{$elemMatch:{date:date}}
-            //     }
-            // ) 
-        // } 
-        // console.log('data to download',data)
-    }catch(e){
-        console.log('error in downloading data',e)
+    } catch(error) {
+        console.error('Download error:', error);
+        res.status(500).json({ error: 'Internal server error: ' + error.message });
     }
-    
-
 })
 
 app.post('/delete',async(req,res)=>{
@@ -351,9 +442,8 @@ app.get('*',(req,res)=>{
 })
 
 initializecollection().then(()=>{
-app.listen(3001 ,()=>{
+app.listen(3000 ,()=>{
   
-    console.log("listening at :http://localhost:3001")
+    console.log("listening at :http://localhost:3000")
 })
 })
-
