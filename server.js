@@ -145,7 +145,7 @@ app.get('/history',async (req,res)=>{
                     $push:"chats"}
              }
              }
-        ])
+        ]).toArray()
 
         res.status(200).json(data)
 
@@ -397,41 +397,47 @@ app.post('/updates',async(req,res)=>{
 })
 
 app.get('/starred',async(req,res)=>{
-    const db=await getdb()
-    const collection=db.collection('history')
-    const results=await collection.aggregate([
-        {
-            $match:{
-                _id:"100984849132378172203",
-                "histories.status":"starred",
-                "histories":{$elemMatch:{status:"starred"}}
-            }
-        },
-        {
-            $unwind:"$histories"
-        },
-        {
-            $sort:{
-                "histories.date":-1
-            }
-        },
-        {
-            $group:{
-                _id:"_id",
-                histories:{
-                    $push:{
-                        date:"$histories.date",
-                        tittle:"$histories.tittle",
-                        description:"$histories.description",
-                        summary:"$histories.summary"
+    try{
+        console.log('starred entered...')
+
+        const db=await getdb()
+        const collection=db.collection('history')
+        const results=await collection.aggregate([
+            {
+                $match:{
+                    _id:"100984849132378172203",
+                    "histories.status":"starred",
+                    "histories":{$elemMatch:{status:"starred"}}
+                }
+            },
+            {
+                $unwind:"$histories"
+            },
+            {
+                $sort:{
+                    "histories.date":-1
+                }
+            },
+            {
+                $group:{
+                    _id:"_id",
+                    histories:{
+                        $push:{
+                            date:"$histories.date",
+                            tittle:"$histories.tittle",
+                            description:"$histories.description",
+                            summary:"$histories.summary"
+                        }
                     }
                 }
             }
-        }
-    ])
-
+        ]).toArray()
+        res.status(200).json(results)
+    }catch(e){
+        console.log("error in starred",e)
+        res.status(500).json({ error: "Internal server error" })
+    }
 })
-
 
 app.post('/ask',
     async(req , res)=>{

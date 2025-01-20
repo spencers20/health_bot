@@ -22,6 +22,7 @@ const downloadsvg=document.querySelector('.export')  // Changed to select by cla
 const allcheckbox=document.getElementById('checkbox')
 const onehistory=document.querySelector('entry_history')
 const maincheckbox = document.getElementById('checkbox')
+
 // const historyelements=require('./reusablecomponents.js')
 let options
 const date=new Date()
@@ -94,10 +95,16 @@ let allcheckboxes
 
 function historyelements(results, entries) {
     // Clear existing entries first
+    const wrapperentries=document.createElement('div')
+    wrapperentries.innerHTML=''
+    entries.appendChild(wrapperentries)
     // entries.innerHTML = '';
     
     results.forEach(doc => {
         doc.histories.forEach(entry => {
+            const length=doc.histories.length
+            const totalentries=document.getElementById('totalentries')
+            totalentries.innerHTML=`${length} total entries`
             const entryDiv = document.createElement('div')
             entryDiv.classList.add('entry_history')
 
@@ -215,7 +222,7 @@ function historyelements(results, entries) {
             detailscontainer.appendChild(entry_date)
 
             entryDiv.appendChild(detailscontainer)
-            entries.appendChild(entryDiv)
+            wrapperentries.appendChild(entryDiv)
         })
     })
 }
@@ -228,11 +235,10 @@ async function gethistory(){
         const historydetails=await fetch('/entries')
         const results =await historydetails.json()
         const entries=document.querySelector('.entries')
-        const totalentries=document.getElementById('totalentries')
-        totalentries.innerHTML=`${results.length} total entries`
+        
         console.log(`results.length  ${results.length}`  )
         historyelements(results,entries)
-    
+        
         updateallcheckboxes()
         console.log(results)
     } catch(e){
@@ -242,15 +248,29 @@ async function gethistory(){
 }
 
 async function getstarred() {
-    const starreddetails=await fetch('/starred')   
-    const results=await starreddetails.json()
-    const entries=document.querySelector('.entries')
-    const totalentries=document.getElementById('totalentries')
-    totalentries.innerHTML=`${results.length} total starred entries`
-    historyelements(results,entries)
-    updateallcheckboxes()
+    try{
+        console.log('getstarred clicked')
+        const starreddetails=await fetch('/starred')   
+        const results=await starreddetails.json()
+        console.log(`results.length  ${results.length}`  )
+        const entries=document.querySelector('.entries')
+        // entries.innerHTML = ''; // Clear all existing entries first
+        historyelements(results,entries)
+        updateallcheckboxes()
+    }catch(e){
+        console.log('error getstarred',e )
+
+    }
     
 }
+
+starred.addEventListener('click',async()=>{
+    console.log('starred opened')
+    await getstarred()
+    
+
+}
+    )
 
 
 document.addEventListener('DOMContentLoaded',async()=>{
