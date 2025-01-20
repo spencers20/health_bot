@@ -1,4 +1,3 @@
-
 const currentdate=document.getElementById('currentdate')
 // const entrytype=document.getElementById('entrytype')
 const duration =document.getElementById('duration')
@@ -21,9 +20,10 @@ const starsvg=document.getElementById('starsvg')
 const deletesvg=document.getElementById('deletesvg')
 const downloadsvg=document.getElementById('downloadsvg')
 const onehistory=document.querySelector('entry_history')
+let options
 
 const date=new Date()
-const options={weekday:'long',day:'numeric',month:'numeric',year:'numeric'}
+options={weekday:'long',day:'numeric',month:'numeric',year:'numeric'}
 const formattedDate=date.toLocaleDateString('en-US',options)
 currentdate.textContent=formattedDate
 
@@ -142,6 +142,41 @@ async function gethistory(){
                     console.log ('detailscontainer clicked')
                     const popup=document.createElement('div')
                     popup.classList.add('popup')
+                    document.body.appendChild(popup)
+                    popup.style.display='flex'
+
+                    const popupcontent=document.createElement('div')
+                    popupcontent.classList.add('popup-content')
+                    popup.appendChild(popupcontent)
+
+
+                    const popdate=document.createElement('span')
+                    popdate.style.marginLeft='500px'
+                    const currentdate=new Date(entry.date).toLocaleDateString('en-US', options)
+                    popdate.innerHTML=currentdate   
+                    popupcontent.appendChild(popdate)
+                    console.log("date",entry.date)
+
+                    const poptittle=document.createElement('span')
+                    poptittle.style.fontSize='20px'
+                    poptittle.innerHTML=entry.tittle
+                    popupcontent.appendChild(poptittle)
+
+                    const lineBreak = document.createElement('br')
+                    popupcontent.appendChild(lineBreak)
+
+                    const popdescription=document.createElement('span')
+                    popdescription.innerHTML=entry.description
+                    popupcontent.appendChild(popdescription)
+
+                    document.addEventListener('click',(e)=>{
+                        if(e.target==popup){
+                            document.body.removeChild(popup)
+                        }
+                    })
+
+                   
+                })
 
 
                 entry_details=document.createElement('div')
