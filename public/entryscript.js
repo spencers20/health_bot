@@ -20,6 +20,7 @@ const selection=document.getElementById('selection')
 const starsvg=document.getElementById('starsvg')
 const deletesvg=document.getElementById('deletesvg')
 const downloadsvg=document.getElementById('downloadsvg')
+const onehistory=document.querySelector('entry_history')
 
 const date=new Date()
 const options={weekday:'long',day:'numeric',month:'numeric',year:'numeric'}
@@ -134,9 +135,18 @@ async function gethistory(){
                 entryDiv.appendChild(entrycheckbox)
 
 
+                const detailscontainer=document.createElement('div')
+                detailscontainer.classList.add('detailscontainer')
+
+                detailscontainer.addEventListener('click',()=>{
+                    console.log ('detailscontainer clicked')
+                    const popup=document.createElement('div')
+                    popup.classList.add('popup')
+
+
                 entry_details=document.createElement('div')
                 entry_details.classList.add('entrydetails')
-                entryDiv.appendChild(entry_details)
+                detailscontainer.appendChild(entry_details)
 
                 entry_tittle=document.createElement('span')
                 entry_tittle.style.marginLeft='10px'
@@ -161,7 +171,9 @@ async function gethistory(){
                 entry_date.style.marginLeft='150px'
                 entry_date.style.marginBottom='5px'
                 entry_date.innerHTML=entry.date
-                entryDiv.appendChild(entry_date)
+                detailscontainer.appendChild(entry_date)
+
+                entryDiv.appendChild(detailscontainer)
 
                 entries.appendChild(entryDiv)
 
