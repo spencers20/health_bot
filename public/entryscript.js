@@ -18,10 +18,12 @@ const description=document.getElementById('description')
 const selection=document.getElementById('selection')
 const starsvg=document.getElementById('starsvg')
 const deletesvg=document.getElementById('deletesvg')
-const downloadsvg=document.getElementById('downloadsvg')
+const downloadsvg=document.querySelector('.export')  // Changed to select by class
+const allcheckbox=document.getElementById('checkbox')
 const onehistory=document.querySelector('entry_history')
+const maincheckbox = document.getElementById('checkbox')
+// const historyelements=require('./reusablecomponents.js')
 let options
-
 const date=new Date()
 options={weekday:'long',day:'numeric',month:'numeric',year:'numeric'}
 const formattedDate=date.toLocaleDateString('en-US',options)
@@ -87,6 +89,138 @@ entryclassification.addEventListener('click',async()=>{
 )
 
 let keydate=[];
+let alldates=[]
+let allcheckboxes 
+
+function historyelements(results, entries) {
+    // Clear existing entries first
+    // entries.innerHTML = '';
+    
+    results.forEach(doc => {
+        doc.histories.forEach(entry => {
+            const entryDiv = document.createElement('div')
+            entryDiv.classList.add('entry_history')
+
+            if (!alldates.includes(entry.date)) {
+                alldates.push(entry.date)
+            }
+            
+            const entrycheckbox=document.createElement('input')
+            entrycheckbox.type='checkbox'
+            entrycheckbox.classList.add('entry-checkbox')
+            //set attribute to get the checked details
+            entrycheckbox.setAttribute('details.date',entry.date)
+            entrycheckbox.setAttribute('details.tittle', entry.tittle)
+            
+            entrycheckbox.addEventListener('change', (event) => {
+                console.log('event listener entered')
+                checkboxbar()
+                const checkbox = event.target
+                const date = checkbox.getAttribute('details.date')
+                
+                if (checkbox.checked) {
+                    if (!keydate.includes(date)) {
+                        keydate.push(date)
+                    }
+                    if (!alldates.includes(date)) {
+                        alldates.push(date)
+                    }
+                    console.log(`alldates : ${alldates} , allkeydates : ${keydate}`)
+                } else {
+                    const index = keydate.indexOf(date)
+                    if (index !== -1) {
+                        keydate.splice(index, 1)
+                    }
+                    const index2 = alldates.indexOf(date)
+                    if (index2 !== -1) {
+                        alldates.splice(index2, 1)
+                        console.log('remaining dates', alldates)
+                    }
+                    if (maincheckbox) {
+                        maincheckbox.checked = false
+                    }
+                    console.log('checkbox unchecked')
+                }
+            })
+                
+            entryDiv.appendChild(entrycheckbox)
+
+            const detailscontainer = document.createElement('div')
+            detailscontainer.classList.add('detailscontainer')
+
+            detailscontainer.addEventListener('click', () => {
+                console.log('detailscontainer clicked')
+                const popup = document.createElement('div')
+                popup.classList.add('popup')
+                document.body.appendChild(popup)
+                popup.style.display = 'flex'
+
+                const popupcontent = document.createElement('div')
+                popupcontent.classList.add('popup-content')
+                popup.appendChild(popupcontent)
+
+                const popdate = document.createElement('span')
+                popdate.style.marginLeft = '500px'
+                const currentdate = new Date(entry.date).toLocaleDateString('en-US', options)
+                popdate.innerHTML = currentdate   
+                popupcontent.appendChild(popdate)
+
+                const poptittle = document.createElement('span')
+                poptittle.style.fontSize = '20px'
+                poptittle.innerHTML = entry.tittle
+                popupcontent.appendChild(poptittle)
+
+                const lineBreak = document.createElement('br')
+                popupcontent.appendChild(lineBreak)
+
+                const popdescription = document.createElement('span')
+                popdescription.innerHTML = entry.description
+                popupcontent.appendChild(popdescription)
+
+                document.addEventListener('click',(e)=>{
+                    if(e.target==popup){
+                        document.body.removeChild(popup)
+                    }
+                })
+
+               
+            })
+
+            const entry_details = document.createElement('div')
+            entry_details.classList.add('entrydetails')
+            detailscontainer.appendChild(entry_details)
+
+            const entry_tittle = document.createElement('span')
+            entry_tittle.style.marginLeft = '10px'
+            entry_tittle.style.marginBottom = '5px'
+            entry_tittle.style.fontSize = '18px'
+            entry_tittle.style.fontWeight = '100'
+            entry_tittle.style.fontFamily = 'serif'
+            entry_tittle.innerHTML = entry.tittle
+            entry_details.appendChild(entry_tittle)
+
+            const entry_description = document.createElement('span')
+            entry_description.style.marginLeft = '10px'
+            entry_description.style.marginBottom = '5px'
+            entry_description.style.width = '300px'
+            const stringentrydesc = String(entry.description)
+            const words = stringentrydesc.split(' ')
+            entry_description.innerHTML = words.slice(0, 7).join(' ') + '...'
+            entry_details.appendChild(entry_description)
+
+            const entry_date = document.createElement('span')
+            entry_date.style.marginLeft = '150px'
+            entry_date.style.marginBottom = '5px'
+            entry_date.innerHTML = entry.date
+            detailscontainer.appendChild(entry_date)
+
+            entryDiv.appendChild(detailscontainer)
+            entries.appendChild(entryDiv)
+        })
+    })
+}
+
+ 
 
 async function gethistory(){
     try{
@@ -94,136 +228,11 @@ async function gethistory(){
         const historydetails=await fetch('/entries')
         const results =await historydetails.json()
         const entries=document.querySelector('.entries')
+        const totalentries=document.getElementById('totalentries')
+        totalentries.innerHTML=`${results.length} total entries`
+        console.log(`results.length  ${results.length}`  )
+        historyelements(results,entries)
     
-        results.forEach(doc=>{
-            doc.histories.forEach(entry=>{
-
-                entryDiv=document.createElement('div')
-                entryDiv.classList.add('entry_history')
-                
-                
-                const entrycheckbox=document.createElement('input')
-                entrycheckbox.type='checkbox'
-                entrycheckbox.classList.add('entry-checkbox')
-                //set attribute to get the checked details
-                entrycheckbox.setAttribute('details.date',entry.date)
-                entrycheckbox.setAttribute('details.tittle', entry.tittle)
-
-
-                
-                entrycheckbox.addEventListener('change', (event)=>{
-                    console.log('event listener entered')
-                    checkboxbar()
-                    const checkbox=event.target
-                    const date =checkbox.getAttribute('details.date')
-                    // const date=new Date(date)
-                    if (checkbox.checked){
-                        if (!keydate.includes(date)){
-                            keydate.push(date)
-                        }
-                    }
-                    else{
-                        const index =keydate.indexOf(date)
-
-                        if(index !==-1){
-                            keydate.splice(index,1)
-                        }
-                        console.log('checkbox unchecked')
-                    }
-                })
-                    
-                entryDiv.appendChild(entrycheckbox)
-
-
-                const detailscontainer=document.createElement('div')
-                detailscontainer.classList.add('detailscontainer')
-
-                detailscontainer.addEventListener('click',()=>{
-                    console.log ('detailscontainer clicked')
-                    const popup=document.createElement('div')
-                    popup.classList.add('popup')
-                    document.body.appendChild(popup)
-                    popup.style.display='flex'
-
-                    const popupcontent=document.createElement('div')
-                    popupcontent.classList.add('popup-content')
-                    popup.appendChild(popupcontent)
-
-
-                    const popdate=document.createElement('span')
-                    popdate.style.marginLeft='500px'
-                    const currentdate=new Date(entry.date).toLocaleDateString('en-US', options)
-                    popdate.innerHTML=currentdate   
-                    popupcontent.appendChild(popdate)
-                    console.log("date",entry.date)
-
-                    const poptittle=document.createElement('span')
-                    poptittle.style.fontSize='20px'
-                    poptittle.innerHTML=entry.tittle
-                    popupcontent.appendChild(poptittle)
-
-                    const lineBreak = document.createElement('br')
-                    popupcontent.appendChild(lineBreak)
-
-                    const popdescription=document.createElement('span')
-                    popdescription.innerHTML=entry.description
-                    popupcontent.appendChild(popdescription)
-
-                    document.addEventListener('click',(e)=>{
-                        if(e.target==popup){
-                            document.body.removeChild(popup)
-                        }
-                    })
-
-                   
-                })
-
-
-                entry_details=document.createElement('div')
-                entry_details.classList.add('entrydetails')
-                detailscontainer.appendChild(entry_details)
-
-                entry_tittle=document.createElement('span')
-                entry_tittle.style.marginLeft='10px'
-                entry_tittle.style.marginBottom='5px'
-                entry_tittle.style.fontSize='18px'
-                entry_tittle.style.fontWeight='100'
-                entry_tittle.style.fontFamily='serif'
-                entry_tittle.innerHTML=entry.tittle
-                entry_details.appendChild(entry_tittle)
-
-                entry_description=document.createElement('span')
-                entry_description.style.marginLeft='10px'
-                entry_description.style.marginBottom='5px'
-                entry_description.style.width='300px'
-                const stringentrydesc=String(entry.description)
-                const words= stringentrydesc.split(' ')
-                entry_description.innerHTML=words.slice(0,7).join(' ')+'...'
-                // console.log(words.slice(0,7).join(' ')+'...')
-                entry_details.appendChild(entry_description)
-
-                entry_date=document.createElement('span')
-                entry_date.style.marginLeft='150px'
-                entry_date.style.marginBottom='5px'
-                entry_date.innerHTML=entry.date
-                detailscontainer.appendChild(entry_date)
-
-                entryDiv.appendChild(detailscontainer)
-
-                entries.appendChild(entryDiv)
-
-
-
-
-
-                console.log("date",entry.date)
-                console.log("tittle",entry.tittle)
-                console.log("description",entry.description)    
-    
-    
-            })
-        })
-
         updateallcheckboxes()
         console.log(results)
     } catch(e){
@@ -232,21 +241,34 @@ async function gethistory(){
 
 }
 
+async function getstarred() {
+    const starreddetails=await fetch('/starred')   
+    const results=await starreddetails.json()
+    const entries=document.querySelector('.entries')
+    const totalentries=document.getElementById('totalentries')
+    totalentries.innerHTML=`${results.length} total starred entries`
+    historyelements(results,entries)
+    updateallcheckboxes()
+    
+}
+
 
 document.addEventListener('DOMContentLoaded',async()=>{
-    await gethistory()
-
-    const checkbox=document.getElementById('checkbox')
-    checkbox.addEventListener('change',handleselect)
-    countunchecked()
+    await gethistory()  
+    // countunchecked()
+    
+    maincheckbox.addEventListener('change',handleselect)
+    
 })
 
 // const allcheckboxes=document.querySelectorAll('.entry-checkbox')
-let allcheckboxes
+
+// allcheckbox contains all the checkboxes in the details list
 
 const updateallcheckboxes=()=>{
-    allcheckboxes=document.querySelectorAll('.entry-checkbox')
+    allcheckboxes=document.querySelectorAll('.entry-checkbox') //takes any checkbox witth clas name entry-checkbox
     console.log('updated checkboxes', allcheckboxes)
+    // console.log(Array.isArray(allcheckboxes)) 
     return allcheckboxes
 
 }
@@ -257,9 +279,12 @@ const countstatement=document.getElementById('countstatement')
 
 const countunchecked=()=>{
     updateallcheckboxes()
+    //turns allcheckboxes to an then counts those which are not checked
     const uncheckedcount=Array.from(allcheckboxes).filter(checkbox=>!checkbox.checked).length
     const totalentries=document.getElementById('totalentries')
     totalentries.innerHTML=`${uncheckedcount} total entries`
+    return uncheckedcount
+   
 }
 //count all selected entries
 const countchecked=()=>{
@@ -277,7 +302,8 @@ function handleselect(event){
     const date =checkbox.getAttribute('details.date')
     allcheckboxes.forEach(checkbox=>{
         checkbox.checked=event.target.checked
-       
+        console.log(" allcheckboxes checked", alldates)
+
     })
     const count=countchecked()
     console.log('count ',count)
@@ -285,11 +311,13 @@ function handleselect(event){
 
     if (checkbox.checked==true){
                 selection.style.display='flex'
+            
                 // if (!keydate.includes(date)){
                 //     keydate.push(date)
                 // }
      } 
     else{
+        event.target.checked==false
         const index=keydate.indexOf(date)
         if(index !==-1){
             keydate.splice(index,1)
@@ -312,18 +340,79 @@ function checkboxbar(){
        
     }
 }
+
+// Get both download SVGs
+const downloadsvgHeader = document.getElementById('downloadsvg-header')
+const downloadsvgSelection = document.getElementById('downloadsvg-selection')
+
+// Function to handle download
+async function handleDownload() {
+    try {
+        console.log('download key pressed...')
+        let keyydate
+        if (maincheckbox.checked == true) {
+            keyydate = alldates
+        } else {
+            keyydate = keydate
+        }
+        const params = keyydate.map(date => `keydate=${encodeURIComponent(date)}`).join('&')
+        await fetch(`/download?${params}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('the response was not ok')
+            }
+            return response.blob()
+        }).then(blob => {
+            const url = window.URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.style.display = "flex"
+            a.href = url
+            a.download = 'histories.pdf'
+
+            document.body.appendChild(a)
+            a.click()
+
+            // Cleanup
+            window.URL.revokeObjectURL(url)
+            document.body.removeChild(a)
+        })
+    } catch(e) {
+        console.log('error in the downloadsvg', e)
+    }
+}
+
+// Add click event listeners to both download SVGs
+downloadsvgHeader.addEventListener('click', handleDownload)
+downloadsvgSelection.addEventListener('click', handleDownload)
+
 // starred saving
 starsvg.addEventListener('click',async()=>{
     try{
         console.log('starsvg entered...')
         console.log('starred clicked')
         console.log('starred dates',keydate)
+        let keyydate
+        if(maincheckbox.checked==true){
+            keyydate=alldates
+        }
+        else{
+            keyydate=keydate
+        }
+
+        console.log('keyydate',keyydate)
+
+
         const results=await fetch('/updates',{
             method: 'POST',
             headers: {
                 'Content-Type':'application/json'
             },
-            body:JSON.stringify({keydate})
+            body:JSON.stringify({keyydate})
         })
 
         if (results.ok){
@@ -341,48 +430,21 @@ starsvg.addEventListener('click',async()=>{
 //delete selected entries
 deletesvg.addEventListener('click',async()=>{
     console.log('keydates', keydate)
+    let keyydate
+    if(maincheckbox.checked==true){
+        keyydate=alldates
+    }
+    else{
+        keyydate=keydate
+    }
+
+    console.log('keyydate',keyydate)
     console.log("delete key pressed")
     const results=await fetch('/delete',{
         method:'POST',
         headers:{
             "Content-Type":"application/json"
         },
-        body:JSON.stringify(keydate)
+        body:JSON.stringify(keyydate)
     })
-})
-
-//download selected data to pdf
-downloadsvg.addEventListener('click',async()=>{
-    try{
-        console.log('download key pressed...')
-        const params=keydate.map(date=>`keydate=${encodeURIComponent(date)}`).join('&')
-        await fetch(`/download?${params}`,{
-            method:'GET',
-            headers:{
-                'Content-Type':'application/json'
-            },
-         
-        })
-        .then(response=>{
-            if(!response.ok){
-                throw new Error('the response was not ok')
-            }
-            return response.blob()
-        }).then(blob=>{
-                const url=window.URL.createObjectURL(blob)
-                const a= document.createElement('a')
-                a.style.display="flex"
-                a.href=url 
-                a.download='histories.pdf'
-
-                document.body.appendChild(a)
-                a.click()
-
-                window.URL.revokeObjectURL(url)
-                document.body.removeChild(a)
-
-        })
-    }catch(e){
-        console.log('error in the downloadsvg',e)
-    }
 })

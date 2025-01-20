@@ -364,7 +364,7 @@ app.post('/delete',async(req,res)=>{
 app.post('/updates',async(req,res)=>{
     try{
 
-        const keydates=req.body.keydate
+        const keydates=req.body.keyydate
         // keydates=keydates.
         const db=await getdb()
         const collection=db.collection('history')
@@ -396,6 +396,41 @@ app.post('/updates',async(req,res)=>{
     }
 })
 
+app.get('/starred',async(req,res)=>{
+    const db=await getdb()
+    const collection=db.collection('history')
+    const results=await collection.aggregate([
+        {
+            $match:{
+                _id:"100984849132378172203",
+                "histories.status":"starred",
+                "histories":{$elemMatch:{status:"starred"}}
+            }
+        },
+        {
+            $unwind:"$histories"
+        },
+        {
+            $sort:{
+                "histories.date":-1
+            }
+        },
+        {
+            $group:{
+                _id:"_id",
+                histories:{
+                    $push:{
+                        date:"$histories.date",
+                        tittle:"$histories.tittle",
+                        description:"$histories.description",
+                        summary:"$histories.summary"
+                    }
+                }
+            }
+        }
+    ])
+
+})
 
 
 app.post('/ask',
