@@ -95,6 +95,7 @@ let allcheckboxes
 
 function historyelements(results, entries) {
     // Clear existing entries first
+    entries.innerHTML = '';
     const wrapperentries=document.createElement('div')
     wrapperentries.innerHTML=''
     entries.appendChild(wrapperentries)
@@ -232,7 +233,7 @@ function historyelements(results, entries) {
 async function gethistory(){
     try{
 
-        const historydetails=await fetch('/entries')
+        const historydetails=await fetch('/user/entries')
         const results =await historydetails.json()
         const entries=document.querySelector('.entries')
         
@@ -247,10 +248,11 @@ async function gethistory(){
 
 }
 
+
 async function getstarred() {
     try{
         console.log('getstarred clicked')
-        const starreddetails=await fetch('/starred')   
+        const starreddetails=await fetch('/user/starred')   
         const results=await starreddetails.json()
         console.log(`results.length  ${results.length}`  )
         const entries=document.querySelector('.entries')
@@ -266,11 +268,18 @@ async function getstarred() {
 
 starred.addEventListener('click',async()=>{
     console.log('starred opened')
+    allentry.innerHTML='starred entry'
     await getstarred()
     
 
 }
     )
+
+allentry.addEventListener('click',async()=>{
+    console.log('allentry opened')
+    allentry.innerHTML='all entry'
+    await gethistory()
+})
 
 
 document.addEventListener('DOMContentLoaded',async()=>{
@@ -376,7 +385,7 @@ async function handleDownload() {
             keyydate = keydate
         }
         const params = keyydate.map(date => `keydate=${encodeURIComponent(date)}`).join('&')
-        await fetch(`/download?${params}`, {
+        await fetch(`/user/download?${params}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -410,6 +419,8 @@ async function handleDownload() {
 downloadsvgHeader.addEventListener('click', handleDownload)
 downloadsvgSelection.addEventListener('click', handleDownload)
 
+
+
 // starred saving
 starsvg.addEventListener('click',async()=>{
     try{
@@ -427,7 +438,7 @@ starsvg.addEventListener('click',async()=>{
         console.log('keyydate',keyydate)
 
 
-        const results=await fetch('/updates',{
+        const results=await fetch('/user/updates',{
             method: 'POST',
             headers: {
                 'Content-Type':'application/json'
@@ -460,7 +471,7 @@ deletesvg.addEventListener('click',async()=>{
 
     console.log('keyydate',keyydate)
     console.log("delete key pressed")
-    const results=await fetch('/delete',{
+    const results=await fetch('/user/delete',{
         method:'POST',
         headers:{
             "Content-Type":"application/json"

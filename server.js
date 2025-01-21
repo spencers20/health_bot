@@ -54,7 +54,7 @@ try{
 
 app.get('/',(req , res)=>{
     console.log('entered')
-    res.render('entries.ejs')
+    res.render('index.ejs')
 })
 // app.get('/symptomchecker',(req , res)=>{
 //     console.log('entered')
@@ -434,7 +434,7 @@ app.get('/starred',async(req,res)=>{
                     histories: {
                         $push: {
                             date: "$histories.date",
-                            title: "$histories.title", // Corrected from `tittle`
+                            tittle: "$histories.tittle", // Corrected from `tittle`
                             description: "$histories.description",
                             summary: "$histories.summary"
                         }
