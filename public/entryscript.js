@@ -233,7 +233,7 @@ function historyelements(results, entries) {
 async function gethistory(){
     try{
 
-        const historydetails=await fetch('/user/entries')
+        const historydetails=await fetch('/user/myhistory')
         const results =await historydetails.json()
         const entries=document.querySelector('.entries')
         
@@ -285,7 +285,6 @@ allentry.addEventListener('click',async()=>{
 document.addEventListener('DOMContentLoaded',async()=>{
     await gethistory()  
     // countunchecked()
-    
     maincheckbox.addEventListener('change',handleselect)
     
 })
@@ -387,13 +386,12 @@ async function handleDownload() {
         const params = keyydate.map(date => `keydate=${encodeURIComponent(date)}`).join('&')
         await fetch(`/user/download?${params}`, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+          
         })
         .then(response => {
+            
             if (!response.ok) {
-                throw new Error('the response was not ok')
+                throw new Error('the response was not ok', response)
             }
             return response.blob()
         }).then(blob => {
@@ -478,4 +476,12 @@ deletesvg.addEventListener('click',async()=>{
         },
         body:JSON.stringify(keyydate)
     })
+
+    if (allentry.innerHTML=='all entries'){
+        await gethistory()
+    } else{
+       await getstarred()
+    }
+
+   
 })

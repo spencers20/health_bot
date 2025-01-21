@@ -3,6 +3,8 @@ const router=express.Router()
 const {getdb}=require('../config/database')
 const { ObjectId } = require('mongodb')
 const Groq=require('groq-sdk')
+const PDFDocument =require('pdfkit')
+const fs=require('fs')
 
 
 router.use( async (req, res,next)=>{
@@ -61,7 +63,7 @@ router.get('/historyentry',async(req, res)=>{
     if(!details){  
         throw new Error("no user found")
     }
-    console.log(details)
+    console.log(details) 
 
     res.render('history.ejs',{user : req.user}) 
 })
@@ -69,6 +71,7 @@ router.get('/historyentry',async(req, res)=>{
 // route to check the history of your entries ..entries.ejs
 router.get('/checkhistory', async(req, res)=>{
     try{
+        
         const db = await getdb()
         const users=db.collection('users')
         const userId=req.user.googleId
@@ -561,7 +564,7 @@ const generatepdf=(data,res)=>{
 //router to download the entries in pdf form
 router.get('/download', async(req,res)=>{
     try{
-
+       console.log('download entered')
         const userId=req.user.googleId
         const keydates = req.query.keydate;
         if (!keydates) {
