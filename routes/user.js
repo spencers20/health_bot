@@ -714,6 +714,7 @@ router.post('/updates',async(req,res)=>{
 router.get('/starred',async(req,res)=>{
     try{
         console.log('starred entered...')
+        const userId=req.user.googleId
 
         const db=await getdb()
         const collection=db.collection('history')

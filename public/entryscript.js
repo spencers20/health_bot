@@ -477,11 +477,11 @@ deletesvg.addEventListener('click',async()=>{
         body:JSON.stringify(keyydate)
     })
 
-    if (allentry.innerHTML=='all entries'){
-        await gethistory()
+    if (allentry.innerHTML.trim()==='starred entry '){
+        await getstarred()
     } else{
-       await getstarred()
+      await gethistory()
     }
 
-   
+    
 })
