@@ -404,34 +404,45 @@ app.get('/starred',async(req,res)=>{
         const collection=db.collection('history')
         const results=await collection.aggregate([
             {
-                $match:{
-                    _id:"100984849132378172203",
-                    "histories.status":"starred",
-                    "histories":{$elemMatch:{status:"starred"}}
+                $match: {
+                    _id: "100984849132378172203",
+                    "histories.status": "starred"
                 }
             },
             {
-                $unwind:"$histories"
-            },
-            {
-                $sort:{
-                    "histories.date":-1
+                $project: {
+                    histories: {
+                        $filter: {
+                            input: "$histories",
+                            as: "history",
+                            cond: { $eq: ["$$history.status", "starred"] }
+                        }
+                    }
                 }
             },
             {
-                $group:{
-                    _id:"_id",
-                    histories:{
-                        $push:{
-                            date:"$histories.date",
-                            tittle:"$histories.tittle",
-                            description:"$histories.description",
-                            summary:"$histories.summary"
+                $unwind: "$histories"
+            },
+            {
+                $sort: {
+                    "histories.date": -1
+                }
+            },
+            {
+                $group: {
+                    _id: "$_id",
+                    histories: {
+                        $push: {
+                            date: "$histories.date",
+                            title: "$histories.title", // Corrected from `tittle`
+                            description: "$histories.description",
+                            summary: "$histories.summary"
                         }
                     }
                 }
             }
         ]).toArray()
+        console.log("starred results", results)
         res.status(200).json(results)
     }catch(e){
         console.log("error in starred",e)
