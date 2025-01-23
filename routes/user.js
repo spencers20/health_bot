@@ -5,6 +5,7 @@ const { ObjectId } = require('mongodb')
 const Groq=require('groq-sdk')
 const PDFDocument =require('pdfkit')
 const fs=require('fs')
+const { group } = require('console')
 
 
 router.use( async (req, res,next)=>{
@@ -30,7 +31,7 @@ router.get('/',
         if(!details){
             throw new Error("no user found")
         }
-        console.log(details)
+        console.log(JSON.stringify(details, null, 2))
 
         res.render('chat.ejs',{user : req.user})
     }
@@ -47,7 +48,7 @@ router.get('/symptomchecker',async(req, res)=>{
     if(!details){
         throw new Error("no user found")
     }
-    console.log(details)
+    console.log(JSON.stringify(details, null, 2))
 
     res.render('symptom.ejs',{user : req.user})
 
@@ -63,7 +64,7 @@ router.get('/historyentry',async(req, res)=>{
     if(!details){  
         throw new Error("no user found")
     }
-    console.log(details) 
+    console.log(JSON.stringify(details, null, 2)) 
 
     res.render('history.ejs',{user : req.user}) 
 })
@@ -160,24 +161,27 @@ async function startnewchat(userId,message){
     
         //saving the new chat in a database
         const chattoadd={
-            chatId:results.chatId,
-            chatMessageId:results.chatMessageId,
-            messages:[
-                {
-                    conversation:[
-                        {
-                            symptomquestion:results.question,
-                            response:results.text,
-                            summary:summary,
-                        
-                        } ,
-                        {
-                            chattime:new Date()
-                        }]
-                }],
-            createdAt:new Date(),
-            updatedAt:new Date()
+                chatId:results.chatId,
+                chatMessageId:results.chatMessageId,
+                messages:[
+
+                    {
+                        question: results.question,
+                        response: results.text,
+                        summary:summary,
+                        chattime:new Date()
+    
+                    }
+                ],
+                
+                createdAt:new Date(),
+                updatedAt:new Date()
             }
+                
+    
+        
+        
+            
             
         const db=await getdb()
         const data=db.collection('data')
@@ -234,28 +238,24 @@ async function conversations(userId,message){
   
     
      //checking the existence of a chatId in the database
-        const findchatId=await data.findOne({
-            _id:userId,
-            'chats.chatId':chatId
-        })
-    //throw an error if no chatId is found
-        if (!findchatId){
-            throw new Error({chatIderror:"chatId not found"})
-        }
+    //  const findchatId = await data.findOne({
+    //     _id: userId,
+    //     chats: {
+    //         $elemMatch: {
+    //             chatId: chatId
+    //         }
+    //     }
+    // });
+    // //throw an error if no chatId is found
+    //     if (!findchatId){
+    //         throw new Error(JSON.stringify({chatIderror:"chatId not found"}))
+    //     }
     //save the new conversation to the db
         const newconversation={
-            conversation:[
-                {
-                    role:"human",
-                    symptomquestion:results.question,
-                    response:results.text,
-                    summary:summary,
-                
-                } ,
-                {
-                    chattime:new Date()
-                }
-            ],
+            question:results.question,
+            response:results.text,
+            summary:summary,
+            chattime: new Date()
           
         }
     //update the messages in the db
@@ -300,26 +300,26 @@ router.post('/chat',
             })
 // if not then save the user to the database and initialize them with a new chat
             if (!objectid){
-                const newuser=data.insertOne({_id:userId})
-
-                if (newuser.acknowledged){
+                data.insertOne({_id:userId})
                 flowiseResponse=await startnewchat(userId,message)
             
-                }   
+            } else{
+                const activechatId=await data.countDocuments({
+                    _id:userId,
+                    activechatId:null
+                })
+    // if theres an activechatId  call the conversations function , if not then call the startnewchat function
+                if (activechatId > 0){
+                    flowiseResponse=await startnewchat(userId,message)
+                } else {
+    
+                   flowiseResponse= await conversations(userId,message)
+    
+                }
+
             }
             // check if theres an active chatId existing in the database
-            const activechatId=await data.countDocuments({
-                _id:userId,
-                activechatId:null
-            })
-// if theres an activechatId  call the conversations function , if not then call the startnewchat function
-            if (activechatId > 0){
-                flowiseResponse=await startnewchat(userId,message)
-            } else {
-
-               flowiseResponse= await conversations(userId,message)
-
-            }
+            
             
 
             res.status(200).json(flowiseResponse)
@@ -370,62 +370,14 @@ router.get('/gethistory', async(req, res)=>{
         const data=db.collection('data')
         const userchats=await data.findOne(
             {_id:req.user.googleId}
-        ). sort({createAt:-1}).toArray()
-        console.log(userchats)
+        ).sort({createAt:-1}).toArray()
+        console.log(JSON.stringify(userchats, null, 2))
         res.status(200).json(userchats)
     }catch(e){
         console.error(`error in getting history ${e}`)
     }
 
 })
-
-//get the history entries from the database to display
-router.get('/myhistory',async(req,res)=>{
-    try{
-        const db=await getdb()
-        const collection=db.collection('history')
-        const userId=req.user.googleId
-
-        const history=await collection.aggregate([
-            {
-                $match:{_id:userId}
-            },
-            {
-                $unwind:"$histories"
-            },
-            {
-                $sort:{"histories.date":-1}
-            },
-            {
-                $group:{
-                    _id:"_id",
-                    histories:{
-                        $push:{
-                            date:"$histories.date",
-                            tittle:"$histories.tittle",
-                            description:"$histories.description",
-                            summary:"$histories.summary"
-                        }
-                    }
-                }
-            }
-        ]).toArray()
-
-        if (history) {
-            res.status(200).json(history)
-            console.log("entries retrieved successful")
-
-        }
-        
-
-    }catch(e){
-        console.log(`error in getting entries : ${e}`)
-    
-
-    }
-})
-
-
 
 
 router.post('/storehistory', async(req, res)=>{
@@ -454,12 +406,13 @@ router.post('/storehistory', async(req, res)=>{
                    filter:{_id:userId},
                    update:{
                     $push:{
-                        histories :{
+                        histories :
+                        {
                             date:date,
                             tittle:tittle,
                             description:description,
                             summary:summary
-                    }            
+                        }            
                    }
                    }
                 }
@@ -473,12 +426,6 @@ router.post('/storehistory', async(req, res)=>{
         }
 
         // console.log('history stored successfully')
-        
-
-        
-
-        
-
 
     }
     catch(e){
@@ -486,8 +433,11 @@ router.post('/storehistory', async(req, res)=>{
     }
 })
 
+
+
+
 //funtion to merge the data  (historis) of the same _id
-const mergehistories= (data)=>{
+const mergeddata= async(data)=>{
     try{
         console.log("merged history entered...")
         const mergedData={}
@@ -560,6 +510,110 @@ const generatepdf=(data,res)=>{
         res.status(500).json({ error: 'Error generating PDF' });
     }
 }
+
+//get the history entries from the database to display
+router.get('/myhistory',async(req,res)=>{
+    try{
+        const db=await getdb()
+        const entries=db.collection('history')
+        const chats=db.collection('data')
+        const userId=req.user.googleId
+
+        const[chatdata,history]=await Promise.all([
+
+             await chats.aggregate([
+                // Match the document with the specified userId
+                { $match: { _id: userId } },
+                
+                // Unwind the 'chats' array to process each chat object individually
+                { $unwind: "$chats" },
+                
+                // Sort the chats by 'updatedAt' in descending order to get the latest chats first
+                { $sort: { "chats.updatedAt": -1 } },
+                
+                // Add fields to structure the desired output
+                {
+                  $addFields: {
+                    date: "$chats.updatedAt",
+                    // Extract the 'question' from the last message as the 'title'
+                    title: { $arrayElemAt: ["$chats.messages.question", -1] },
+                    // Extract the 'response' from the last message as the 'description'
+                    description: { $arrayElemAt: ["$chats.messages.response", -1] },
+                    // Extract the 'summary' from the last message
+                    summary: { $arrayElemAt: ["$chats.messages.summary", -1] },
+                    //get the chat id
+                    chatId: "$chats.chatId",
+                    // Include all messages as 'conversations'
+                    conversations: "$chats.messages"
+                  }
+                },
+                
+                // Group the processed chats back into an array under 'histories'
+                {
+                  $group: {
+                    _id: userId,
+                    histories: {
+                      $push: {
+                        date: "$date",
+                        title: "$title",
+                        description: "$description",
+                        summary: "$summary",
+                        chatId: "$chatId",
+                        conversations: "$conversations"
+                      }
+                    }
+                  }
+                }
+              ]).toArray(),
+               
+    
+            await entries.aggregate([
+                {
+                    $match:{_id:userId}
+                },
+                {
+                    $unwind:"$histories"
+                },
+                {
+                    $sort:{"histories.date":-1}
+                },
+                {
+                    $group:{
+                        _id:userId,
+                        histories:{
+                            $push:{
+                                date:"$histories.date",
+                                tittle:"$histories.tittle",
+                                description:"$histories.description",
+                                summary:"$histories.summary"
+                            }
+                        }
+                    }
+                }
+            ]).toArray()
+        ])
+        const combinedData=[...datachat,...history]
+        
+
+
+     
+
+
+
+        if (history) {
+            res.status(200).json(history)
+            console.log("entries retrieved successful")
+
+        }
+        
+
+    }catch(e){
+        console.log(`error in getting entries : ${e}`)
+    
+
+    }
+})
+
 
 //router to download the entries in pdf form
 router.get('/download', async(req,res)=>{

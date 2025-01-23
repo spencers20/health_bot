@@ -67,7 +67,7 @@ app.get('/',(req , res)=>{
 
 app.get('/tips',async(req , res)=>{
     try{
-        console.log('tips url entered...')
+        // console.log('tips url entered...')
         const db=await getdb()
         const tipscollection=db.collection('tips')
         const tipsindb= await tipscollection.find().toArray()
