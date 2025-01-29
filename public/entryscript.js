@@ -182,7 +182,7 @@ function historyelements(results, entries) {
                 popupcontent.appendChild(lineBreak)
 
                 const popdescription = document.createElement('span')
-                popdescription.innerHTML = entry.description
+                popdescription.innerHTML = entry.summary
                 popupcontent.appendChild(popdescription)
 
                 document.addEventListener('click',(e)=>{
@@ -211,7 +211,7 @@ function historyelements(results, entries) {
             entry_description.style.marginLeft = '10px'
             entry_description.style.marginBottom = '5px'
             entry_description.style.width = '300px'
-            const stringentrydesc = String(entry.description)
+            const stringentrydesc = String(entry.summary)
             const words = stringentrydesc.split(' ')
             entry_description.innerHTML = words.slice(0, 7).join(' ') + '...'
             entry_details.appendChild(entry_description)

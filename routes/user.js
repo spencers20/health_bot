@@ -223,6 +223,7 @@ async function conversations(userId,message){
         const activechatId=await data.findOne({
             _id:userId,
             'activechatId':{$exists:true}
+
         })
 
         console.log('existing active chatId',activechatId.activechatId)
@@ -420,7 +421,7 @@ router.post('/storehistory', async(req, res)=>{
             }
         ])
 
-        if (result.acknowledged){
+        if (result.acknowledged===true){
             console.log('history stored successfull')
             res.status(200).json(result)
         }
@@ -450,7 +451,7 @@ const mergeddata= async(data)=>{
                 }
             }
     
-            mergedData[item._id]=[
+            mergedData[item._id].histories=[
                 ...mergedData[item._id].histories,
                 ...item.histories
             ]
@@ -511,16 +512,17 @@ const generatepdf=(data,res)=>{
     }
 }
 
-//get the history entries from the database to display
-router.get('/myhistory',async(req,res)=>{
+
+async function combineddata (req) {
     try{
+
         const db=await getdb()
         const entries=db.collection('history')
         const chats=db.collection('data')
         const userId=req.user.googleId
-
+        
         const[chatdata,history]=await Promise.all([
-
+        
              await chats.aggregate([
                 // Match the document with the specified userId
                 { $match: { _id: userId } },
@@ -536,11 +538,11 @@ router.get('/myhistory',async(req,res)=>{
                   $addFields: {
                     date: "$chats.updatedAt",
                     // Extract the 'question' from the last message as the 'title'
-                    title: { $arrayElemAt: ["$chats.messages.question", -1] },
+                    tittle: { $arrayElemAt: ["$chats.messages.question", -1] },
                     // Extract the 'response' from the last message as the 'description'
                     description: { $arrayElemAt: ["$chats.messages.response", -1] },
                     // Extract the 'summary' from the last message
-                    summary: { $arrayElemAt: ["$chats.messages.summary", -1] },
+                    summary: "$chats.summary",
                     //get the chat id
                     chatId: "$chats.chatId",
                     // Include all messages as 'conversations'
@@ -555,7 +557,7 @@ router.get('/myhistory',async(req,res)=>{
                     histories: {
                       $push: {
                         date: "$date",
-                        title: "$title",
+                        tittle: "$tittle",
                         description: "$description",
                         summary: "$summary",
                         chatId: "$chatId",
@@ -565,8 +567,8 @@ router.get('/myhistory',async(req,res)=>{
                   }
                 }
               ]).toArray(),
-               
-    
+              
+        
             await entries.aggregate([
                 {
                     $match:{_id:userId}
@@ -592,20 +594,74 @@ router.get('/myhistory',async(req,res)=>{
                 }
             ]).toArray()
         ])
-        const combinedData=[...datachat,...history]
         
+        console.log(chatdata.chatId)
+        const combinedData=[...chatdata,...history]
+        return combinedData
+    }catch(e){
+        console.log('error in combining data',e)
+    }
+}
 
+//get the history entries from the database to display
+router.get('/myhistory',async(req,res)=>{
+    try{
+        const db=await getdb()
+        const entries=db.collection('history')
+        const chats=db.collection('data')
+        const userId=req.user.googleId
 
-     
+        const message="from the above conversations generate me a brief summary "
+        const response =await chats.find({
+            _id:userId
+        }).toArray()
 
+        for (const chat of response[0].chats) {
+            if(!chat.summaryTime || chat.updatedAt.getTime()>chat.summaryTime.getTime){
+                const flowisedata={
+                    question:message,
+                    chatId:chat.chatId
+                }
+                const  summaryresponse=await  sendToFLowise(flowisedata)
+                console.log("summary response ", summaryresponse.text)
 
+                const updatedsummary=await chats.updateOne(
+                    {_id:userId,
+                        "chats.chatId":chat.chatId
+                    },
+                    {$set:{"chats.$.summary":summaryresponse.text,
+                        "chats.$.summaryTime":new Date()}
+                    }
+                )
 
-        if (history) {
-            res.status(200).json(history)
-            console.log("entries retrieved successful")
+                if (updatedsummary.modifiedCount > 0){
+                    console.log("summary generated and updated ")
+                    const combinedData=await combineddata(req)
+                    
+                    const combined_data=Array.isArray(combinedData)? combinedData: Array.from(combinedData)
+                
+                    const datamerged=await mergeddata(combined_data)
+                    res.status(200).json(datamerged)
+                        
+                    
+                }
 
+            }
+                
+            const combinedData=await combineddata(req)
+            
+            const combined_data=Array.isArray(combinedData)? combinedData: Array.from(combinedData)
+                
+            const datamerged=await mergeddata(combined_data)
+            res.status(200).json(datamerged)
+                        
+           
+
+            
         }
-        
+    
+        // console.log('combined data  ',combinedData)
+ 
 
     }catch(e){
         console.log(`error in getting entries : ${e}`)
