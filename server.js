@@ -54,7 +54,7 @@ try{
 
 app.get('/',(req , res)=>{
     console.log('entered')
-    res.render('index.ejs')
+    res.render('trial.ejs')
 })
 // app.get('/symptomchecker',(req , res)=>{
 //     console.log('entered')

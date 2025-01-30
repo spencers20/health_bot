@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll Color Change</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+        .page {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        #page1 { background-color: white; }
+        #page2 { background-color: lightblue; transition: background-color 0.5s ease; }
+        #page3 { background-color: white; }
+        
+        /* Button Style */
+        .scroll-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            background-color: black;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        .scroll-button:hover {
+            background-color: gray;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="scroll-button" onclick="scrollToPage2()">Go to Page 2</button>
+
+    <div class="page" id="page1">Page 1</div>
+    <div class="page" id="page2">
+      <p id="tittle">
+        Page 2
+      </p>  
+    </div>
+    <div class="page" id="page3">Page 3</div>
+
+    <script>
+        const pages2=document.getElementById('page2')
+        // Scroll to Page 2 when the button is clicked
+        document.addEventListener('DOMContentLoaded',()=>{
+            console.log('window innerheight', window.innerHeight)
+            console.log('page2 starting height',pages2.offsetTop)
+        })
+        function scrollToPage2() {
+            document.getElementById("page2").scrollIntoView({ behavior: "smooth" });
+        }
+
+        // Change background color when scrolling
+        window.addEventListener("scroll", function () {
+            console.log('window  innerheight',window.innerHeight)
+            console.log('page2 starting height',pages2.offsetTop)
+            console.log('scroll length',window.scrollY)
+            const tittle=document.getElementById('tittle')
+
+            const scrollposition=window.scrollY
+            const page2start=page2.offsetTop
+            const windowinner=window.innerHeight
+
+            scrollposition >=page2start ?(
+                console.log('working on tittle...'), 
+                pages2.style.backgroundColor='green')
+            :console.log('not reached')
+
+    // Calculate the trigger point (10% of viewport height)
+
+
+
+  
+});
+
+    </script>
+
+</body>
+</html>
