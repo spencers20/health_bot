@@ -180,10 +180,49 @@ function historyelements(results, entries) {
 
                 const lineBreak = document.createElement('br')
                 popupcontent.appendChild(lineBreak)
+                if(entry.chatId){
+                    const popdescription = document.createElement('span')
+                    popdescription.innerHTML = entry.summary
+                    popupcontent.appendChild(popdescription)
 
-                const popdescription = document.createElement('span')
-                popdescription.innerHTML = entry.summary
-                popupcontent.appendChild(popdescription)
+                    const popbutton=document.createElement('button')
+                    popbutton.innerHTML='view chats'
+                    popbutton.style.width='100px'
+                    popbutton.style.height='50px'
+                    popupcontent.appendChild(popbutton)
+
+                    const lineBreak = document.createElement('br')
+                    popupcontent.appendChild(lineBreak)
+
+                    popbutton.addEventListener('click',()=>{
+                        popupcontent.style.overflowY='auto'
+                        popupcontent.style.height='70%'
+                        popupcontent.style.width='70%'
+                        popbutton.style.display='none'
+
+                        entry.conversations.map(conversation=>{
+                        const chatquestion = document.createElement('span')
+                        chatquestion.classList.add('chatquestion')
+                        chatquestion.innerHTML=conversation.question
+                        popupcontent.appendChild(chatquestion)
+
+                        const chatresponse=document.createElement('span')
+                        chatresponse.classList.add('response')
+                        chatresponse.innerHTML=conversation.response
+                        popupcontent.appendChild(chatresponse)
+
+
+                        })
+                    })
+
+
+                }else{
+
+                    const popdescription = document.createElement('span')
+                    popdescription.innerHTML = entry.description
+                    popupcontent.appendChild(popdescription)
+                }
+
 
                 document.addEventListener('click',(e)=>{
                     if(e.target==popup){

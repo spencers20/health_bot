@@ -616,6 +616,7 @@ router.get('/myhistory',async(req,res)=>{
             _id:userId
         }).toArray()
 
+        //generate summaries if the summaries do not exist or is not updated to the current time 
         for (const chat of response[0].chats) {
             if(!chat.summaryTime || chat.updatedAt.getTime()>chat.summaryTime.getTime){
                 const flowisedata={
