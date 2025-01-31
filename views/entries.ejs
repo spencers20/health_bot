@@ -179,11 +179,11 @@
             </div>
             <div class="filter" style="display: flex;">
                 
-                <div class="filtercontainer"id="entriestype" >
+                <div class="filtercontainer" >
                     <div style="margin-top:0px; margin-left:20px ; font-size: 18px;">entry type</div>
                     <div style="cursor: pointer; border: 1px solid black ; padding:5px; display: flex; justify-content: space-between; width:150px ;  margin-top:10px;  background-color: rgb(235, 235, 235);"> 
-                       <div style="display:flex; flex-direction: column;position:relative;width:100% ; margin: 5px;">
-                        <span id="currenttype" style=" background-color: azure; ">all entries</span>
+                        <div id="currenttype" style=" background-color: azure; ">all entries</div>
+                       <div id="entriestype" style="display:flex; flex-direction: column;position:relative;width:100% ; margin: 5px;">
                         <span id="allentries" style=" display:none ;margin:5px ">all entries</span>
                         <span id="symptoms" style=" display:none ;margin:5px  ">symptoms diary</span>
                         <span  id = "checkups" style=" display:none;margin:5px " >daily diary</span>
@@ -220,14 +220,14 @@
                 </div>
                 </div>
     
-                <div class="filtercontainer" id="entryclassification" >
+                <div class="filtercontainer"  >
                     <div style="margin-top:0px; margin-left: 20px; font-size: 18px;">entry classification</div>
                     <div style="cursor: pointer; border: 1px solid black ; padding:5px; display: flex; justify-content: space-between; width:150px ;  margin-top:10px; background-color: rgb(235, 235, 235);"> 
-                       <div style="display:flex; flex-direction: column;position:relative;width:100% ">
-                        <span id="currententry" style=" background-color: azure; ">all entries</span>
-                        <span id="allentry" style=" display: none; margin:5px ">all entries</span>
-                        <span  id = "starred" style="margin:5px; display:none ">starred entry</span>
-                        <span  id = "bin" style="margin: 5px; display:none ">archived entry</span>
+                        <div id="currententry" style=" background-color: azure; ">all entries</div>
+                       <div id="entryclassification" style="display:flex; flex-direction: column;position:relative;width:100%; display:none ">
+                        <span id="allentry" style=" display: flex; margin:5px ">all entries</span>
+                        <span  id = "starred" style="margin:5px; display:flex ">starred entry</span>
+                        <span  id = "bin" style="margin: 5px; display:flex ">archived entry</span>
                         
         
                         </div>

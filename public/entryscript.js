@@ -37,18 +37,20 @@ currenttype.addEventListener('click',()=>{
     try{
         const entrytype=currenttype.innerHTML.trim();  
         if(entrytype.includes('all entries')){
-            checkups.style.display='flex'
-            symptoms.style.display='flex'
-            allentries.style.display='none'
+            entriestype.style.display=='none'? (
+                allentries.style.display='none',
+                entriestype.style.display='flex'
+            ):entriestype.style.display='none'
         }else if(entrytype.includes('daily diary')){
-            allentries.style.display='flex'
-            symptoms.style.display='flex'
-            checkups.style.display='none'
+            entriestype.style.display=='none'? (
+                checkups.style.display='none',
+                entriestype.style.display='flex'          
+            ):entriestype.style.display='none'
         }else if(entrytype.includes('symptoms diary')){
-            allentries.style.display='flex'
-            checkups.style.display='flex'
-            symptoms.style.display='none'
-       
+            entriestype.style.display=='none'? (
+                symptoms.style.display='none',
+                entriestype.style.display='flex'
+            ):entriestype.style.display='none'
         }
     }catch(e){
         console.log(e)
@@ -80,16 +82,18 @@ currententry.addEventListener('click',async()=>{
         console.log('currententry', currententry.innerHTML)
         const currenttentry=currententry.innerHTML.trim();
         if( currenttentry.includes('all entries')){
-            bin.style.display='flex'
-            starred.style.display='flex'
-            console.log('starredentry',currenttentry)     
+            entryclassification.style.display=='none'?(
+                allentry.style.display='none',
+                entryclassification.style.display='flex'
+            ):entryclassification.style.display='none'               
         } else if(currenttentry.includes('starred entry')){
-            bin.style.display='flex'
-            allentry.style.display='flex'
-            starred.style.display='none'
+            entryclassification.style.display=='none'?(
+                starred.style.display='none',
+                entryclassification.style.display='flex'
+            ):entryclassification.style.display='none'
+           
         }else{
-            bin.style.display='none'
-            allentry.style.display='none'
+            entryclassification.style.display=='none'? entryclassification.style.display='flex':entryclassification.style.display='none'
         }
        
     } catch(e){
@@ -109,7 +113,8 @@ function historyelements(results, entries) {
     wrapperentries.innerHTML=''
     entries.appendChild(wrapperentries)
     // entries.innerHTML = '';
-    
+
+        
     results.forEach(doc => {
         doc.histories.forEach(entry => {
             const length=doc.histories.length
@@ -404,6 +409,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     await gethistory()  
     // countunchecked()
     maincheckbox.addEventListener('change',handleselect)
+
     
 })
 
@@ -461,8 +467,7 @@ function handleselect(event){
                 // if (!keydate.includes(date)){
                 //     keydate.push(date)
                 // }
-     } 
-    else{
+     } else{
         event.target.checked==false
         const index=keydate.indexOf(date)
         if(index !==-1){
@@ -525,6 +530,8 @@ async function handleDownload() {
             // Cleanup
             window.URL.revokeObjectURL(url)
             document.body.removeChild(a)
+
+            maincheckbox==true? maincheckbox.checked=false: maincheckbox.checked=true
         })
     } catch(e) {
         console.log('error in the downloadsvg', e)
@@ -566,7 +573,9 @@ starsvg.addEventListener('click',async()=>{
            const updated=results.json
            if (updated.success){
             const pathElement=starsvg.querySelector('path')
-            pathElement.setAttribute("fill","black")
+            pathElement.setAttribute("fill","green")
+            selection.style.display='none'
+
            }
         }
     } catch(e){

@@ -791,6 +791,7 @@ router.post('/updates',async(req,res)=>{
         const keydates=req.body.keyydate
         // keydates=keydates.
         const db=await getdb()
+        const userId=req.user.googleId
         const collection=db.collection('history')
         console.log("keydates", keydates)
         for(const dates of keydates){
