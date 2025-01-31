@@ -151,7 +151,7 @@
             </div>
             <div class="infoheader">
                 <div style="display: flex; flex-direction: column; left:5px ; margin-bottom: 0px">
-                    <span style="font-size: 22px; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">  <%=user.name%>Journal</span>
+                    <span style="font-size: 22px; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;"> <%=user.name%> Journal</span>
                     <div style=" display: flex;margin-top: 0px;">
                         <span style="border-right-style: solid; border-right-width:thin ">
                            <span id="totalentries" style="margin-right:4px;"></span> 
@@ -182,14 +182,15 @@
                 <div class="filtercontainer"id="entriestype" >
                     <div style="margin-top:0px; margin-left:20px ; font-size: 18px;">entry type</div>
                     <div style="cursor: pointer; border: 1px solid black ; padding:5px; display: flex; justify-content: space-between; width:150px ;  margin-top:10px;  background-color: rgb(235, 235, 235);"> 
-                       <div style="display:flex; flex-direction: column;position:relative;width:100% ">
-                        <span id="allentries" style=" background-color: azure; ">all entries</span>
-                        <span id="symptoms" style="margin-top: 5px; display:none   ">symptoms diary</span>
-                        <span  id = "checkups" style="margin-top: 10px; display:none">daily diary</span>
+                       <div style="display:flex; flex-direction: column;position:relative;width:100% ; margin: 5px;">
+                        <span id="currenttype" style=" background-color: azure; ">all entries</span>
+                        <span id="allentries" style=" display:none ;margin:5px ">all entries</span>
+                        <span id="symptoms" style=" display:none ;margin:5px  ">symptoms diary</span>
+                        <span  id = "checkups" style=" display:none;margin:5px " >daily diary</span>
     
                        </div>
                        <div style=" margin-right:3px ; margin-top: 5px;">
-                        <svg class="v-icon" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <svg id="currenttype" class="v-icon" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 16L6 10h12L12 16z" fill="black"></path>
                         </svg>
                     </div>
@@ -223,14 +224,15 @@
                     <div style="margin-top:0px; margin-left: 20px; font-size: 18px;">entry classification</div>
                     <div style="cursor: pointer; border: 1px solid black ; padding:5px; display: flex; justify-content: space-between; width:150px ;  margin-top:10px; background-color: rgb(235, 235, 235);"> 
                        <div style="display:flex; flex-direction: column;position:relative;width:100% ">
-                        <span id="allentry" style=" background-color: azure; ">all entries</span>
-                        <span  id = "starred" style="margin-top: 10px; display:none ">starred entry</span>
-                        <span  id = "bin" style="margin-top: 10px; display:none ">archived entry</span>
+                        <span id="currententry" style=" background-color: azure; ">all entries</span>
+                        <span id="allentry" style=" display: none; margin:5px ">all entries</span>
+                        <span  id = "starred" style="margin:5px; display:none ">starred entry</span>
+                        <span  id = "bin" style="margin: 5px; display:none ">archived entry</span>
                         
         
                         </div>
                         <div style=" margin-right:3px ; margin-top: 5px;">
-                            <svg class="v-icon" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <svg id="currententry" class="v-icon" width="16" height="16" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M12 16L6 10h12L12 16z" fill="black"></path>
                             </svg>
                         </div>

@@ -4,6 +4,8 @@ const duration =document.getElementById('duration')
 const entry=document.getElementById('entry')
 const entriestype=document.getElementById('entriestype')
 const symptoms=document.getElementById('symptoms')
+const allentries=document.getElementById('allentries')
+const currenttype=document.getElementById('currenttype')
 const checkups=document.getElementById('checkups')
 const entryclassification=document.getElementById('entryclassification')
 const weektime=document.getElementById('weektime')
@@ -22,6 +24,7 @@ const downloadsvg=document.querySelector('.export')  // Changed to select by cla
 const allcheckbox=document.getElementById('checkbox')
 const onehistory=document.querySelector('entry_history')
 const maincheckbox = document.getElementById('checkbox')
+const currententry=document.getElementById('currententry')
 
 // const historyelements=require('./reusablecomponents.js')
 let options
@@ -30,22 +33,23 @@ options={weekday:'long',day:'numeric',month:'numeric',year:'numeric'}
 const formattedDate=date.toLocaleDateString('en-US',options)
 currentdate.textContent=formattedDate
 
-entriestype.addEventListener('click',()=>{
+currenttype.addEventListener('click',()=>{
     try{
-        if (symptoms.style.display=='none' || checkups.style.display=='none'){
-            console.log('clicked')
-            // duration.style.height='70px'
-            // entryclassification.style.height='70px'
-            // entriestype.style.minHeight='100px'
-            symptoms.style.display='block'
-            checkups.style.display='block'
-            
-        } else {
-            entriestype.style.height='70px'
-            symptoms.style.display='none'
+        const entrytype=currenttype.innerHTML.trim();  
+        if(entrytype.includes('all entries')){
+            checkups.style.display='flex'
+            symptoms.style.display='flex'
+            allentries.style.display='none'
+        }else if(entrytype.includes('daily diary')){
+            allentries.style.display='flex'
+            symptoms.style.display='flex'
             checkups.style.display='none'
-        }
+        }else if(entrytype.includes('symptoms diary')){
+            allentries.style.display='flex'
+            checkups.style.display='flex'
+            symptoms.style.display='none'
        
+        }
     }catch(e){
         console.log(e)
     }
@@ -71,18 +75,23 @@ duration.addEventListener('click',()=>{
 
 })
 
-entryclassification.addEventListener('click',async()=>{
+currententry.addEventListener('click',async()=>{
     try{
-        // await gethistory()
-        if(bin.style.display=='none' || starred.style.display=='none' || allentry.style.display=='none'){
-            bin.style.display='block'
-            starred.style.display='block'
-            allentry.style.display='block'
-        } else {
-            bin.style.display='none'
+        console.log('currententry', currententry.innerHTML)
+        const currenttentry=currententry.innerHTML.trim();
+        if( currenttentry.includes('all entries')){
+            bin.style.display='flex'
+            starred.style.display='flex'
+            console.log('starredentry',currenttentry)     
+        } else if(currenttentry.includes('starred entry')){
+            bin.style.display='flex'
+            allentry.style.display='flex'
             starred.style.display='none'
-            // allentry.style.display='none'
+        }else{
+            bin.style.display='none'
+            allentry.style.display='none'
         }
+       
     } catch(e){
         console.log("error in entryclassification",e)
     }
@@ -275,7 +284,7 @@ async function gethistory(){
         const historydetails=await fetch('/user/myhistory')
         const results =await historydetails.json()
         const entries=document.querySelector('.entries')
-        
+        console.log('results an array', Array.isArray(results))   
         console.log(`results.length  ${results.length}`  )
         historyelements(results,entries)
         
@@ -286,6 +295,9 @@ async function gethistory(){
     }
 
 }
+
+
+
 
 
 async function getstarred() {
@@ -304,22 +316,89 @@ async function getstarred() {
     }
     
 }
-
+// starred classification listener
 starred.addEventListener('click',async()=>{
     console.log('starred opened')
-    allentry.innerHTML='starred entry'
     await getstarred()
+    currententry.innerHTML='starred entry'
+    starred.style.display='none'
+    allentry.style.display='none'
+    bin.style.display='none'
     
 
 }
     )
 
+    // all entry classification listener
 allentry.addEventListener('click',async()=>{
-    console.log('allentry opened')
-    allentry.innerHTML='all entry'
     await gethistory()
+    console.log('allentry opened')
+    currententry.innerHTML='all entries'
+    bin.style.display='none'
+    starred.style.display='none'
+    allentry.style.display='none'
+   
+})
+// symptom entry type event listener to display symptom checker histories
+symptoms.addEventListener('click',async()=>{
+    try{
+        const historydetails=await fetch('/user/myhistory')
+        const result =await historydetails.json()
+        const entries=document.querySelector('.entries')
+
+        const results=result.map(chathistory=>({
+            ...chathistory,
+            histories:chathistory.histories? chathistory.histories.filter(entry=>entry.chatId):[]
+        }))
+
+        historyelements(results,entries)
+        currenttype.innerHTML='symptoms diary'
+        allentries.style.display='none'
+        symptoms.style.display='none'
+        checkups.style.display='none'
+        updateallcheckboxes()
+
+
+    }catch(e){
+        console.log('error in getting symptoms histories',e)
+    }
 })
 
+// all entries to display all both chats and checkupd history
+allentries.addEventListener('click', async()=>{
+
+    await gethistory()
+    currenttype.innerHTML='all entries'   
+    allentries.style.display='none'
+    symptoms.style.display='none'
+    checkups.style.display='none'
+    updateallcheckboxes()
+})
+
+// view checkup histories   
+
+checkups.addEventListener('click',async()=>{
+    try{
+        const historydetails=await fetch('/user/myhistory')
+        const result=await historydetails.json()
+        const entries=document.querySelector('.entries')
+
+        const results=result.map(entryhistory=>({
+            ...entryhistory,
+            histories:entryhistory.histories? entryhistory.histories.filter(entry=>!entry.chatId):[]
+        })
+       )
+
+       historyelements(results,entries)
+       allentries.style.display='none'
+       currenttype.innerHTML='daily diary'
+       checkups.style.display='none'
+       symptoms.style.display='none'
+       updateallcheckboxes()
+    }catch(e){
+        console.log('error in getting daily checkups histories',e)
+    }
+})
 
 document.addEventListener('DOMContentLoaded',async()=>{
     await gethistory()  

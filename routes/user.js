@@ -9,7 +9,7 @@ const { group } = require('console')
 
 
 router.use( async (req, res,next)=>{
-    if (req.isAuthenticated){
+    if (req.isAuthenticated()){
         next()
     } else{
         res.status.send('user unauthenticated')
