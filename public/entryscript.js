@@ -25,6 +25,10 @@ const allcheckbox=document.getElementById('checkbox')
 const onehistory=document.querySelector('entry_history')
 const maincheckbox = document.getElementById('checkbox')
 const currententry=document.getElementById('currententry')
+const entryclassification=document.getElementById('entryclassification')
+const allentry=document.getElementById('allentry')
+const starred=document.getElementById('starred')
+const bin=document.getElementById('bin')
 
 // const historyelements=require('./reusablecomponents.js')
 let options
@@ -33,12 +37,14 @@ options={weekday:'long',day:'numeric',month:'numeric',year:'numeric'}
 const formattedDate=date.toLocaleDateString('en-US',options)
 currentdate.textContent=formattedDate
 
+
+
 currenttype.addEventListener('click',()=>{
-    try{
+    try{  
         const entrytype=currenttype.innerHTML.trim();  
         if(entrytype.includes('all entries')){
             entriestype.style.display=='none'? (
-                allentries.style.display='none',
+              allentries.style.display='none',
                 entriestype.style.display='flex'
             ):entriestype.style.display='none'
         }else if(entrytype.includes('daily diary')){
@@ -479,6 +485,21 @@ function handleselect(event){
     
 }
 
+//this function ensures that a checkbox is unchecked once its keydate is removed from the keydates array  
+function uncheckcheckbox(){
+    updateallcheckboxes()
+    allcheckboxes.forEach(checkbox=>{
+        const date =checkbox.getAttribute('details.date')
+        if(!keydate.includes(date)){
+            checkbox.checked=false
+        } else if (!alldates.includes(data)){
+            checkbox.checked=false
+        }
+        
+    })
+  
+}
+
 // function for each checkbox...to count the checked checkbox and open the selection display
 function checkboxbar(){
     console.log('checkboxbar function entered...')
@@ -531,7 +552,7 @@ async function handleDownload() {
             window.URL.revokeObjectURL(url)
             document.body.removeChild(a)
 
-            maincheckbox==true? maincheckbox.checked=false: maincheckbox.checked=true
+            // maincheckbox==true? maincheckbox.checked=false: maincheckbox.checked=true
         })
     } catch(e) {
         console.log('error in the downloadsvg', e)
@@ -569,15 +590,17 @@ starsvg.addEventListener('click',async()=>{
             body:JSON.stringify({keyydate})
         })
 
-        if (results.ok){
-           const updated=results.json
-           if (updated.success){
-            const pathElement=starsvg.querySelector('path')
-            pathElement.setAttribute("fill","green")
-            selection.style.display='none'
+        console.log('starred update results', results)
 
-           }
-        }
+        // if (results.ok){
+        //    const updated=results.json
+        //    if (updated.success){
+        //     const pathElement=starsvg.querySelector('path')
+        //     pathElement.setAttribute("fill","green")
+        //     selection.style.display='none'
+
+        //    }
+        // }
     } catch(e){
         console.log('error to send keydates to updates: ',e)
     }

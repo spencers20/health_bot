@@ -54,11 +54,11 @@ try{
 
 app.get('/',(req , res)=>{
     console.log('entered')
-    res.render('index.ejs')
+    res.render('entries.ejs')
 })
 // app.get('/symptomchecker',(req , res)=>{
 //     console.log('entered')
-//     res.render('symptom.ejs')
+//     res.render('symptom.ejs') <%=user.name%> 
     
 // })
 
