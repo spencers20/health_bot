@@ -1,12 +1,10 @@
+
 const currentdate=document.getElementById('currentdate')
 // const entrytype=document.getElementById('entrytype')
 const duration =document.getElementById('duration')
 const entry=document.getElementById('entry')
 const entriestype=document.getElementById('entriestype')
-const symptoms=document.getElementById('symptoms')
-const allentries=document.getElementById('allentries')
 const currenttype=document.getElementById('currenttype')
-const checkups=document.getElementById('checkups')
 const entryclassification=document.getElementById('entryclassification')
 const weektime=document.getElementById('weektime')
 const monthtime=document.getElementById('monthtime')
@@ -25,10 +23,10 @@ const allcheckbox=document.getElementById('checkbox')
 const onehistory=document.querySelector('entry_history')
 const maincheckbox = document.getElementById('checkbox')
 const currententry=document.getElementById('currententry')
-const entryclassification=document.getElementById('entryclassification')
-const allentry=document.getElementById('allentry')
-const starred=document.getElementById('starred')
-const bin=document.getElementById('bin')
+const symptoms=document.getElementById('symptoms')
+const allentries=document.getElementById('allentries')
+const checkups=document.getElementById('checkups')
+
 
 // const historyelements=require('./reusablecomponents.js')
 let options
@@ -39,29 +37,30 @@ currentdate.textContent=formattedDate
 
 
 
-currenttype.addEventListener('click',()=>{
+
+function typeDropdown(){
     try{  
+        console.log('currenttype clicked')
         const entrytype=currenttype.innerHTML.trim();  
-        if(entrytype.includes('all entries')){
-            entriestype.style.display=='none'? (
-              allentries.style.display='none',
-                entriestype.style.display='flex'
-            ):entriestype.style.display='none'
-        }else if(entrytype.includes('daily diary')){
-            entriestype.style.display=='none'? (
-                checkups.style.display='none',
-                entriestype.style.display='flex'          
-            ):entriestype.style.display='none'
-        }else if(entrytype.includes('symptoms diary')){
-            entriestype.style.display=='none'? (
-                symptoms.style.display='none',
-                entriestype.style.display='flex'
-            ):entriestype.style.display='none'
+        console.log('entrytype',entrytype)
+        const computedStyle=window.getComputedStyle(entriestype).display
+
+        if(computedStyle=='none'){
+            entriestype.style.setProperty('display','flex','important')
+            entrytype.includes('all entries')?allentries.style.display='none': allentries.style.display='flex'
+            entrytype.includes('symptoms diary')?symptoms.style.display='none': symptoms.style.display='flex'
+            entrytype.includes('daily diary')?checkups.style.display='none': checkups.style.display='flex'
+            
+            
+        } else{
+            entriestype.style.setProperty('display','none','important')
         }
+    
+       
     }catch(e){
         console.log(e)
     }
-})
+}
 
 duration.addEventListener('click',()=>{
     try{
@@ -83,30 +82,27 @@ duration.addEventListener('click',()=>{
 
 })
 
-currententry.addEventListener('click',async()=>{
+
+function classificationDropdown(){
     try{
         console.log('currententry', currententry.innerHTML)
         const currenttentry=currententry.innerHTML.trim();
-        if( currenttentry.includes('all entries')){
-            entryclassification.style.display=='none'?(
-                allentry.style.display='none',
-                entryclassification.style.display='flex'
-            ):entryclassification.style.display='none'               
-        } else if(currenttentry.includes('starred entry')){
-            entryclassification.style.display=='none'?(
-                starred.style.display='none',
-                entryclassification.style.display='flex'
-            ):entryclassification.style.display='none'
-           
+        const computedstyle=window.getComputedStyle(entryclassification).display
+        console.log("computedstyle",computedstyle)
+        if(computedstyle=='none'){
+            currenttentry.includes('all entries')?allentry.style.display='none':allentry.style.display='flex'
+            currenttentry.includes('starred entry')?starred.style.display='none':starred.style.display='flex'
+  
+            entryclassification.style.setProperty('display','flex','important')
         }else{
-            entryclassification.style.display=='none'? entryclassification.style.display='flex':entryclassification.style.display='none'
+            entryclassification.style.setProperty('display','none','important')
         }
-       
+         
     } catch(e){
         console.log("error in entryclassification",e)
     }
 }
-)
+
 
 let keydate=[];
 let alldates=[]
@@ -130,8 +126,14 @@ function historyelements(results, entries) {
             entryDiv.classList.add('entry_history')
 
             if (!alldates.includes(entry.date)) {
-                alldates.push(entry.date)
-            }
+                entry.chatId? alldates.push(entry.chatId):alldates.push(entry.date)
+                
+            }   
+            // Array.isArray(alldates) ? console.log('alldates is an array',alldates): console.log('alldates is not an array', alldates)
+            // alldates.forEach(date=>{
+            //     const dates=new Date(date)
+            //     isNaN(dates.getTime())? console.log('date is a chatId',dates):console.log('date is a valid date',dates)
+            // })
             
             const entrycheckbox=document.createElement('input')
             entrycheckbox.type='checkbox'
@@ -139,29 +141,35 @@ function historyelements(results, entries) {
             //set attribute to get the checked details
             entrycheckbox.setAttribute('details.date',entry.date)
             entrycheckbox.setAttribute('details.tittle', entry.tittle)
+            entrycheckbox.setAttribute('details.chatId',entry.chatId)
             
             entrycheckbox.addEventListener('change', (event) => {
                 console.log('event listener entered')
                 checkboxbar()
                 const checkbox = event.target
                 const date = checkbox.getAttribute('details.date')
+                const chatId = checkbox.getAttribute('details.chatId')
                 
                 if (checkbox.checked) {
-                    if (!keydate.includes(date)) {
-                        keydate.push(date)
+                    if (!keydate.includes(date) || !keydate.includes(chatId)) {
+                        chatId? keydate.push(chatId):keydate.push(date)
                     }
-                    if (!alldates.includes(date)) {
-                        alldates.push(date)
+                    if (!alldates.includes(date) || !alldates.includes(chatId)) {
+                        chatId? alldates.push(chatId):alldates.push(date)
                     }
                     console.log(`alldates : ${alldates} , allkeydates : ${keydate}`)
                 } else {
                     const index = keydate.indexOf(date)
-                    if (index !== -1) {
+                    const chatindex=keydate.indexOf(chatId)
+                    if (index !== -1 || chatindex !== -1) {
                         keydate.splice(index, 1)
+                        keydate.splice(chatindex, 1)
                     }
                     const index2 = alldates.indexOf(date)
-                    if (index2 !== -1) {
+                    const chatindex2 = alldates.indexOf(chatId)
+                    if (index2 !== -1 || chatindex2 !== -1) {
                         alldates.splice(index2, 1)
+                        alldates.splice(chatindex2, 1)
                         console.log('remaining dates', alldates)
                     }
                     if (maincheckbox) {
@@ -170,7 +178,7 @@ function historyelements(results, entries) {
                     console.log('checkbox unchecked')
                 }
             })
-                
+               
             entryDiv.appendChild(entrycheckbox)
 
             const detailscontainer = document.createElement('div')
@@ -310,7 +318,6 @@ async function gethistory(){
 
 
 
-
 async function getstarred() {
     try{
         console.log('getstarred clicked')
@@ -332,9 +339,11 @@ starred.addEventListener('click',async()=>{
     console.log('starred opened')
     await getstarred()
     currententry.innerHTML='starred entry'
-    starred.style.display='none'
-    allentry.style.display='none'
-    bin.style.display='none'
+    entryclassification.style.display='none'
+    // allentry.style.display='flex'
+    // starred.style.display='none'
+     
+    
     
 
 }
@@ -345,14 +354,18 @@ allentry.addEventListener('click',async()=>{
     await gethistory()
     console.log('allentry opened')
     currententry.innerHTML='all entries'
-    bin.style.display='none'
-    starred.style.display='none'
-    allentry.style.display='none'
+    entryclassification.style.display='none'
+   
    
 })
 // symptom entry type event listener to display symptom checker histories
 symptoms.addEventListener('click',async()=>{
     try{
+        //updating the dropdown menu
+        currenttype.innerHTML='symptoms diary'
+        entriestype.style.display='none'
+        
+         //getting the symptoms from the backend
         const historydetails=await fetch('/user/myhistory')
         const result =await historydetails.json()
         const entries=document.querySelector('.entries')
@@ -362,11 +375,7 @@ symptoms.addEventListener('click',async()=>{
             histories:chathistory.histories? chathistory.histories.filter(entry=>entry.chatId):[]
         }))
 
-        historyelements(results,entries)
-        currenttype.innerHTML='symptoms diary'
-        allentries.style.display='none'
-        symptoms.style.display='none'
-        checkups.style.display='none'
+        historyelements(results,entries)    
         updateallcheckboxes()
 
 
@@ -380,9 +389,8 @@ allentries.addEventListener('click', async()=>{
 
     await gethistory()
     currenttype.innerHTML='all entries'   
-    allentries.style.display='none'
-    symptoms.style.display='none'
-    checkups.style.display='none'
+    
+    entriestype.style.display='none'
     updateallcheckboxes()
 })
 
@@ -390,22 +398,36 @@ allentries.addEventListener('click', async()=>{
 
 checkups.addEventListener('click',async()=>{
     try{
+        //updating the dropdown menu
+        entriestype.style.display='none'
+        currenttype.innerHTML='daily diary'
+        // checkups.style.display='none'
+        
         const historydetails=await fetch('/user/myhistory')
         const result=await historydetails.json()
         const entries=document.querySelector('.entries')
 
-        const results=result.map(entryhistory=>({
-            ...entryhistory,
-            histories:entryhistory.histories? entryhistory.histories.filter(entry=>!entry.chatId):[]
-        })
-       )
+        const currenttentry=currententry.innerHTML.trim()
 
-       historyelements(results,entries)
-       allentries.style.display='none'
-       currenttype.innerHTML='daily diary'
-       checkups.style.display='none'
-       symptoms.style.display='none'
-       updateallcheckboxes()
+        if (currenttentry.includes('starred entry')){
+            const results=result.map(entryhistory=>({
+                ...entryhistory,
+                histories:entryhistory.histories? entryhistory.histories.filter(entry=>!entry.chatId && entry.status=='starred'):[]
+            }))
+            historyelements(results,entries)
+            updateallcheckboxes()      
+        } else{
+            const results=result.map(entryhistory=>({
+                ...entryhistory,
+                histories:entryhistory.histories? entryhistory.histories.filter(entry=>!entry.chatId):[]
+            })
+           )
+        
+    
+           historyelements(results,entries)
+           updateallcheckboxes()
+        }
+
     }catch(e){
         console.log('error in getting daily checkups histories',e)
     }
@@ -591,6 +613,20 @@ starsvg.addEventListener('click',async()=>{
         })
 
         console.log('starred update results', results)
+
+        if(results){
+            console.log('results of starsvg',results)
+            allcheckboxes.forEach(checkbox=>{
+                if(checkbox.checked==true){
+                    const index=keydate.indexOf(keyydate)
+                    if (!index==-1){
+                        keydate.splice(index,1)
+                    } 
+                    checkbox.checked=false
+                }
+            })
+            selection.style.display='none'
+        }
 
         // if (results.ok){
         //    const updated=results.json

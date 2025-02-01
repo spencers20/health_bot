@@ -546,7 +546,8 @@ async function combineddata (req) {
                     //get the chat id
                     chatId: "$chats.chatId",
                     // Include all messages as 'conversations'
-                    conversations: "$chats.messages"
+                    conversations: "$chats.messages",
+                    status:"$chats.status"
                   }
                 },
                 
@@ -561,7 +562,9 @@ async function combineddata (req) {
                         description: "$description",
                         summary: "$summary",
                         chatId: "$chatId",
-                        conversations: "$conversations"
+                        conversations: "$conversations",
+                        status:"$status"
+                        
                       }
                     }
                   }
@@ -587,7 +590,8 @@ async function combineddata (req) {
                                 date:"$histories.date",
                                 tittle:"$histories.tittle",
                                 description:"$histories.description",
-                                summary:"$histories.summary"
+                                summary:"$histories.summary",
+                                status:"$histories.status"
                             }
                         }
                     }
@@ -792,28 +796,47 @@ router.post('/updates',async(req,res)=>{
         // keydates=keydates.
         const db=await getdb()
         const userId=req.user.googleId
-        const collection=db.collection('history')
+        const chatscollection=db.collection('chats')
+        const history=db.collection('history')
         console.log("keydates", keydates)
         for(const dates of keydates){
             date= new Date(dates)
             console.log(date)
-             
-            const results=await collection.updateOne(
-                {_id:userId,
-                    "histories.date":date,
-                    "histories":{$elemMatch:{date:date}}
-                },
-                {
-                    $set:{"histories.$.status":"starred"}
+            if (isNaN(date.getTime())){   //if it contains a chatId
+                const results=await chatscollection.updateOne(
+                    {
+                        _id:userId,
+                        "chats.chatId":dates,
+                        "chats":{$elemMatch:{chatId:dates}}
+                    },
+                    {
+                        $set:{"chats.$.status":"starred"}
+                    }
+                )
+
+                if (results.modifiedCount>0){
+                    console.log("updated data")
+                    res.status(200).json({success:true})
                 }
-            )
-
-            if (results.modifiedCount>0){
-                console.log("updated data")
-                res.status(200).json({success:true})
+            } else{
+                const results=await history.updateOne(
+                    {_id:userId,
+                        "histories.date":date,
+                        "histories":{$elemMatch:{date:date}}
+                    },
+                    {
+                        $set:{"histories.$.status":"starred"}
+                    }
+                )
+    
+                if (results.modifiedCount>0){
+                    console.log("updated data")
+                    res.status(200).json({success:true})
+                }
+    
+                } 
             }
-
-            } 
+             
 
 
     }catch(e){
