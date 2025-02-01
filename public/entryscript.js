@@ -129,11 +129,11 @@ function historyelements(results, entries) {
                 entry.chatId? alldates.push(entry.chatId):alldates.push(entry.date)
                 
             }   
-            // Array.isArray(alldates) ? console.log('alldates is an array',alldates): console.log('alldates is not an array', alldates)
-            // alldates.forEach(date=>{
-            //     const dates=new Date(date)
-            //     isNaN(dates.getTime())? console.log('date is a chatId',dates):console.log('date is a valid date',dates)
-            // })
+            Array.isArray(alldates) ? console.log('alldates is an array',alldates): console.log('alldates is not an array', alldates)
+            alldates.forEach(date=>{
+                const dates=new Date(date)
+                isNaN(dates.getTime())? console.log('date is a chatId',date):console.log('date is a valid date',dates)
+            })
             
             const entrycheckbox=document.createElement('input')
             entrycheckbox.type='checkbox'
@@ -614,8 +614,9 @@ starsvg.addEventListener('click',async()=>{
 
         console.log('starred update results', results)
 
-        if(results){
-            console.log('results of starsvg',results)
+        if(results.ok==true){
+            // console.log('results of starsvg',results)
+            alert('Entry starred successfully')
             allcheckboxes.forEach(checkbox=>{
                 if(checkbox.checked==true){
                     const index=keydate.indexOf(keyydate)
@@ -626,17 +627,9 @@ starsvg.addEventListener('click',async()=>{
                 }
             })
             selection.style.display='none'
+
         }
 
-        // if (results.ok){
-        //    const updated=results.json
-        //    if (updated.success){
-        //     const pathElement=starsvg.querySelector('path')
-        //     pathElement.setAttribute("fill","green")
-        //     selection.style.display='none'
-
-        //    }
-        // }
     } catch(e){
         console.log('error to send keydates to updates: ',e)
     }

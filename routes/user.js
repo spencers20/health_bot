@@ -796,46 +796,50 @@ router.post('/updates',async(req,res)=>{
         // keydates=keydates.
         const db=await getdb()
         const userId=req.user.googleId
-        const chatscollection=db.collection('chats')
+        const chatscollection=db.collection('data')
         const history=db.collection('history')
         console.log("keydates", keydates)
-        for(const dates of keydates){
-            date= new Date(dates)
-            console.log(date)
-            if (isNaN(date.getTime())){   //if it contains a chatId
-                const results=await chatscollection.updateOne(
-                    {
-                        _id:userId,
-                        "chats.chatId":dates,
-                        "chats":{$elemMatch:{chatId:dates}}
-                    },
-                    {
-                        $set:{"chats.$.status":"starred"}
-                    }
-                )
+        keydates.forEach(async(dates)=>{
+            const date=new Date(dates)
+            console.log("date to be updated",date)
 
-                if (results.modifiedCount>0){
-                    console.log("updated data")
-                    res.status(200).json({success:true})
-                }
-            } else{
-                const results=await history.updateOne(
-                    {_id:userId,
-                        "histories.date":date,
-                        "histories":{$elemMatch:{date:date}}
-                    },
-                    {
-                        $set:{"histories.$.status":"starred"}
-                    }
-                )
-    
-                if (results.modifiedCount>0){
-                    console.log("updated data")
-                    res.status(200).json({success:true})
-                }
-    
-                } 
+           if (isNaN(date.getTime())){   //if  it is not a date
+            console.log("it is a chatId", dates)
+            const results=await chatscollection.updateOne(
+                {
+                    _id:userId,
+                    "chats.chatId":dates,
+                    "chats":{$elemMatch:{chatId:dates}}
+                },
+                {
+                   $set:{"chats.$.status":"starred"}
+               }
+               )
+
+            if (results.modifiedCount>0){
+                console.log("updated data")
+                res.status(200).json({success:true})
             }
+           } else{
+            
+               const results=await history.updateOne(
+                   {_id:userId,
+                       "histories.date":date,
+                       "histories":{$elemMatch:{date:date}}
+                   },
+                   {
+                       $set:{"histories.$.status":"starred"}
+                   }
+               )
+   
+               if (results.modifiedCount>0){
+                   console.log("updated data")
+                   res.status(200).json({success:true})
+               }
+   
+               } 
+       })
+            
              
 
 
