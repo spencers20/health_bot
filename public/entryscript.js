@@ -152,10 +152,10 @@ function historyelements(results, entries) {
                 
                 if (checkbox.checked) {
                     if (!keydate.includes(date) || !keydate.includes(chatId)) {
-                        chatId? keydate.push(chatId):keydate.push(date)
+                        chatId && chatId!=='undefined'? keydate.push(chatId):keydate.push(date)
                     }
                     if (!alldates.includes(date) || !alldates.includes(chatId)) {
-                        chatId? alldates.push(chatId):alldates.push(date)
+                        chatId && chatId!=='undefined'? alldates.push(chatId):alldates.push(date)
                     }
                     console.log(`alldates : ${alldates} , allkeydates : ${keydate}`)
                 } else {
