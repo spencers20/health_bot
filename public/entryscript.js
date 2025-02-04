@@ -117,9 +117,9 @@ function historyelements(results, entries) {
     // entries.innerHTML = '';
 
         
-    results.forEach(doc => {
-        doc.histories.forEach(entry => {
-            const length=doc.histories.length
+    // results.forEach(doc => {
+          results.forEach(entry => {
+            const length=results.length
             const totalentries=document.getElementById('totalentries')
             totalentries.innerHTML=`${length} total entries`
             const entryDiv = document.createElement('div')
@@ -292,7 +292,7 @@ function historyelements(results, entries) {
             entryDiv.appendChild(detailscontainer)
             wrapperentries.appendChild(entryDiv)
         })
-    })
+    // })
 }
 
  
@@ -321,8 +321,15 @@ async function gethistory(){
 async function getstarred() {
     try{
         console.log('getstarred clicked')
-        const starreddetails=await fetch('/user/starred')   
-        const results=await starreddetails.json()
+        const starreddetails=await fetch('/user/myhistory')   
+        const starentry=await starreddetails.json()
+        const results=[]
+        starentry.forEach((entry)=>{
+            if (entry.status==='starred'){
+                results.push(entry)
+            }
+        })
+
         console.log(`results.length  ${results.length}`  )
         const entries=document.querySelector('.entries')
         // entries.innerHTML = ''; // Clear all existing entries first
@@ -369,11 +376,15 @@ symptoms.addEventListener('click',async()=>{
         const historydetails=await fetch('/user/myhistory')
         const result =await historydetails.json()
         const entries=document.querySelector('.entries')
+        const results=[]
+        result.forEach((entry)=>{
+            if(entry.chatId){
+                results.push(entry)
+            }
+        })
 
-        const results=result.map(chathistory=>({
-            ...chathistory,
-            histories:chathistory.histories? chathistory.histories.filter(entry=>entry.chatId):[]
-        }))
+
+        
 
         historyelements(results,entries)    
         updateallcheckboxes()
@@ -410,18 +421,24 @@ checkups.addEventListener('click',async()=>{
         const currenttentry=currententry.innerHTML.trim()
 
         if (currenttentry.includes('starred entry')){
-            const results=result.map(entryhistory=>({
-                ...entryhistory,
-                histories:entryhistory.histories? entryhistory.histories.filter(entry=>!entry.chatId && entry.status=='starred'):[]
-            }))
+            const results=[]
+
+            result.forEach((entry)=>{
+                if(!entry.chatId && entry.status=='starred'){
+                    results.push(entry)
+                }
+                !entry.chatId
+            })
             historyelements(results,entries)
             updateallcheckboxes()      
         } else{
-            const results=result.map(entryhistory=>({
-                ...entryhistory,
-                histories:entryhistory.histories? entryhistory.histories.filter(entry=>!entry.chatId):[]
+            const results=[]
+            result.forEach((entry)=>{
+                if(!entry.chatId){
+                    results.push(entry)
+                }
+                
             })
-           )
         
     
            historyelements(results,entries)

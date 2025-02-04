@@ -925,62 +925,6 @@ router.post('/updates',async(req,res)=>{
 })
 
 
-// router to get the starred entries
-router.get('/starred',async(req,res)=>{
-    try{
-        console.log('starred entered...')
-        const userId=req.user.googleId
-
-        const db=await getdb()
-        const collection=db.collection('history')
-        const results=await collection.aggregate([
-            {
-                $match: {
-                    _id: userId,
-                    "histories.status": "starred"
-                }
-            },
-            {
-                $project: {
-                    histories: {
-                        $filter: {
-                            input: "$histories",
-                            as: "history",
-                            cond: { $eq: ["$$history.status", "starred"] }
-                        }
-                    }
-                }
-            },
-            {
-                $unwind: "$histories"
-            },
-            {
-                $sort: {
-                    "histories.date": -1
-                }
-            },
-            {
-                $group: {
-                    _id: userId,
-                    histories: {
-                        $push: {
-                            date: "$histories.date",
-                            tittle: "$histories.tittle", // Corrected from `tittle`
-                            description: "$histories.description",
-                            summary: "$histories.summary"
-                        }
-                    }
-                }
-            }
-        ]).toArray()
-        console.log("starred results", results)
-        res.status(200).json(results)
-    }catch(e){
-        console.log("error in starred",e)
-        res.status(500).json({ error: "Internal server error" })
-    }
-})
-
 
 
 
