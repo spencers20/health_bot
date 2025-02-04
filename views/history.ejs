@@ -114,7 +114,7 @@
               </svg>
               
 
-              <span style="margin-left :10px ;font-size: 17px; margin-bottom: 10px;"> Starred History</span>
+              <span id="starred" style="margin-left :10px ;font-size: 17px; margin-bottom: 10px;"> Starred History</span>
               
         </div>
 
@@ -145,7 +145,7 @@
 
             <p style=" margin-left:600px; text-align: center ; font-size: 30px; font-weight: bold;"> myafya365
                 <p>
-            <p style="margin-left:400px; font-size:20px"> <%=user.name%> </p>
+            <p style="margin-left:400px; font-size:20px"> <%=user.name.split(" ")[1]? user.name.split(" ")[1]:user.name%></p>
 
     
     

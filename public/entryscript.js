@@ -347,6 +347,12 @@ starred.addEventListener('click',async()=>{
     await getstarred()
     currententry.innerHTML='starred entry'
     entryclassification.style.display='none'
+    const starpath=document.getElementById('starpath')
+    // if(starpath.getAttribute('fill'==='grey')){
+    //     starpath.setAttribute('fill','blue')
+    // } else{
+    //     starpath.setAttribute('fill','grey')
+    // }
     // allentry.style.display='flex'
     // starred.style.display='none'
      
@@ -688,11 +694,17 @@ deletesvg.addEventListener('click',async()=>{
         body:JSON.stringify(keyydate)
     })
 
-    if (allentry.innerHTML.trim()==='starred entry '){
-        await getstarred()
-    } else{
-      await gethistory()
+    console.log('delete results',results)
+    if(results.ok==true){
+        alert('deleted succesfully')
+        selection.style.display='none'
+        if (allentry.innerHTML.trim()==='starred entry '){
+            await getstarred()
+        } else{
+          await gethistory()
+        }
     }
+
 
     
 })

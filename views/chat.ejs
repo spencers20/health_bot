@@ -236,7 +236,7 @@
         </div>
     </div>
     <div class="container">
-        <h1 id="intro">Hello <%=user.name %>  how may i help you</h1>
+        <h1 id="intro">Hello <%=user.name.split(" ")[1]? user.name.split(" ")[1]:user.name%> how may i help you</h1>
         
         <div id="chat-container" style="display: block;"></div>
         <div class="search-bar">

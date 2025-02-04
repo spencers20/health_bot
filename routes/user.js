@@ -836,29 +836,48 @@ router.post('/delete',async(req,res)=>{
         const keydates=req.body
         // console.log(req.body)
         const db=await getdb()
-        const collection=db.collection('history')
+        const chatcollection=db.collection('data')
+        const historycollection=db.collection('history')
         console.log('keydates in delete', keydates)
 
-        for(const dates of keydates){
+        keydates.forEach(async(dates)=>{
             const date=new Date(dates)
             console.log(date)
-
-            const deleteresult=await collection.updateOne(
-                {
-                _id:userId,
-                "histories.date":date,
-                "histories":{$elemMatch:{date:date}}
-                },
-                {
-                    $pull:{ "histories":{date:date}}
+            if(!isNaN(date)){
+                const deleteresult=await historycollection.updateOne(
+                    {
+                    _id:userId,
+                    "histories.date":date,
+                    "histories":{$elemMatch:{date:date}}
+                    },
+                    {
+                        $pull:{ "histories":{date:date}}
+                    }
+             
+                )
+                if(deleteresult.modifiedCount>0){
+                    console.log("deleted successfully")
+                    res.status(200).json({success:true})
+            }
+            } else{
+                const deleteresult=await chatcollection.updateOne(
+                    {
+                        _id:userId,
+                        "chats.chatId":dates,
+                        chats:{$elemMatch:{chatId:dates}}
+                    },{
+                        $pull:{
+                            "chats":{chatId:dates}
+                        }
+                    }
+                )
+                if(deleteresult.modifiedCount>0){
+                    console.log("deleted successfully")
+                    res.status(200).json({success:true})
                 }
-         
-        )
-        if(deleteresult.modifiedCount>0){
-            console.log("deleted successfully")
-            res.status(200).json({success:true})
-        }
-        }
+            }
+        })
+        
     }catch(e){
         console.log('errror in deleting data ', e)
     }

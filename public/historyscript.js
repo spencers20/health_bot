@@ -4,6 +4,11 @@ const  describe=document.getElementById('describe')
 const tittle=document.getElementById('symptom-title')
 const newentry=document.getElementById('newentry')
 
+const date=new Date()
+const options={ weekday:"short", day:"numeric",month :"numeric" ,year:"numeric"}
+const formattedDate=date.toLocaleDateString("en-US",options)
+currentdate.textContent=formattedDate
+
 save.addEventListener('click',async()=>{
     try{
         console.log("clicked")
@@ -50,7 +55,5 @@ newentry.addEventListener('click',async()=>{
         console.log("error in refreshing page",e)
     }
 })
-const date=new Date()
-const options={ weekday:"short", day:"numeric",month :"numeric" ,year:"numeric"}
-const formattedDate=date.toLocaleDateString("en-US",options)
-currentdate.textContent=formattedDate
+
+
