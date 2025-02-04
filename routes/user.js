@@ -436,34 +436,6 @@ router.post('/storehistory', async(req, res)=>{
 
 
 
-
-//funtion to merge the data  (historis) of the same _id
-const mergeddata= async(data)=>{
-    try{
-        console.log("merged history entered...")
-        const mergedData={}
-    
-        data.forEach((item) => {
-            if(!mergedData[item._id]){
-                mergedData[item._id]={
-                    _id:item._id,
-                    histories:[]
-                }
-            }
-    
-            mergedData[item._id].histories=[
-                ...mergedData[item._id].histories,
-                ...item.histories
-            ]
-        });
-        console.log("merged data")
-
-        return Object.values(mergedData)
-    }catch(e){
-        console.log("error in merging the history", e)
-    }
-}
-
 // funtion to generate a pdf of data required
 const generatepdf=(data,res)=>{
     try{
@@ -490,28 +462,30 @@ const generatepdf=(data,res)=>{
 
                 if(item.chats){
                     item.chats.forEach((chat)=>{
-                        doc.fontSize(16)
-                        font('Helvetica-Bold')
+                        doc.fontSize(14)
+                        .font('Helvetica-Bold')
                         .text('Summary')
 
-                        doc.fontSize(13)
+                        doc.fontSize(12)
                         .font('Helvetica')
                         .text(`${chat.summary|| 'No summary'}`)
+
+                        doc.fontSize(14)
+                            .font('Helvetica-Bold')
+                            .text('conversations')
                         .moveDown(1)
 
                         chat.messages.forEach((message)=>{
                             const date=new Date(message.chattime).toLocaleDateString()
-                            doc.fontSize(15)
-                            .font('Helvetica-Bold')
-                            .text('conversations')
+                            
                             
                             doc.fontSize(13)
-                            .font('courier-bold')
+                            .font('Courier-Bold')
                             .text(`${date}`,{align:'right'})
                             .text(`${message.question}`,{align:'left'})
 
-                            doc.fontSize(12)
-                            .font(11)
+                            doc.fontSize(11)
+                            .font('Times-Roman')
                             .text(`${message.response}`)
                             .moveDown(1)
 
@@ -632,12 +606,43 @@ async function combineddata (req) {
         ])
         
         console.log(chatdata.chatId)
-        const combinedData=[...chatdata,...history]
+        
+
+        const combinedData=[...chatdata, ...history]
+        console.log("combineddata..... ",combinedData)
         return combinedData
     }catch(e){
         console.log('error in combining data',e)
     }
 }
+
+//funtion to merge the data  (historis) of the same _id
+const mergeddata= async(data)=>{
+    try{
+        console.log("merged history entered...")
+        const mergedData={}
+    
+        data.forEach((item) => {
+            if(!mergedData[item._id]){
+                mergedData[item._id]={
+                    _id:item._id,
+                    histories:[]
+                }
+            }
+    
+            mergedData[item._id].histories=[
+                ...mergedData[item._id].histories,
+                ...item.histories
+            ]
+        });
+        console.log("merged data")
+
+        return Object.values(mergedData)
+    }catch(e){
+        console.log("error in merging the history", e)
+    }
+}
+
 
 //get the history entries from the database to display
 router.get('/myhistory',async(req,res)=>{
@@ -677,7 +682,9 @@ router.get('/myhistory',async(req,res)=>{
                     
                     const combined_data=Array.isArray(combinedData)? combinedData: Array.from(combinedData)
                 
-                    const datamerged=await mergeddata(combined_data)
+                    const unsortmergeddata=await mergeddata(combined_data)
+                    const datamerged=unsortmergeddata[0].histories.sort((a,b)=> new Date(b.date)-new Date(a.date))
+                    console.log('datamerged ', datamerged)
                     res.status(200).json(datamerged)
                         
                     
@@ -689,7 +696,9 @@ router.get('/myhistory',async(req,res)=>{
             
             const combined_data=Array.isArray(combinedData)? combinedData: Array.from(combinedData)
                 
-            const datamerged=await mergeddata(combined_data)
+            const unsortmergeddata=await mergeddata(combined_data)
+            const datamerged=unsortmergeddata[0].histories.sort((a,b)=> new Date(b.date)-new Date(a.date))
+            console.log('datamerged ', datamerged)
             res.status(200).json(datamerged)
                         
            
@@ -729,13 +738,15 @@ router.get('/download', async(req,res)=>{
             const parsedDate = new Date(keydates);
             if (isNaN(parsedDate.getTime())) {
                 try{
+                    console.log('chatID to download')
+                    
+                    console.log('chatId2',keydates)
 
                     const chatdata=await chatcollection.findOne(
                     {
-                        id:userId,
-                        "chats.chatId":parsedDate
-                    }
-                )
+                        _id:userId,
+                        "chats.chatId":keydates
+                    })
                 console.log('Found data:', chatdata);
                 generatepdf([chatdata], res);
                 } catch(e){
@@ -787,12 +798,13 @@ router.get('/download', async(req,res)=>{
                     }
                 } else{
                     try{
+                        console.log('downloading data with chatid')
                         const chatdata=await chatcollection.findOne(
                         {
-                            id:userId,
-                            "chats.chatId":parsedDate
+                            _id:userId,
+                            "chats.chatId":dateStr
                         }
-                    ).
+                    )
                     console.log('Found data:', chatdata);
                     results.push(chatdata)
                     } catch(e){
