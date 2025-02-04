@@ -63,8 +63,6 @@ app.get('/',(req , res)=>{
 // })
 
 
-
-
 app.get('/tips',async(req , res)=>{
     try{
         // console.log('tips url entered...')

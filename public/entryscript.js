@@ -576,6 +576,21 @@ async function handleDownload() {
 
             // maincheckbox==true? maincheckbox.checked=false: maincheckbox.checked=true
         })
+        .then(()=>{
+
+            allcheckboxes.forEach(checkbox=>{
+                if(checkbox.checked===true){
+                    const index=keydate.indexOf(keyydate)
+                    if (index !==-1){
+                        keydate.splice(index,1)
+                    } 
+                    checkbox.checked=false
+                }
+            })
+            selection.style.display='none'
+        }
+            
+        )
     } catch(e) {
         console.log('error in the downloadsvg', e)
     }
@@ -618,9 +633,9 @@ starsvg.addEventListener('click',async()=>{
             // console.log('results of starsvg',results)
             alert('Entry starred successfully')
             allcheckboxes.forEach(checkbox=>{
-                if(checkbox.checked==true){
+                if(checkbox.checked===true){
                     const index=keydate.indexOf(keyydate)
-                    if (!index==-1){
+                    if (index !==-1){
                         keydate.splice(index,1)
                     } 
                     checkbox.checked=false

@@ -488,15 +488,47 @@ const generatepdf=(data,res)=>{
                 .text(`ID: ${item._id}`,{align:"center"})
                 .moveDown(1);
 
-            item.histories.forEach((history)=>{
-                const date = new Date(history.date).toLocaleDateString();
-    
-                doc.fontSize(14)
-                    .text(`Date: ${date}`, {fontWeight: "bold"})
-                    .text(`Title: ${history.tittle || 'No title'}`)
-                    .text(`${history.description || 'No description'}`)
-                    .moveDown(1);
-            });
+                if(item.chats){
+                    item.chats.forEach((chat)=>{
+                        doc.fontSize(16)
+                        font('Helvetica-Bold')
+                        .text('Summary')
+
+                        doc.fontSize(13)
+                        .font('Helvetica')
+                        .text(`${chat.summary|| 'No summary'}`)
+                        .moveDown(1)
+
+                        chat.messages.forEach((message)=>{
+                            const date=new Date(message.chattime).toLocaleDateString()
+                            doc.fontSize(15)
+                            .font('Helvetica-Bold')
+                            .text('conversations')
+                            
+                            doc.fontSize(13)
+                            .font('courier-bold')
+                            .text(`${date}`,{align:'right'})
+                            .text(`${message.question}`,{align:'left'})
+
+                            doc.fontSize(12)
+                            .font(11)
+                            .text(`${message.response}`)
+                            .moveDown(1)
+
+
+                        })
+                    })
+                } else{
+                    item.histories.forEach((history)=>{
+                    const date = new Date(history.date).toLocaleDateString();
+                        
+                    doc.fontSize(14)
+                        .text(`Date: ${date}`, {fontWeight: "bold"})
+                        .text(`Title: ${history.tittle || 'No title'}`)
+                        .text(`${history.description || 'No description'}`)
+                        .moveDown(1);
+                                });
+                }
     
             if (index < data.length - 1) {
                 doc.addPage();
@@ -684,37 +716,54 @@ router.get('/download', async(req,res)=>{
         const keydates = req.query.keydate;
         if (!keydates) {
             return res.status(400).json({ error: 'No dates provided' });
+        } else{
+            console.log('keyydates to download',keydates)
         }
 
         const db = await getdb();
         const history = db.collection('history');
+        const chatcollection=db.collection('data')
 
         if (!Array.isArray(keydates)) {
             // Handle single date
             const parsedDate = new Date(keydates);
             if (isNaN(parsedDate.getTime())) {
-                return res.status(400).json({ error: 'Invalid date format' });
-            }
+                try{
 
-            console.log('Searching for date:', parsedDate);
-            const data = await history.findOne(
-                {
-                    _id: userId,
-                    "histories.date": parsedDate
-                },
-                {
-                    projection: {
-                        histories: { $elemMatch: { date: parsedDate }}
+                    const chatdata=await chatcollection.findOne(
+                    {
+                        id:userId,
+                        "chats.chatId":parsedDate
                     }
+                )
+                console.log('Found data:', chatdata);
+                generatepdf([chatdata], res);
+                } catch(e){
+                    console.error("error in downoalding single chatId",e )
+                    return res.status(400).json({ error: 'Invalid date format' });
                 }
-            );
-
-            if (!data) {
-                return res.status(404).json({ error: 'No data found for the specified date' });
+            } else{
+                console.log('Searching for date:', parsedDate);
+                const data = await history.findOne(
+                    {
+                        _id: userId,
+                        "histories.date": parsedDate
+                    },
+                    {
+                        projection: {
+                            histories: { $elemMatch: { date: parsedDate }}
+                        }
+                    }
+                );
+    
+                if (!data) {
+                    return res.status(404).json({ error: 'No data found for the specified date' });
+                }
+                console.log('Found data:', data);
+                generatepdf([data], res);
             }
 
-            console.log('Found data:', data);
-            generatepdf([data], res);
+
         } else {
             // Handle multiple dates
             const results = [];
@@ -736,6 +785,21 @@ router.get('/download', async(req,res)=>{
                     if (data) {
                         results.push(data);
                     }
+                } else{
+                    try{
+                        const chatdata=await chatcollection.findOne(
+                        {
+                            id:userId,
+                            "chats.chatId":parsedDate
+                        }
+                    ).
+                    console.log('Found data:', chatdata);
+                    results.push(chatdata)
+                    } catch(e){
+                        console.error("error in downoalding single chatId",e )
+                        return res.status(400).json({ error: 'Invalid date format' });
+                    }
+
                 }
             }
             
