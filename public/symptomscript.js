@@ -18,6 +18,7 @@ const age=document.getElementById('age')
 const buttons=document.getElementById('buttons')
 const tip=document.getElementById('tip')
 const headertip=document.getElementById('headertip')
+const image=document.getElementById('image')
 
 
 
@@ -54,9 +55,12 @@ function formatTextToHTML(text) {
         const results = await response.json()
     
         const randomtip=results[Math.floor(Math.random()*results.length)]
-     
-        headertip.textContent=randomtip.title
+        console.log('random tips',randomtip)
+        console.log('math random',Math.random())
+        console.log("Math.floor(Math.random()*results.length)", Math.floor(Math.random()*results.length))
+        headertip.textContent=randomtip.tittle
         tip.textContent=randomtip.description
+        image.setAttribute('src',randomtip.image)
 
     }catch(e){
         console.error(`error in getting tips from api : ${e}`)

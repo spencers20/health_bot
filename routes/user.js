@@ -421,7 +421,7 @@ router.post('/storehistory', async(req, res)=>{
             }
         ])
 
-        if (result.acknowledged===true){
+        if (result.ok==true){
             console.log('history stored successfull')
             res.status(200).json(result)
         }

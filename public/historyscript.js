@@ -29,9 +29,11 @@ save.addEventListener('click',async()=>{
 
         
         console.log( "saved history results",results)
+
+            save.style.color="green"  
+            save.innerHTML="Saved" 
         
-        save.style.color="green"  
-        save.innerHTML="Saved" 
+        
 
         // const results=await result.json()
         // console.log(results)
@@ -56,4 +58,8 @@ newentry.addEventListener('click',async()=>{
     }
 })
 
-
+// starred.addEventListener('click',async()=>{
+//     await fetch('/user/myhistory')
+//     .then(results=>results.json)
+//     .then(results.status=)
+// })
