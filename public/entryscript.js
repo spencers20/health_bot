@@ -149,13 +149,19 @@ function historyelements(results, entries) {
                 const checkbox = event.target
                 const date = checkbox.getAttribute('details.date')
                 const chatId = checkbox.getAttribute('details.chatId')
+                console.log("dates_2",date)
+                console.log("chatId..1 ",chatId)
                 
                 if (checkbox.checked) {
                     if (!keydate.includes(date) || !keydate.includes(chatId)) {
-                        chatId && chatId!=='undefined'? keydate.push(chatId):keydate.push(date)
+                        chatId && chatId!=='undefined' && chatId!==null?(
+                            console.log("chatId ",chatId),
+                            keydate.push(chatId)
+                            
+                        ) :keydate.push(date)
                     }
                     if (!alldates.includes(date) || !alldates.includes(chatId)) {
-                        chatId && chatId!=='undefined'? alldates.push(chatId):alldates.push(date)
+                        chatId && chatId!=='undefined' && chatId!==null? alldates.push(chatId):alldates.push(date)
                     }
                     console.log(`alldates : ${alldates} , allkeydates : ${keydate}`)
                 } else {

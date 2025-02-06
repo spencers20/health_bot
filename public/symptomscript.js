@@ -53,7 +53,7 @@ function formatTextToHTML(text) {
 
         const response =await fetch('/tips')
         const results = await response.json()
-    
+        
         const randomtip=results[Math.floor(Math.random()*results.length)]
         console.log('random tips',randomtip)
         console.log('math random',Math.random())

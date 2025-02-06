@@ -111,7 +111,12 @@ async function sendToFLowise(flowisedata){
         );
         const result = await response.json()
         console.log('results:',result)
-        return result
+        if(result.success==false){
+            console.Error(' call to flowise failed')
+        } else{
+            console.log("success result ",result)
+            return result
+        }
         
     } catch(e){
         console.error(` flowise  error : ${e}`)
@@ -844,6 +849,7 @@ router.post('/delete',async(req,res)=>{
             const date=new Date(dates)
             console.log(date)
             if(!isNaN(date)){
+                console.log('date to be deleted ', date)
                 const deleteresult=await historycollection.updateOne(
                     {
                     _id:userId,
@@ -855,11 +861,13 @@ router.post('/delete',async(req,res)=>{
                     }
              
                 )
+                console.log("delte results",deleteresult)
                 if(deleteresult.modifiedCount>0){
                     console.log("deleted successfully")
                     res.status(200).json({success:true})
             }
             } else{
+                  console.log('date to be deleted ', dates)
                 const deleteresult=await chatcollection.updateOne(
                     {
                         _id:userId,
