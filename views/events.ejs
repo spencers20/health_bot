@@ -8,10 +8,11 @@
             display:flex; 
             top:1px; 
             width:100% ; 
-            height: 50px;
+            height: 60px;
             background-color: bisque;
             justify-content: center; 
             align-items: center;
+            position: sticky;
 
         }
 
@@ -37,36 +38,63 @@
 
         .bottom{
             width:100%;
-            border: 1px solid black;
-            margin-top: 40px
+            /* border: 1px solid black; */
+            margin-top: 40px;   
+            display: flex;
+            flex-direction: column;
+            /* background-color: white; */
         }
 
         .bottom-boxes{
-            background-color: rgb(143, 210, 212); 
-            width:30%;
-            height:300px;
+            background-color: rgb(247, 243, 233); 
+            width:40%;
             padding:5px;
-            margin:10px;
+            /* margin:10px; */
             box-shadow: 2px 3px rgb(7, 1, 1);
             border-radius: 5%;
+            min-height:500px ;
         
 
 
         }
+        .main{
+            margin-top:0px;
+            display:flex; 
+            width:100%;
+            background-color: aliceblue; 
+            flex-direction: row;
+            /* position: sticky; */
+            
+            /* min-height: 85%; */
+        }
+        .fc-toolbar {
+        display: flex;
+        justify-content: space-between; /* Ensures proper spacing */
+        align-items: center;
+       
+       }
+
+      .fc-toolbar-chunk {
+       display: flex;
+       gap: 10px; /* Adjust spacing between buttons */
+     }
 
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
+
+
 </head>
 
 <body>
-    <div class="tittlebar">
+    <div class="tittlebar" >
         <span>
             AFYA24-7
         </span>
     </div>
 
-    <div class="main" style="margin-top:20px; display:flex; width:100%;background-color: aliceblue; height: 85% ;">
-      <div class="e-sidebar" style="margin-top:10px; margin-left: 20px; display:flex; flex-direction:column;width:25%; position:relative; height:550px; background-color:rgb(119, 119, 124);border-radius: 10px;"> 
+    <div class="main" >
+      <div class="e-sidebar" style="margin-top:30px; margin-left: 20px; display:flex; flex-direction:column;width:20%; position:fixed; height:550px; background-color:rgb(237, 237, 245);border-radius: 10px;"> 
         <span class="side-icon" style="margin-top: 30px;">
             
                 <svg  style="margin-left:20px" xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" viewBox="0 0 24 24" fill="none"><path d="M9 20H7C5.89543 20 5 19.1046 5 18V10.9199C5 10.336 5.25513 9.78132 5.69842 9.40136L10.6984 5.11564C11.4474 4.47366 12.5526 4.47366 13.3016 5.11564L18.3016 9.40136C18.7449 9.78132 19 10.336 19 10.9199V18C19 19.1046 18.1046 20 17 20H15M9 20V14C9 13.4477 9.44772 13 10 13H14C14.5523 13 15 13.4477 15 14V20M9 20H15" stroke="#464455" stroke-linecap="round" stroke-linejoin="round"/>
@@ -122,22 +150,22 @@
 
       </div>
       <!-- main body -->
-      <div class="l-body" style="padding:10px; width: 100%;">
+      <div class="l-body" style="padding:10px; width: 70%; margin-left: 24% ; margin-top: 30px;">
         <div class="f-top" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
             <span >
-                <p style="font-size: 15px; margin:0">
+                <p style="font-size: 30px; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;margin:0">
                     Events
                 </p>
-                <p style="font-size: 12px; margin:0">
+                <p style="font-size: 18px; margin:0">
                     Schedule and monitor your personal health events and clinic  appointments
                 </p>
             </span>
 
-            <span id="eventdate"> DATE </span>
+            <span id="eventdate" style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; border-radius: 10px; color: rgb(54, 1, 10) ;"> DATE </span>
         </div>
 
         <!-- Today events -->
-        <div  style="display: flex; flex-direction: column; margin-top: 20px;" >
+        <div  style="display: flex; flex-direction: column; margin-top: 40px;" >
             <span>
                 Today events
             </span>
@@ -148,78 +176,106 @@
 
         </div>
 
-        <div id="eventoutline" style="display: flex; flex-direction: row; padding: 5px; margin: 5px;background-color: white;">
-            <div id="chat" style="background-color: white;">
-                <canvas id="mainchart" style="width: 200px;height:200px ;">
-                </canvas>
-
+        <div   id="eventoutline" style="padding: 5px; margin: 5px; display: flex; flex-direction: column; margin-top:20px;">
+            <div style="font-size: 18px;">
+                Event Outline
             </div>
-            <div class="legend-card" style=" box-shadow:1px 1px 1px 1px rgb(13, 77, 216);" >
-                <span style="display:flex;flex-direction:row; align-items: center; justify-content: center; margin-top: 10px;">
-                    <div style="width:30px ;height:10px; background-color:rgb(16, 150, 194); margin-top: 5px;"></div>
-                    <div style="margin-left: 10px; font-size: 20px;"> upcoming</div>
-                </span>
 
-                <div style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
-                    8
+            <div style="display: flex; flex-direction: row; margin:10px;  ">
+                <div id="chat" style="background-color: white;">
+                    <canvas id="mainchart" style="width: 200px;height:200px ;">
+                    </canvas>
+    
                 </div>
-            </div>
-
-            <div class="legend-card" style=" box-shadow:1px 1px 1px 1px rgb(150, 231, 103);" >
-                <span style="display:flex;flex-direction:row; align-items: center; justify-content: center; margin-top: 10px;">
-                    <div style="width:30px ;height:10px; background-color:rgb(150, 231, 103); margin-top: 5px;"></div>
-                    <div style="margin-left: 10px; font-size: 20px;"> Completed </div>
-                </span>
-
-                <div style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
-                    10
+                <div class="legend-card" style=" box-shadow:1px 1px 1px 1px rgb(13, 77, 216);" >
+                    <span style="display:flex;flex-direction:row; align-items: center; justify-content: center; margin-top: 10px;">
+                        <div style="width:30px ;height:10px; background-color:rgb(16, 150, 194); margin-top: 5px;"></div>
+                        <div style="margin-left: 10px; font-size: 20px;"> upcoming</div>
+                    </span>
+    
+                    <div style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
+                        8
+                    </div>
                 </div>
-            </div>
-
-            <div class="legend-card" style=" box-shadow:1px 1px 1px 1px rgb(194, 74, 98);" >
-                <span style="display:flex;flex-direction:row; align-items: center; justify-content: center; margin-top: 10px;">
-                    <div style="width:30px ;height:10px; background-color:rgb(194, 74, 98); margin-top: 5px;"></div>
-                    <div style="margin-left: 10px; font-size: 20px;"> cancelled</div>
-                </span>
-
-                <div style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
-                    3
+    
+                <div class="legend-card" style=" box-shadow:1px 1px 1px 1px rgb(150, 231, 103);" >
+                    <span style="display:flex;flex-direction:row; align-items: center; justify-content: center; margin-top: 10px;">
+                        <div style="width:30px ;height:10px; background-color:rgb(150, 231, 103); margin-top: 5px;"></div>
+                        <div style="margin-left: 10px; font-size: 20px;"> Completed </div>
+                    </span>
+    
+                    <div style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
+                        10
+                    </div>
                 </div>
-            </div>
-
-            <div class="legend-card" style=" box-shadow:1px 1px 1px 1px rgb(255, 230, 224);" >
-                <span style="display:flex;flex-direction:row; align-items: center; justify-content: center; margin-top: 10px;">
-                    <div style="width:30px ;height:10px; background-color:rgb(255, 230, 224); margin-top: 5px;"></div>
-                    <div style="margin-left: 10px; font-size: 20px;"> uncompleted</div>
-                </span>
-
-                <div style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
-                    5
+    
+                <div class="legend-card" style=" box-shadow:1px 1px 1px 1px rgb(194, 74, 98);" >
+                    <span style="display:flex;flex-direction:row; align-items: center; justify-content: center; margin-top: 10px;">
+                        <div style="width:30px ;height:10px; background-color:rgb(194, 74, 98); margin-top: 5px;"></div>
+                        <div style="margin-left: 10px; font-size: 20px;"> cancelled</div>
+                    </span>
+    
+                    <div style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
+                        3
+                    </div>
                 </div>
+    
+                <div class="legend-card" style=" box-shadow:1px 1px 1px 1px rgb(255, 230, 224);" >
+                    <span style="display:flex;flex-direction:row; align-items: center; justify-content: center; margin-top: 10px;">
+                        <div style="width:30px ;height:10px; background-color:rgb(255, 230, 224); margin-top: 5px;"></div>
+                        <div style="margin-left: 10px; font-size: 20px;"> uncompleted</div>
+                    </span>
+    
+                    <div style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
+                        5
+                    </div>
+                </div>
+    
             </div>
-
         </div>
 
         <div class="bottom">
+            <div style="font-size: 18px;">
+                Schedule events
+            </div>
+            <div class="bot-box" style="width:100%; display: flex; flex-direction: row; margin-top: 10px; background-color: white">
+                <div class="bottom-boxes" >
+                    <div style="display: flex; flex-direction: column; margin:5px;padding:5px;">
+                        <span style="font-size: 20px;">  Schedule </span>
+                        <span style="margin-top: 30px;"> 
+                            Set reminders  for your health appointments and events with afya 
+                        </span>
+        
+                        <span>
+                            <textarea style=" background-color:rgb(212, 219, 216); width:100%; height: 100px; margin-top: 10px; white-space: pre-wrap; border: none; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; font-size: 16px;" placeholder="I have an appointment with Doctor Joseph on 5th June"></textarea>
+                            <button style="margin-top: 10px; padding:auto;margin-left:60px; width:100px; height: 30px;border-radius: 5px;">set reminder</button>
+                        </span>
+        
+                        <span style="margin-top:20px ;width:100% ;height:300px; border: 1px solid rgb(27, 2, 2);">
+                            
+                        </span>
+                    </div>
+            </div>
+    
             <div class="bottom-boxes" >
-                <div style="display: flex; flex-direction: column; margin:5px;padding:5px;">
-                    <span style="font-size: 20px;">  Schedule </span>
-                    <span style="margin-top: 30px;font-size: ;"> 
-                        Set reminders  for your health appointments and events with afya 
-                    </span>
-    
-                    <span>
-                        <input type="textarea" style="width:90%; height:100px; margin-top: 10px;" placeholder="i have an Appointment with doctor Joseph on 5th June">
-                    </span>
-    
-                    <span style="width:90% ;height:300px; border: 1px solid rgb(27, 2, 2);">
-    
-                    </span>
+                <div id="calendar" style="   margin:5px;padding:5px; overflow: hidden; width:100%">
+                
                 </div>
         </div>
-
+    
+        <div class="bottom-boxes" >
+            <div style="display: flex; flex-direction: column; margin:5px;padding:5px;">
+                <span style="font-size: 20px;">  Your Events </span>
+    
+                
+            </div>
+    </div>
+    
+    
+            </div>
 
         </div>
+
 
     
       </div>

@@ -1,7 +1,10 @@
-  
+// const { height } = require("pdfkit/js/page")
+
 const eventdate=document.getElementById('eventdate')
 const ctx=document.getElementById('mainchart').getContext("2d")
+const calendarEl=document.getElementById('calendar')
 const plugins=Chart.plugins
+// const height
 
 let options
 const date=new Date()
@@ -55,6 +58,26 @@ new Chart(ctx,{
         }
     }
 })
+
+const calendar=new FullCalendar.Calendar(calendarEl,{
+      
+    initialView:'dayGridMonth',
+    selectable:true,
+    dateClick:(info)=>{
+        alert("selected date :" +info.dateStr   )
+    },
+    height:'auto',
+    headerToolbar: {
+        left: 'prev,next',
+        center: 'title',  // This controls the title placement
+        right: ''
+      },
+  
+})
+
+    calendar.render()
+
+
 
 
 
