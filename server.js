@@ -12,6 +12,8 @@ const path=require('path')
 const cron=require('node-cron')
 const fs =  require('fs');
 const { get } = require('http');
+const { CommandStartedEvent } = require('mongodb');
+const Groq=require('groq-sdk')
 
 
 // const collection=require('./database')
@@ -54,7 +56,7 @@ try{
 
 app.get('/',(req , res)=>{
     console.log('entered')
-    res.render('events.ejs')
+    res.render('trial.ejs')
 })
 // app.get('/symptomchecker',(req , res)=>{
 //     console.log('entered')
@@ -80,82 +82,142 @@ app.get('/tips',async(req , res)=>{
     
 })
 
-app.get('/entries', async(req,res)=>{
+app.get('/events',async(req,res)=>{
     try{
-        console.log('entries url entered...')
         const db=await getdb()
-        const collection=db.collection('history')
-        const entries=await collection.aggregate([
-            { $match:{_id:"100984849132378172203"}
+        const eventscollection=await db.collection('events')
+        const events=await eventscollection.findOne({
+            _id:"100984849132378172203",
+        })
+        // console.log("events", events)
+        res.status(200).json(events)
+    }catch(e){
+        console.error(`failed to get the events from the database ${e}`)
+    }
+})
 
-            },
-            {
-                $unwind:"$histories"
-            },
-            {
-                $sort:{"histories.date":-1}
-            },
-            {
-                $group:{
-                    _id:"_id",
-                    histories:{
-                        $push:{
-                            date:"$histories.date",
-                            tittle:"$histories.tittle",
-                            description:"$histories.description",
-                            summary:"$histories.summary"
-                        }
-                    }
+async function getsummary(instruction){
+    const  groq = new Groq({api_key:process.env.GROQ_API_KEY})
+    try{
+
+        const chatCompletions=await groq.chat.completions.create({
+            messages :[
+                {
+                    role:"user",
+                    content: instruction
+
                 }
-            }
-        ]).toArray()
-        console.log(entries)
+            ],
+            model:"llama-3.3-70b-versatile",
+            temperature:1,
+        })
+        console.log(`chatCompletions: ${chatCompletions}`)
 
-        // return entries
-        res.status(200).json(entries)
-        console.log("entries retrieved successful")
-      
+        const summary=chatCompletions.choices[0]?.message?.content || "No summary found"
+
+        return summary
+    } catch(e){
+        console.log(`error in generating summaries ${e}`)
+    }
+
+
+}
+
+//get the reminder from flowise
+app.post('/greminder',async(req,res)=>{
+    try{
+        const reminder=req.body.rem
+        const date=new Date()
+        console.log('instructions', reminder)
+        const instruction = `
+        You are an intelligent reminder assistant. Your task is to categorize reminders correctly and generate structured JSON responses    
+        Given the following details:
+        - Current Date: ${date}
+        - Reminder: ${reminder}
+        
+        Generate a structured reminder in the following JSON format, selecting the most appropriate type and description:
+        
+        {
+          "reminder": {
+            "type": "{either 'appointment' or 'personal'}",
+            "description": "{geneerate a brief but complete description of the ${reminder}}",
+            "summary": "{concise summary of max 5 words e.g 'appointment with dr.jacob' depending on the ${reminder}}",
+            "datedue": "{same format as  e.g "2025-02-14T00:00:00.000Z"}",
+            "dateset": "{same format as e.g "2025-02-14T00:00:00.000Z"}",
+            
+          }
+        }
+        
+        Guidelines:
+        - Ensure 'summary' is meaningful and limited to 5 words.
+        - Format all dates to match ${date}.
+        - Respond strictly with the JSON object, without any additional text.
+        
+        if no ${reminder} respond only with no reminder..`;
+
+    
+
+        const stringfiedresponse=await getsummary(instruction)
+        console.log("response ...", stringfiedresponse)
+        let response
+        // if (typeof stringfiedresponse==='string'){
+        //    response=JSON.parse(stringfiedresponse)
+        // } else{
+        //     response=stringfiedresponse
+        // }
+
+        response= typeof stringfiedresponse =='string'? JSON.parse(stringfiedresponse):stringfiedresponse
+        modifresponse=[response]
+        console.log(`modifedresponse ${modifresponse}`)
+        const finalres=Object.values(modifresponse[0])
+        console.log('finalres ...', finalres)
+        Array.isArray(modifresponse)?console.log(finalres.type):console.log('not array')
+        res.status(200).json(finalres)                 
 
     } catch(e){
-        console.log(`error in getting entries : ${e}`)
+        console.error(`error in getting reminder ${e}`)
     }
+
+
+
 })
 
-app.get('/history',async (req,res)=>{
+app.post('/storeevent', async(req,res)=>{
     try{
 
-        const db=await getdb();
-        const datacollection=db.collection('data')
-        const data= await datacollection.aggregate([
-            {$match:{
-                _id :"100984849132378172203"
-            }},
-            { $unwind : "$chats"
-
+        console.log('store event entered')
+        const db=await getdb()
+        const eventcollection=await db.collection('events')
+        const {reminder}= req.body
+        console.log('reminder',reminder)
+        const response=await eventcollection.updateOne(
+            {
+                _id: "100984849132378172203"
             },
-            { $sort :{
-                "chats.updatedAt":-1
+            {
+                $push:{
+                    events:{
+                        type:reminder.type,
+                        description:reminder.description,
+                        summary:reminder.summary,
+                        datedue:reminder.datedue,
+                        dateset:reminder.dateset,
+                        status:"upcoming"   
+    
+                    }
+                }
+    
             }
-             },
-             {$group:{
-                _id:"_id",
-                chats:{
-                    $push:"chats"}
-             }
-             }
-        ]).toArray()
-
-        res.status(200).json(data)
-
+        ) 
+      
+        
+        response.acknowledged?res.status(200).json(response):console.log('no event stored ')
+       
     }catch(e){
-        console.error(`error in getting data from db : ${e}`)
-        res.status(500).json({errorgettingdata: `${e}`}) 
-    }
-
+        console.error('error in storing event')
+    }    
 
 })
-
-
 //delete data 
 
 
@@ -178,275 +240,6 @@ app.get('/get/:id',
     }
 )
 
-//funtion to merge the data  (historis) of the same _id
-const mergehistories= (data)=>{
-    try{
-        console.log("merged history entered...")
-        const mergedData={}
-    
-        data.forEach((item) => {
-            if(!mergedData[item._id]){
-                mergedData[item._id]={
-                    _id:item._id,
-                    histories:[]
-                }
-            }
-    
-            mergedData[item._id]=[
-                ...mergedData[item._id].histories,
-                ...item.histories
-            ]
-        });
-        console.log("merged data")
-
-        return Object.values(mergedData)
-    }catch(e){
-        console.log("error in merging the history", e)
-    }
-}
-
-const generatepdf=(data,res)=>{
-    try{
-        console.log("generatepdf function entered...")
-        if (!data || data.length === 0) {
-            return res.status(404).json({ error: 'No data to generate PDF' });
-        }
-
-        console.log('Generating PDF with data:', JSON.stringify(data, null, 2));
-        
-        const doc = new PDFDocument();
-        
-        // Set headers on the response object, not the PDF document
-        res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", "attachment; filename=histories.pdf");
-        doc.pipe(res);
-    
-        doc.fontSize(20).text("Health  History Report", {align: 'center', underline: true}).moveDown(1);
-    
-        data.forEach((item,index)=>{
-            doc.fontSize(16)
-                .text(`ID: ${item._id}`,{align:"center"})
-                .moveDown(1);
-
-            item.histories.forEach((history)=>{
-                const date = new Date(history.date).toLocaleDateString();
-    
-                doc.fontSize(14)
-                    .text(`Date: ${date}`, {fontWeight: "bold"})
-                    .text(`Title: ${history.tittle || 'No title'}`)
-                    .text(`${history.description || 'No description'}`)
-                    .moveDown(1);
-            });
-    
-            if (index < data.length - 1) {
-                doc.addPage();
-            }
-        });
-    
-        doc.end();
-        console.log('PDF generation completed');
-
-    } catch(e){
-        console.log('error downloading function',e);
-        res.status(500).json({ error: 'Error generating PDF' });
-    }
-}
-
-app.get('/download', async(req,res)=>{
-    try{
-        const keydates = req.query.keydate;
-        if (!keydates) {
-            return res.status(400).json({ error: 'No dates provided' });
-        }
-
-        const db = await getdb();
-        const history = db.collection('history');
-
-        if (!Array.isArray(keydates)) {
-            // Handle single date
-            const parsedDate = new Date(keydates);
-            if (isNaN(parsedDate.getTime())) {
-                return res.status(400).json({ error: 'Invalid date format' });
-            }
-
-            console.log('Searching for date:', parsedDate);
-            const data = await history.findOne(
-                {
-                    _id: "100984849132378172203",
-                    "histories.date": parsedDate
-                },
-                {
-                    projection: {
-                        histories: { $elemMatch: { date: parsedDate }}
-                    }
-                }
-            );
-
-            if (!data) {
-                return res.status(404).json({ error: 'No data found for the specified date' });
-            }
-
-            console.log('Found data:', data);
-            generatepdf([data], res);
-        } else {
-            // Handle multiple dates
-            const results = [];
-            for(const dateStr of keydates) {
-                const parsedDate = new Date(dateStr);
-                if (!isNaN(parsedDate.getTime())) {
-                    console.log('Searching for date:', parsedDate);
-                    const data = await history.findOne(
-                        {
-                            _id: "100984849132378172203",
-                            "histories.date": parsedDate
-                        },
-                        {
-                            projection: {
-                                histories: { $elemMatch: { date: parsedDate }}
-                            }
-                        }
-                    );
-                    if (data) {
-                        results.push(data);
-                    }
-                }
-            }
-            
-            if (results.length === 0) {
-                return res.status(404).json({ error: 'No data found for any of the specified dates' });
-            }
-
-            console.log('Found data for multiple dates:', results);
-            // mergedData=mergehistories(results)
-            generatepdf(results, res);
-        }
-    } catch(error) {
-        console.error('Download error:', error);
-        res.status(500).json({ error: 'Internal server error: ' + error.message });
-    }
-})
-
-app.post('/delete',async(req,res)=>{
-    try{
-        const keydates=req.body
-        // console.log(req.body)
-        const db=await getdb()
-        const collection=db.collection('history')
-        console.log('keydates in delete', keydates)
-
-        for(const dates of keydates){
-            const date=new Date(dates)
-            console.log(date)
-
-            const deleteresult=await collection.updateOne(
-                {
-                _id:"100984849132378172203",
-                "histories.date":date,
-                "histories":{$elemMatch:{date:date}}
-                },
-                {
-                    $pull:{ "histories":{date:date}}
-                }
-         
-        )
-        if(deleteresult.modifiedCount>0){
-            console.log("deleted successfully")
-            res.status(200).json({success:true})
-        }
-        }
-    }catch(e){
-        console.log('errror in deleting data ', e)
-    }
-})
-
-app.post('/updates',async(req,res)=>{
-    try{
-
-        const keydates=req.body.keyydate
-        // keydates=keydates.
-        const db=await getdb()
-        const collection=db.collection('history')
-        console.log("keydates", keydates)
-        for(const dates of keydates){
-            date= new Date(dates)
-            console.log(date)
-             
-            const results=await collection.updateOne(
-                {_id:"100984849132378172203",
-                    "histories.date":date,
-                    "histories":{$elemMatch:{date:date}}
-                },
-                {
-                    $set:{"histories.$.status":"starred"}
-                }
-            )
-
-            if (results.modifiedCount>0){
-                console.log("updated data")
-                res.status(200).json({success:true})
-            }
-
-            } 
-
-
-    }catch(e){
-        console.log('error in updating',e)
-    }
-})
-
-app.get('/starred',async(req,res)=>{
-    try{
-        console.log('starred entered...')
-
-        const db=await getdb()
-        const collection=db.collection('history')
-        const results=await collection.aggregate([
-            {
-                $match: {
-                    _id: "100984849132378172203",
-                    "histories.status": "starred"
-                }
-            },
-            {
-                $project: {
-                    histories: {
-                        $filter: {
-                            input: "$histories",
-                            as: "history",
-                            cond: { $eq: ["$$history.status", "starred"] }
-                        }
-                    }
-                }
-            },
-            {
-                $unwind: "$histories"
-            },
-            {
-                $sort: {
-                    "histories.date": -1
-                }
-            },
-            {
-                $group: {
-                    _id: "$_id",
-                    histories: {
-                        $push: {
-                            date: "$histories.date",
-                            tittle: "$histories.tittle", // Corrected from `tittle`
-                            description: "$histories.description",
-                            summary: "$histories.summary"
-                        }
-                    }
-                }
-            }
-        ]).toArray()
-        console.log("starred results", results)
-        res.status(200).json(results)
-    }catch(e){
-        console.log("error in starred",e)
-        res.status(500).json({ error: "Internal server error" })
-    }
-})
 
 app.post('/ask',
     async(req , res)=>{
