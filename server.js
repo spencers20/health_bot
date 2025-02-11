@@ -14,6 +14,7 @@ const fs =  require('fs');
 const { get } = require('http');
 const { CommandStartedEvent } = require('mongodb');
 const Groq=require('groq-sdk')
+const nodemailer=require('nodemailer')
 
 
 // const collection=require('./database')
@@ -56,13 +57,123 @@ try{
 
 app.get('/',(req , res)=>{
     console.log('entered')
-    res.render('trial.ejs')
+    res.render('index.ejs')
 })
 // app.get('/symptomchecker',(req , res)=>{
 //     console.log('entered')
 //     res.render('symptom.ejs') <%=user.name%> 
     
 // })
+
+async function getsummary(instruction){
+    const  groq = new Groq({api_key:process.env.GROQ_API_KEY})
+    try{
+
+        const chatCompletions=await groq.chat.completions.create({
+            messages :[
+                {
+                    role:"user",
+                    content: instruction
+
+                }
+            ],
+            model:"llama-3.3-70b-versatile",
+            temperature:1,
+        })
+        console.log(`chatCompletions: ${chatCompletions}`)
+
+        const summary=chatCompletions.choices[0]?.message?.content || "No summary found"
+
+        return summary
+    } catch(e){
+        console.log(`error in generating summaries ${e}`)
+    }
+
+
+}
+
+async function sendmail(to,subject,body){
+    try{
+
+        const transporter=nodemailer.createTransport({
+            service:"gmail",
+            port:587,
+            secure:false,
+            auth:{
+                user:"spencernyaenya@gmail.com",
+                pass:"jiml nuuw vmui glda"
+            }
+        }
+        )
+    
+        const aboutmail={
+            from:"afya24-7",
+            subject:subject,
+            text:body,
+            to:to
+        }
+        const infomail= await transporter.sendMail(aboutmail)
+        console.log(infomail)
+        return(infomail)
+    }catch(e){
+        console.error('error in sending email...',e)
+    }
+}
+
+async function sendnotification(){
+    const db=await getdb()
+    const eventcollection=db.collection('events')
+    const date =new Date()
+    console.log(date)
+    const datatosend= await eventcollection.findOne({
+        _id:"100984849132378172203"
+        // "events.datedue":"2025-02-14T00:00:00.000Z"},
+    },
+        {
+            projection:{
+                events:{$elemMatch:{datedue: date}}
+            }
+    })
+    console.log("result from db ",datatosend)
+    // console.log("results3....",datatosend.events)
+    if (datatosend){
+        const results=datatosend.events
+        console.log("results....",results)
+        console.log("results2....",results[0].summary)
+        
+        const to="nyaenyaspencer21@gmail.com"
+        const subject=results.summary 
+        const instruction=` You are an intelligent reminder assistant who writes emails given a text .
+                            given : text =${results[0].description}  generate  a brief  email body, to inform about the text:${results.description} 
+                            include greetings , and always be polite
+                            always start with Dear sir, and finish with thank you, do not add anything or be verbous `
+    
+        const bodyinfo=await getsummary(instruction)
+        console.log('bodyoinformation ...',bodyinfo)
+    
+        const body=bodyinfo
+
+    
+        const sentemail=await sendmail(to,subject,body)
+        if(sentemail.messageId){
+            console.log(sentemail)
+            console.log("email sent")
+            res.status(200).json(sentemail)
+        }
+    
+
+}
+}
+
+app.post('/sendmail',async(req,res)=>{
+    try{
+        cron('* * * * * *',sendnotification)
+    } catch(e){
+        console.error('error in notification')
+        console.log("sendmail entered")
+        
+    }
+})
 
 
 app.get('/tips',async(req , res)=>{
@@ -96,32 +207,7 @@ app.get('/events',async(req,res)=>{
     }
 })
 
-async function getsummary(instruction){
-    const  groq = new Groq({api_key:process.env.GROQ_API_KEY})
-    try{
 
-        const chatCompletions=await groq.chat.completions.create({
-            messages :[
-                {
-                    role:"user",
-                    content: instruction
-
-                }
-            ],
-            model:"llama-3.3-70b-versatile",
-            temperature:1,
-        })
-        console.log(`chatCompletions: ${chatCompletions}`)
-
-        const summary=chatCompletions.choices[0]?.message?.content || "No summary found"
-
-        return summary
-    } catch(e){
-        console.log(`error in generating summaries ${e}`)
-    }
-
-
-}
 
 //get the reminder from flowise
 app.post('/greminder',async(req,res)=>{
@@ -214,7 +300,7 @@ app.post('/storeevent', async(req,res)=>{
         response.acknowledged?res.status(200).json(response):console.log('no event stored ')
        
     }catch(e){
-        console.error('error in storing event')
+        console.error('error in storing event',e)
     }    
 
 })

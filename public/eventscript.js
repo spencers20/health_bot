@@ -1,6 +1,3 @@
-// const { height } = require("pdfkit/js/page")
-
-// const { response } = require("express")
 
 const eventdate=document.getElementById('eventdate')
 const ctx=document.getElementById('mainchart').getContext("2d")
@@ -11,6 +8,12 @@ const reminder=document.getElementById('reminder')
 const responsecontainer=document.getElementById('responsecontainer')
 const responsearea=document.getElementById('responsearea')
 const setreminder=document.getElementById('setreminder')
+const setremwithdate=document.getElementById('setremwithdate')
+const setdate=document.getElementById("setdate")
+const saveevent=document.getElementById('saveevent')
+const settitle=document.getElementById('settitle')
+const setremwithai=document.getElementById('setremwithai')
+const setdescription=document.getElementById('setdescription')
 // const height
 let reminderresult
 let options
@@ -66,12 +69,21 @@ new Chart(ctx,{
     }
 })
 
+let duesetdate
 const calendar=new FullCalendar.Calendar(calendarEl,{
       
     initialView:'dayGridMonth',
     selectable:true,
     dateClick:(info)=>{
-        alert("selected date :" +info.dateStr   )
+         duesetdate=info.dateStr
+        try{
+            setremwithai.style.display='none'
+            setremwithdate.style.display='flex'
+            setdate.innerHTML=info.dateStr
+            alert("selected date :" +info.dateStr   )
+        } catch(e){
+            console.error('errror in date ',e)
+        }
     },
     height:'auto',
     headerToolbar: {
@@ -83,6 +95,43 @@ const calendar=new FullCalendar.Calendar(calendarEl,{
 })
 
     calendar.render()
+
+saveevent.addEventListener('click',async()=>{
+    try{
+
+        const date=new Date()
+        const dateset=new Date(duesetdate)
+
+        const reminderdetails={
+            "type":"upcoming",
+            "description":setdescription.value,
+            "summary":settitle.value,
+            "datedue": dateset,
+            "dateset":date,
+            "status":"upcoming"
+
+        }
+
+        const rems=[reminderdetails]
+        console.log('reminderdetails',rems)
+        console.log('reminderdetails is an array ',Array.isArray(reminderdetails))
+        const reminder=reminderdetails
+        await fetch('/storeevent',{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({reminder})
+        }).then(response=>{
+            console.log('response ', response)
+            response.ok? alert('reminder stored'):console.error('not stored in db')
+        })
+    } catch(e){
+        console.log('error in saving event ',e)
+    }
+
+
+})
 
 
 
