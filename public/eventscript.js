@@ -30,44 +30,51 @@ const finaldate=date.toLocaleDateString('en-US',options)
 console.log(finaldate)
 eventdate.textContent=finaldate
 
-events={
-    'cancelled':3,
-    'upcoming':8,
-    'completed':10,
-    'uncompleted':5
+
+
+function eventschart(events){
+    try{
+
+        labels=Object.keys(events)
+        values=Object.values(events)
+        
+        new Chart(ctx,{
+            type:'pie',
+            data:{
+                labels:labels,
+                datasets:[{
+                    label:'Event',
+                    data:values ,
+                    backgroundColor:['rgb(194, 74, 98)','rgb(16, 150, 194)','rgb(150, 231, 103)','rgb(255, 230, 224)']
+                }]
+            },
+            options:{
+                responsive:true,
+                plugins:{
+                    title: {
+                        display: true,
+                        text: 'Event Stats', // Your chart heading
+                        font: {
+                            size: 15
+                        },
+                        padding: {
+                            top: 1,
+                            bottom: 5
+                        }
+                    },
+                    legend:false
+                }
+            }
+        })
+        document.getElementById("upcomingcount").innerHTML=events.upcoming
+        document.getElementById("cancelledcount").innerHTML=events.cancelled
+        document.getElementById("Completedcount").innerHTML=events.completed
+        document.getElementById("uncompletedcount").innerHTML=events.uncompleted
+    } catch(e){
+        console.error('error in building a chart ',e)
+    }
 }
 
-labels=Object.keys(events)
-values=Object.values(events)
-
-new Chart(ctx,{
-    type:'pie',
-    data:{
-        labels:labels,
-        datasets:[{
-            label:'Event',
-            data:values ,
-            backgroundColor:['rgb(194, 74, 98)','rgb(16, 150, 194)','rgb(150, 231, 103)','rgb(255, 230, 224)']
-        }]
-    },
-    options:{
-        responsive:true,
-        plugins:{
-            title: {
-                display: true,
-                text: 'Event Stats', // Your chart heading
-                font: {
-                    size: 15
-                },
-                padding: {
-                    top: 1,
-                    bottom: 5
-                }
-            },
-            legend:false
-        }
-    }
-})
 
 let duesetdate
 const calendar=new FullCalendar.Calendar(calendarEl,{
@@ -138,9 +145,10 @@ saveevent.addEventListener('click',async()=>{
 async function getevents(){
     try{
        const response =await fetch('/events')
-       const events=await response.json()
-       console.log(`events ${Object.values(events.events)}`)
-       Array.isArray(events.events)?console.log("events is an array"):console.log('events is not an array')
+       const event=await response.json()
+    //    console.log(`events ${Object.values(events.events)}`)
+       Array.isArray(event.events)?console.log("events is an array"):console.log('events is not an array')
+       const events=event.events.sort((a,b)=>new Date(b.datedue)-new Date(a.datedue))
        return events
       
     } catch(e){
@@ -149,15 +157,59 @@ async function getevents(){
 
 }
 
-function eventlist(events){
+function eventlist(events){ 
     try{
+        // console.log("events...",events)
+        // const sortedeventlist=events.events.sort((a,b)=>new Date(b.datedue)-new Date(a.datedue))
+    //    console.log("sortedeventlist...",sortedeventlist)
+      //  console.log("eventlist function entered....")
+      const elist=document.querySelector('.elist')
+    //   elist.classList.add('eventslist')
+      elist.innerHTML=''
+      const listcontainer=document.createElement('div')
+      listcontainer.innerHTML=""
+      elist.appendChild(listcontainer)
 
-        events.events.forEach((event)=>{
-            const elist=document.querySelector('.elist')
+      const sortedeventlist=events
+        sortedeventlist.forEach((event)=>{
             const onevent=document.createElement('div')
-            onevent.classList.add('eventslist')
-          
+            onevent.style.borderBottom='1px solid black'
+            onevent.classList.add('eventone')
+
+            const menudots = document.createElement('div');
+
+            menudots.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" width="24px" height="24px" viewBox="0 0 64 64">
+                    <circle cx="32.026" cy="12.028" r="4"/>
+                    <circle cx="32.026" cy="32.028" r="4"/>
+                    <circle cx="32.026" cy="52.028" r="4"/>
+                </svg>
+            `;
+            menudots.setAttribute('details.duedate',event.datedue)
+            console.log("duedate...",event.datedue)
+
             
+            onevent.appendChild(menudots);
+
+            menudots.addEventListener('click',()=>{
+                const duedate=menudots.getAttribute('details.duedate')
+                console.log("duedate...",duedate)
+                const minimenu=document.createElement('div')
+                minimenu.classList.add('.minimenu')
+                minimenu.style.display='flex'
+
+                const cancelevent=document.createElement('div')
+                cancelevent.innerHTML='cancel'
+                cancelevent.style.marginTop='10px'
+
+
+            })
+            
+
+           
+            const eventdetails=document.createElement('div')
+            eventdetails.style.flexDirection='column'
+            eventdetails.style.marginLeft='10px'
             const eventdate=document.createElement('div')
             eventdate.style.marginBottom='10px'
             eventdate.style.marginLeft='200px'
@@ -171,14 +223,15 @@ function eventlist(events){
 
             })
             eventdate.innerHTML=finaldate
-            onevent.appendChild(eventdate)
+            eventdetails.appendChild(eventdate)
     
             const eventdisc=document.createElement('div')
             eventdisc.style.marginBottom='10px'
-            eventdisc.innerHTML=event.description
-            onevent.appendChild(eventdisc)
+            eventdisc.innerHTML=event.summary
+            eventdetails.appendChild(eventdisc)
+            onevent.appendChild(eventdetails)
 
-    
+            listcontainer.appendChild(onevent)
             elist.appendChild(onevent)
     
         })
@@ -189,7 +242,23 @@ function eventlist(events){
 
 }
 
+function todayevents(events){
+    try{
+        events.forEach((event)=>{
+            if (event.datedue=="2025-06-07T00:00:00.000Z"){
+                 console.log("event....",event)
+                document.getElementById('eventtittle').innerHTML=event.type
+                document.getElementById('event').innerHTML=event.summary
+                 
+            }
 
+        })
+
+    }catch(e){
+        console.error('error in getting todaye events ',e)
+    }
+
+}
 
 genreminder.addEventListener('click',async()=>{
     try{
@@ -243,9 +312,115 @@ setreminder.addEventListener('click',async()=>{
 })
 
 
+async function upcomingreminders(){
+    const events=await getevents()
+    let upcomingevents=[]
+    events.forEach((event)=>{
+        if (event.status=='upcoming'){
+            upcomingevents.push(event)
+        }
+
+    })
+
+    return upcomingevents
+
+}
+
+async function cancelledreminders(){
+    const events=await getevents()
+    let cancelledevents=[]
+    events.forEach((event)=>{
+        if (event.status=='cancelled'){
+            cancelledevents.push(event)
+        }
+
+    })
+
+    return cancelledevents
+
+}
+
+async function completedreminders(){
+    const events=await getevents()
+    let completedevents=[]
+    events.forEach((event)=>{
+        if (event.status=='completed'){
+            completedevents.push(event)
+        }
+
+    })
+    console.log("completedevents is an array..." ,Array.isArray(completedevents))
+    const sortedevents=completedevents.sort((a,b)=>new Date(b.duedate)-new Date(a.duedate))
+    console.log('sortedevents...',sortedevents)
+    console.log('completedevents...',completedevents)
+    return completedevents
+
+
+}
+
+async function uncompletedreminders(){
+    const events=await getevents()
+    let uncompletedevents=[]
+    events.forEach((event)=>{
+        if (event.status=='uncompleted'){
+            uncompletedevents.push(event)
+        }
+
+    })
+    return uncompletedevents
+
+}
+
+document.getElementById("cancellegend").addEventListener('click',async()=>{
+    
+    const events= await cancelledreminders()
+    console.log("cancelled events",events)
+    eventlist(events)
+    document.querySelector('.bot-box').scrollIntoView({behavior:"smooth"})
+    document.getElementById('event_type').innerHTML="Cancelled Events"
+})
+
+
+document.getElementById('completedlegend').addEventListener('click',async()=>{
+    const events=await completedreminders()
+    eventlist(events)
+    document.querySelector('.bot-box').scrollIntoView({behavior:"smooth"})
+    document.getElementById('event_type').innerHTML="Completed Events"
+})
+
+document.getElementById('upcominglegend').addEventListener('click',async()=>{
+    const events=await upcomingreminders()
+    eventlist(events)
+    document.querySelector('.bot-box').scrollIntoView({behavior:"smooth"})
+    document.getElementById('event_type').innerHTML="Upcoming Events"
+})
+
+document.getElementById('uncompletedlegend').addEventListener('click',async()=>{
+    const events=await uncompletedreminders()
+    eventlist(events)
+    document.querySelector('.bot-box').scrollIntoView({behavior:"smooth"})
+    document.getElementById('event_type').innerHTML="Uncompleted Events"
+})
 
 document.addEventListener('DOMContentLoaded',async()=>{
    const events= await getevents()
     eventlist(events)
+    todayevents(events)
+
+    const upcoming=await upcomingreminders()
+    const uncompleted=await uncompletedreminders()
+    const cancelled=await cancelledreminders()
+    const completed=await completedreminders()
+
+    const eventsdist={
+        "cancelled":cancelled.length,
+        "upcoming":upcoming.length,
+        "completed":completed.length,
+        "uncompleted":uncompleted.length
+    }
+
+    eventschart(eventsdist)
+
+
    
 })

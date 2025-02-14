@@ -33,6 +33,7 @@
             padding: 5px; 
             display: flex; 
             flex-direction: column;
+            cursor: pointer;
             /* box-shadow:1px 1px 1px 1px rgb(13, 77, 216); */
         }
 
@@ -43,6 +44,14 @@
             display: flex;
             flex-direction: column;
             /* background-color: white; */
+        }
+        .minimenu{
+            width:80px;
+            height: 80px;
+            background-color: rgb(131, 126, 126);
+            display:none;  
+            flex-direction: column;
+
         }
 
         .bottom-boxes{
@@ -56,14 +65,14 @@
         
         } 
 
-        .eventslist{
+        .eventone{
             margin:5px; 
             padding:1px;
             margin-top:10px; 
             /* justify-content: space-between;  */
             width:100%; 
             display: flex; 
-            flex-direction: column;
+            flex-direction: row;
             margin-left:10px; 
             border-bottom: 1px solid black;
             align-items: center;
@@ -204,47 +213,47 @@
                     </canvas>
     
                 </div>
-                <div class="legend-card" style=" box-shadow:1px 1px 1px 1px rgb(13, 77, 216);" >
+                <div id="upcominglegend" class="legend-card" style=" box-shadow:1px 1px 1px 1px rgb(13, 77, 216);" >
                     <span style="display:flex;flex-direction:row; align-items: center; justify-content: center; margin-top: 10px;">
                         <div style="width:30px ;height:10px; background-color:rgb(16, 150, 194); margin-top: 5px;"></div>
                         <div style="margin-left: 10px; font-size: 20px;"> upcoming</div>
                     </span>
     
-                    <div style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
-                        8
+                    <div id="upcomingcount" style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
+                        0
                     </div>
                 </div>
     
-                <div class="legend-card" style=" box-shadow:1px 1px 1px 1px rgb(150, 231, 103);" >
+                <div id="completedlegend" class="legend-card" style=" box-shadow:1px 1px 1px 1px rgb(150, 231, 103);" >
                     <span style="display:flex;flex-direction:row; align-items: center; justify-content: center; margin-top: 10px;">
                         <div style="width:30px ;height:10px; background-color:rgb(150, 231, 103); margin-top: 5px;"></div>
                         <div style="margin-left: 10px; font-size: 20px;"> Completed </div>
                     </span>
     
-                    <div style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
-                        10
+                    <div id="Completedcount" style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
+                        0
                     </div>
                 </div>
     
-                <div class="legend-card" style=" box-shadow:1px 1px 1px 1px rgb(194, 74, 98);" >
+                <div id="cancellegend" class="legend-card" style="cursor: pointer; box-shadow:1px 1px 1px 1px rgb(194, 74, 98);" >
                     <span style="display:flex;flex-direction:row; align-items: center; justify-content: center; margin-top: 10px;">
                         <div style="width:30px ;height:10px; background-color:rgb(194, 74, 98); margin-top: 5px;"></div>
                         <div style="margin-left: 10px; font-size: 20px;"> cancelled</div>
                     </span>
     
-                    <div style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
-                        3
+                    <div id="cancelledcount" style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
+                        0
                     </div>
                 </div>
     
-                <div class="legend-card" style=" box-shadow:1px 1px 1px 1px rgb(255, 230, 224);" >
+                <div id="uncompletedlegend" class="legend-card" style="cursor: pointer; box-shadow:1px 1px 1px 1px rgb(255, 230, 224);" >
                     <span style="display:flex;flex-direction:row; align-items: center; justify-content: center; margin-top: 10px;">
                         <div style="width:30px ;height:10px; background-color:rgb(255, 230, 224); margin-top: 5px;"></div>
                         <div style="margin-left: 10px; font-size: 20px;"> uncompleted</div>
                     </span>
     
-                    <div style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
-                        5
+                    <div id="uncompletedcount" style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
+                        0
                     </div>
                 </div>
     
@@ -252,11 +261,11 @@
         </div>
 
         <div class="bottom">
-            <div style="font-size: 18px;">
+            <div  style="font-size: 18px;">
                 Schedule events
             </div>
             <div class="bot-box" style="width:100%; display: flex; flex-direction: row; margin-top: 10px; background-color: white">
-                <div class="bottom-boxes" >
+                <div class="bottom-boxes"  style="overflow-y: auto;">
                     <div id="setremwithdate" style="display: none; flex-direction: column;margin:10px;padding: 10px;">
                         <input id="settitle" type="text" placeholder="appointment with Dr. Luke " style="border: none; border-bottom: 1px solid black; height: 50px; margin-top: 30px; font-size:18px ;">
                         <span id="setdate" style="margin-top:20px"></span>
@@ -310,10 +319,11 @@
     
         <div class="bottom-boxes"  style="overflow-x: hidden;overflow-y: visible;">
             <div style="display: flex; flex-direction: column; margin:5px;padding:5px;">
-                <span style="font-size: 20px;">  Your Events </span>
+                <span id="event_type" style="font-size: 20px; border-radius: 10px; align-items:center;justify-content: center; align-content: center; color: rgb(41, 77, 196);">  Your Events </span>
             </div>
             <!-- <div></div> -->
              <div class="elist" style="width:100%;display: flex; flex-direction: column;">
+                <div> hh</div>
 
                  <!-- <div class="eventslist" > -->
                    <!-- <div style="margin-bottom: 10px;">
