@@ -176,8 +176,11 @@ function eventlist(events){
             onevent.style.borderBottom='1px solid black'
             onevent.classList.add('eventone')
 
+            const menus=document.createElement('div')
+            menus.style.display='flex'
+            menus.style.flexDirection='row'
             const menudots = document.createElement('div');
-
+            menudots.style.cursor='pointer'
             menudots.innerHTML = `
                 <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" width="24px" height="24px" viewBox="0 0 64 64">
                     <circle cx="32.026" cy="12.028" r="4"/>
@@ -187,23 +190,51 @@ function eventlist(events){
             `;
             menudots.setAttribute('details.duedate',event.datedue)
             console.log("duedate...",event.datedue)
+            menus.appendChild(menudots);
+
+            const menulist=document.createElement('div')
+            menulist.classList.add('menulist')
+            menulist.innerHTML=`
+                <span  id="completevent" class="popuplist"> completed </span>
+                <span  id="cancelevent" class="popuplist"> cancel</span>
+                <span  id="deletevent" class="popuplist">delete</span>
+            
+            `
+            menus.appendChild(menulist)
 
             
-            onevent.appendChild(menudots);
 
+            function togglemenulist(){
+                if(menulist.style.display=='none' || menulist.style.display==''){
+                    menulist.style.display='flex'
+                    eventdate.style.marginLeft='100px'
+                } else{
+                    menulist.style.display='none'
+                    eventdate.style.marginLeft='150px'
+                
+            }
+        } 
             menudots.addEventListener('click',()=>{
                 const duedate=menudots.getAttribute('details.duedate')
                 console.log("duedate...",duedate)
-                const minimenu=document.createElement('div')
-                minimenu.classList.add('.minimenu')
-                minimenu.style.display='flex'
+                togglemenulist()
+                
+            })
 
-                const cancelevent=document.createElement('div')
-                cancelevent.innerHTML='cancel'
-                cancelevent.style.marginTop='10px'
-
+            // giving each list element a function
+            document.getElementById('completevent').addEventListener('click',async()=>{
+                const completedate=menudots.getAttribute('details.duedate')
+                await fetch('/manageevent',{
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                    body:JSON.stringify(completedate)
+                })
 
             })
+
+            onevent.appendChild(menus)
             
 
            
@@ -212,7 +243,7 @@ function eventlist(events){
             eventdetails.style.marginLeft='10px'
             const eventdate=document.createElement('div')
             eventdate.style.marginBottom='10px'
-            eventdate.style.marginLeft='200px'
+            eventdate.style.marginLeft='150px'
             eventdate.style.color='red'
             const date=new Date(event.datedue)
             const finaldate=date.toLocaleDateString('en-US',{

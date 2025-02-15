@@ -76,6 +76,7 @@
             margin-left:10px; 
             border-bottom: 1px solid black;
             align-items: center;
+            justify-content: center;
         }
         .responsedetails{
             margin-top: 10px; 
@@ -92,6 +93,27 @@
             /* position: sticky; */
             
             /* min-height: 85%; */
+        }
+
+        .menulist{
+            /* display: flex; */
+            flex-direction: column;
+            height: 75px; 
+            width:90px;
+            background-color: rgb(176, 180, 180);
+            display: none;
+        }
+
+        .popuplist{
+            /* border-bottom: 1px solid rgb(41, 39, 13); */
+            padding:2px;
+            transition:background-color 0.3s ease ;
+            width:100%;
+            text-align: center;
+
+        }
+        .popuplist:hover{
+            background-color: aqua;
         }
         .fc-toolbar {
         display: flex;
@@ -261,8 +283,12 @@
         </div>
 
         <div class="bottom">
-            <div  style="font-size: 18px;">
+            <div  style="font-size: 18px; display: flex; flex-direction: row;">
+               <div>
                 Schedule events
+               </div>
+
+               
             </div>
             <div class="bot-box" style="width:100%; display: flex; flex-direction: row; margin-top: 10px; background-color: white">
                 <div class="bottom-boxes"  style="overflow-y: auto;">
@@ -323,7 +349,7 @@
             </div>
             <!-- <div></div> -->
              <div class="elist" style="width:100%;display: flex; flex-direction: column;">
-                <div> hh</div>
+               
 
                  <!-- <div class="eventslist" > -->
                    <!-- <div style="margin-bottom: 10px;">
