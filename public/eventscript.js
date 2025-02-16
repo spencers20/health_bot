@@ -32,7 +32,7 @@ eventdate.textContent=finaldate
 
 
 
-function eventschart(events){
+async function eventschart(events){
     try{
 
         labels=Object.keys(events)
@@ -189,15 +189,17 @@ function eventlist(events){
                 </svg>
             `;
             menudots.setAttribute('details.duedate',event.datedue)
+            menudots.setAttribute('details.description',event.description)
             console.log("duedate...",event.datedue)
             menus.appendChild(menudots);
 
             const menulist=document.createElement('div')
             menulist.classList.add('menulist')
             menulist.innerHTML=`
-                <span  id="completevent" class="popuplist"> completed </span>
-                <span  id="cancelevent" class="popuplist"> cancel</span>
-                <span  id="deletevent" class="popuplist">delete</span>
+                <span   class="popuplist completevent"> completed </span>
+                <span   class="popuplist cancelevent"> cancel</span>
+                <span   class="popuplist activatevent" style="display:none; align-items:center" > activate</span>
+                <span   class="popuplist deletevent">delete</span>
             
             `
             menus.appendChild(menulist)
@@ -214,25 +216,123 @@ function eventlist(events){
                 
             }
         } 
+                               
+          const activatevent=menulist.querySelector('.activatevent')
+          const cancelevent=menulist.querySelector('.cancelevent')
+          const completevent = menulist.querySelector('.completevent');
+        
             menudots.addEventListener('click',()=>{
                 const duedate=menudots.getAttribute('details.duedate')
+                if (event.status=='cancelled'){
+                    cancelevent.style.display='none'
+                    activatevent.style.display='flex'
+                    completevent.style.display='none'
+
+                }
                 console.log("duedate...",duedate)
                 togglemenulist()
                 
             })
-
-            // giving each list element a function
-            document.getElementById('completevent').addEventListener('click',async()=>{
-                const completedate=menudots.getAttribute('details.duedate')
+             
+            //menulist functions
+            async function menulistlistener(task){
+                try{
+                    const completedate=menudots.getAttribute('details.duedate')
+                const description=menudots.getAttribute('details.description')
+                const message={
+                    description:description,
+                    date:completedate,
+                    task:task
+                }
                 await fetch('/manageevent',{
                     method:'POST',
                     headers:{
                         'Content-Type':'application/json'
                     },
-                    body:JSON.stringify(completedate)
-                })
+                    body:JSON.stringify(message)
+                }) .then(async (response)=>{
+                    const results=await response.json()
+    
+                    if(results.modifiedCount>0){
+                        const eventlist=await allfunctions()
+                        // await upcomingreminders()
+                        await eventschart(eventlist)
+                        return results 
+                    }
+                }
+                )
+                }catch(e){
+                    console.error('errror adding eventlistener to menus ',e)
+
+                }
+            }
+
+
+            
+            completevent.addEventListener('click', async(e) => {
+                try{
+                    console.log('Complete event clicked!');
+                    e.target.style.color = 'red';
+                    task='complete'
+                    const results=await menulistlistener(task) 
+                    if (results.modifiedCount>0){
+                        alert('event completed successfully')
+                    }
+                }catch(e){
+                    console.error('error in completing an event ',e)
+                }
+                
+            });
+
+
+            const deleteevent=menulist.querySelector('.deletevent')
+            deleteevent.addEventListener('click',async(e)=>{
+                try{
+                    console.log('Delete event clicked!');
+                    e.target.style.color = 'red';
+                    task='delete'
+                    const results=await menulistlistener(task) 
+                    if (results.modifiedCount>0){
+                        alert('event deleted successfully')
+                    }
+                }catch(e){
+                    console.error('error in deleting an event ',e)
+                }
 
             })
+
+            
+            cancelevent.addEventListener('click',async(e)=>{
+                try{
+                    console.log('cancel event clicked!');
+                    e.target.style.color = 'red';
+                    task='cancel'
+                    const results=await menulistlistener(task) 
+                    if (results.modifiedCount>0){
+                        alert('event canceled successfully')
+                    }
+                }catch(e){
+                    console.error('error in canceling an event ',e)
+                }
+                             
+
+            })
+
+            activatevent.addEventListener('click', async(e)=>{
+                try{
+                    console.log('activate event clicked!');
+                    e.target.style.color = 'red';
+                    task='activate'
+                    const results=await menulistlistener(task) 
+                    if (results.modifiedCount>0){
+                        alert('event activated successfully')
+                    }
+                }catch(e){
+                    console.error('error in canceling an event ',e)
+                }
+
+            })
+
 
             onevent.appendChild(menus)
             
@@ -244,7 +344,16 @@ function eventlist(events){
             const eventdate=document.createElement('div')
             eventdate.style.marginBottom='10px'
             eventdate.style.marginLeft='150px'
-            eventdate.style.color='red'
+            if (event.status=='upcoming'){
+                 eventdate.style.color='blue'
+            } else if(event.status=='cancelled'){
+                eventdate.style.color='red'
+            }else if(event.status=='completed'){
+                eventdate.style.color='green'
+            } else{
+                eventdate.style.color='rgb(255, 230, 224)'
+            }
+           
             const date=new Date(event.datedue)
             const finaldate=date.toLocaleDateString('en-US',{
                 weekday:'short',
@@ -275,8 +384,10 @@ function eventlist(events){
 
 function todayevents(events){
     try{
+        const date=new Date()
+        console.log('date today..',date)
         events.forEach((event)=>{
-            if (event.datedue=="2025-06-07T00:00:00.000Z"){
+            if (event.datedue==date){
                  console.log("event....",event)
                 document.getElementById('eventtittle').innerHTML=event.type
                 document.getElementById('event').innerHTML=event.summary
@@ -291,6 +402,7 @@ function todayevents(events){
 
 }
 
+//function to generate result from the AI model
 genreminder.addEventListener('click',async()=>{
     try{
         const rem=reminder.value
@@ -308,6 +420,7 @@ genreminder.addEventListener('click',async()=>{
         console.log('reminderresult', reminderresult)
         genreminder.style.display='none'
         responsecontainer.style.display='flex'
+
         document.getElementById('e_tittle').innerHTML=reminderresult[0].summary
         document.getElementById('e_type').innerHTML=reminderresult[0].type
         document.getElementById('e_description').innerHTML=reminderresult[0].description
@@ -331,10 +444,10 @@ setreminder.addEventListener('click',async()=>{
             method:'POST',
             headers:{
                 'Content-Type':'application/json'
-            },
+            },  
             body:JSON.stringify({reminder})
         }).then(response=>{
-            response.ok? alert('reminder created successdfully'):console.log('reminder not set')
+            response.ok? alert('reminder created successfully'):console.log('reminder not set')
         })
     }catch(e){
         console.error('error in setting reminder...',e)
@@ -433,25 +546,26 @@ document.getElementById('uncompletedlegend').addEventListener('click',async()=>{
     document.getElementById('event_type').innerHTML="Uncompleted Events"
 })
 
-document.addEventListener('DOMContentLoaded',async()=>{
-   const events= await getevents()
-    eventlist(events)
-    todayevents(events)
+async function allfunctions(){
+    const events= await getevents()
+     eventlist(events)
+     todayevents(events)
+    
+     const upcoming=await upcomingreminders()
+     const uncompleted=await uncompletedreminders()
+     const cancelled=await cancelledreminders()
+     const completed=await completedreminders()
+    
+     const eventsdist={
+         "cancelled":cancelled.length,
+         "upcoming":upcoming.length,
+         "completed":completed.length,
+         "uncompleted":uncompleted.length
+     }
+    
+     await eventschart(eventsdist)
 
-    const upcoming=await upcomingreminders()
-    const uncompleted=await uncompletedreminders()
-    const cancelled=await cancelledreminders()
-    const completed=await completedreminders()
+     return eventsdist
+}
 
-    const eventsdist={
-        "cancelled":cancelled.length,
-        "upcoming":upcoming.length,
-        "completed":completed.length,
-        "uncompleted":uncompleted.length
-    }
-
-    eventschart(eventsdist)
-
-
-   
-})
+document.addEventListener('DOMContentLoaded',allfunctions)

@@ -98,8 +98,8 @@
         .menulist{
             /* display: flex; */
             flex-direction: column;
-            height: 75px; 
-            width:90px;
+            max-height: 75px; 
+            max-width:90px;
             background-color: rgb(176, 180, 180);
             display: none;
         }
@@ -110,6 +110,7 @@
             transition:background-color 0.3s ease ;
             width:100%;
             text-align: center;
+            cursor: pointer;
 
         }
         .popuplist:hover{
@@ -293,6 +294,9 @@
             <div class="bot-box" style="width:100%; display: flex; flex-direction: row; margin-top: 10px; background-color: white">
                 <div class="bottom-boxes"  style="overflow-y: auto;">
                     <div id="setremwithdate" style="display: none; flex-direction: column;margin:10px;padding: 10px;">
+                        <div id="backtoai" onclick="document.getElementById('setremwithdate').style.display='none'; document.getElementById('setremwithai').style.display='flex'" style="cursor: pointer;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25px" height="25px" viewBox="0 0 1024 1024"><path fill="#000000" d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64z"/><path fill="#000000" d="m237.248 512 265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312L237.248 512z"/><script xmlns=""/></svg>
+                        </div>
                         <input id="settitle" type="text" placeholder="appointment with Dr. Luke " style="border: none; border-bottom: 1px solid black; height: 50px; margin-top: 30px; font-size:18px ;">
                         <span id="setdate" style="margin-top:20px"></span>
                         <textarea  id="setdescription" placeholder="add description about your event " style="border-radius: 10px; background-color: aliceblue; border: none; min-height: 200px; margin-top: 20px;"></textarea>
@@ -315,21 +319,21 @@
                              <span id="responsearea" style="margin-top:20px ;width:100% ;height:300px; border: 1px solid rgb(27, 2, 2); margin:10px;padding: 5px; overflow-x: hidden;display: flex; flex-direction: column;">
                                 <span id="e_tittle" style="margin-top:10px; font-size: 20px; margin-left: 20px; font-weight: bold;"> Appointment with dr.kingori</span>
                                 <span class="responsedetails" > 
-                                    <span style="  font-size: 20px; color:rgb(86, 168, 9)"> Type:</span>
+                                    <span style="  font-size: 20px; color:rgb(86, 168, 9)"></span>
                                     <span id="e_type" style="margin-left: 5px;" ></span>
                                 </span>
-                                  <span class="responsedetails" > 
-                                    <span style="  font-size: 20px; color:rgb(59, 168, 9)"> Description:</span>
-                                    <span id="e_description"  style="margin-left: 5px;"></span>
-                                </span>
                                 <span class="responsedetails" > 
-                                    <span style="  font-size: 20px; color:rgb(54, 168, 9)"> Datedue:  </span>
+                                    <span style="  font-size: 20px; color:rgb(54, 168, 9)"> Datedue: </span>
                                     <span id="event_datedue" style="margin-left: 5px;" ></span>
                                 </span>
-                                <span class="responsedetails" > 
-                                    <span style="  font-size: 20px; color:rgb(94, 168, 9)"> dateset:</span>
-                                    <span id="event_dateset" style="margin-left: 5px;"></span>
+                                  <span class="responsedetails" > 
+                                    <span style="  font-size: 20px; color:rgb(59, 168, 9)"> </span>
+                                    <span id="e_description"  style="margin-left: 5px;"></span>
                                 </span>
+                                <!-- <span class="responsedetails" > 
+                                    <span style="  font-size: 20px; color:rgb(94, 168, 9)"> </span>
+                                    <span id="event_dateset" style="margin-left: 5px;"></span>
+                                </span> -->
 
                              </span>
                              <button id="setreminder" style="margin-top: 20px; padding:auto;margin-left:60px; width:100px; height: 30px;border-radius: 5px;">set reminder</button>

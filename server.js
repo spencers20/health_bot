@@ -92,6 +92,7 @@ async function getsummary(instruction){
 
 }
 
+//function to sendmail
 async function sendmail(to,subject,body){
     try{
 
@@ -107,8 +108,8 @@ async function sendmail(to,subject,body){
         )
     
         const aboutmail={
-            from:"afya24-7",
-            subject:subject,
+            from:'"afya24-7" <spencernyaenya@gmail.com>',
+            subject:subject || 'Health update',
             text:body,
             to:to
         }
@@ -119,58 +120,202 @@ async function sendmail(to,subject,body){
         console.error('error in sending email...',e)
     }
 }
-
+//function for sending notification
 async function sendnotification(){
-    const db=await getdb()
-    const eventcollection=db.collection('events')
-    const date =new Date()
-    console.log(date)
-    const datatosend= await eventcollection.findOne({
-        _id:"100984849132378172203"
-        // "events.datedue":"2025-02-14T00:00:00.000Z"},
-    },
-        {
-            projection:{
-                events:{$elemMatch:{datedue: date}}
-            }
-    })
-    console.log("result from db ",datatosend)
-    // console.log("results3....",datatosend.events)
-    if (datatosend){
-        const results=datatosend.events
-        console.log("results....",results)
-        console.log("results2....",results[0].summary)
-        
-        const to="nyaenyaspencer21@gmail.com"
-        const subject=results.summary 
-        const instruction=` You are an intelligent reminder assistant who writes emails given a text .
-                            given : text =${results[0].description}  generate  a brief  email body, to inform about the text:${results.description} 
-                            include greetings , and always be polite
-                            always start with Dear sir, and finish with thank you, do not add anything or be verbous `
-    
-        const bodyinfo=await getsummary(instruction)
-        console.log('bodyoinformation ...',bodyinfo)
-    
-        const body=bodyinfo
-
-    
-        const sentemail=await sendmail(to,subject,body)
-        if(sentemail.messageId){
-            console.log(sentemail)
-            console.log("email sent")
-            res.status(200).json(sentemail)
-        }
-    
-
-}
-}
-
-app.post('/sendmail',async(req,res)=>{
     try{
-        cron('* * * * * *',sendnotification)
+        console.log('cron entered successfully...')
+        const db=await getdb()
+        const eventcollection=db.collection('events')
+        const date =new Date()
+        console.log(date)
+        const uncompleted=await eventcollection.updateOne(
+            {
+                _id:"100984849132378172203",
+                "events.date":{$lt:date},
+                "events.status":"upcoming",
+                events:{$elemMatch:{
+                    datedue:{$lt:date},
+                    status:'upcoming'
+                }}
+
+            },
+            {
+                $set:{
+
+                    "events.$.status":'uncompleted'
+
+                }
+            }
+        )
+
+        if(uncompleted.modifiedCount>0){
+            console.log('set uncomplete successfully', uncompleted)
+        } else{
+            console.log("setting uncomplete failed!!")
+        }
+        const datatosend= await eventcollection.findOne({
+            _id:"100984849132378172203"
+            // "events.datedue":"2025-02-14T00:00:00.000Z"},
+        },
+            {
+                projection:{
+                    events:{
+                        $elemMatch:{
+                            datedue: date,
+                            status:"upcoming"
+                        }
+                    }
+                }
+        })
+        console.log("result from db ",datatosend)
+        // console.log("results3....",datatosend.events)
+        if (datatosend){
+            const results=datatosend.events
+            console.log("results....",results)
+            console.log("results2....",results[0].summary)
+            
+            const to="nyaenyaspencer21@gmail.com"
+            const subject=results[0].summary 
+            const instruction=` You are an intelligent reminder assistant who writes emails given a text .
+                                given : text =${results[0].description}  generate  a brief  email body, to inform about the text:${results.description} 
+                                include greetings , and always be polite
+                                always start with Dear sir, and finish with thank you, do not add anything or be verbous `
+        
+            const bodyinfo=await getsummary(instruction)
+            console.log('bodyoinformation ...',bodyinfo)
+        
+            const body=bodyinfo
+    
+        
+            const sentemail=await sendmail(to,subject,body)
+            if(sentemail.messageId){
+                console.log(sentemail)
+                console.log("email sent")
+                res.status(200).json(sentemail)
+            }
+        }
+    }catch(e){
+        console.error('error in sending notification ',e)
+    }
+    
+
+
+}
+//sending notification for an event
+try{
+    cron.schedule(' 0 7 * * *',sendnotification)
+} catch(e){
+    console.error('error in notification')
+    console.log("sendmail entered")
+    
+}
+
+
+app.post('/manageevent',async(req,res)=>{
+    try{
+
+        const db=await getdb()
+        const eventcollection=db.collection('events')
+        const {description,date,task}=req.body
+        console.log('descriptions..',description  )
+        // const dates=new Date(date)
+        // !isNaN(datestr.getTime())?console.log('date entered is true date',datestr):console.error('dates entered not a real date')
+        console.log('date completed...',date)
+        if(task=='complete'){
+            console.log('completed task entered...')
+            const completeresults=await eventcollection.updateOne(
+                {
+                    _id:"100984849132378172203",
+                    'events.datedue':date,
+                    'events.description':description,
+                     "events":{$elemMatch:{description:description,datedue:date}}
+                },
+                {
+                    $set:{
+                        'events.$.status':'completed'
+                    }
+                }
+
+            )
+            console.log('completeresult...',completeresults)
+            if(completeresults.modifiedCount>0){
+                res.status(200).json(completeresults)
+            } else{
+                console.error('error in marking the status complete')
+            }
+            
+        } else if(task=='cancel'){
+            console.log('cancelled task entered...')
+            const cancelledresults=await eventcollection.updateOne(
+                {
+                    _id:"100984849132378172203",
+                    'events.datedue':date,
+                    "events":{$elemMatch:{description:description,datedue:date}}                    
+                },
+                {
+                    $set:{
+                        'events.$.status':'cancelled'
+                    }
+    
+                }
+
+            )
+            if(cancelledresults.modifiedCount>0){
+                console.log('event cancelled successfully')
+                res.status(200).json(cancelledresults)
+            } else{
+                console.error('error in cancelling an event')
+            }
+             
+        } else if(task=='delete'){
+            console.log('deleting event entered...')
+            const deletedresults=await eventcollection.updateOne(
+                {
+                    _id:"100984849132378172203",
+                    'events.datedue':date,
+                    'events.description':description,
+                    "events":{$elemMatch:{description:description,datedue:date}}
+                },
+                {
+                    $pull:{'events':{datedue:date}}
+    
+                }
+
+            )
+            if(deletedresults.modifiedCount>0){
+                res.status(200).json(deletedresults)
+            } else{
+                console.error('error in deleting an event')
+            }
+            
+
+        } else{
+            console.log('activating event ....')
+            const activateresults=await eventcollection.updateOne(
+                {
+                    _id:"100984849132378172203",
+                    'events.datedue':date,
+                    "events.description":description,
+                    "events":{$elemMatch:{description:description,datedue:date}}
+                },{
+                    $set:{
+                        'events.$.status':'upcoming'
+                    }
+                    
+                }
+
+            )
+            console.log('activated event...',activateresults)
+            if(activateresults.modifiedCount>0){
+                res.status(200).json(activateresults)
+            } else{
+                console.error('error in marking the status upcoming')
+            }
+
+        }
+
     } catch(e){
-        console.error('error in notification')
-        console.log("sendmail entered")
+        console.error('error managing an event',e)
         
     }
 })
