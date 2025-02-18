@@ -6,6 +6,7 @@ const Groq=require('groq-sdk')
 const PDFDocument =require('pdfkit')
 const fs=require('fs')
 const { group } = require('console')
+const cron=require('node-cron')
 
 
 router.use( async (req, res,next)=>{
@@ -125,7 +126,7 @@ async function sendToFLowise(flowisedata){
 }
 
 //get summaries from the users input
-async function getsummary(message){
+async function querymodel(instruction){
     const  groq = new Groq({api_key:process.env.GROQ_API_KEY})
     try{
 
@@ -133,7 +134,7 @@ async function getsummary(message){
             messages :[
                 {
                     role:"user",
-                    content: `You are a health assistant; given the following text: ${message}, generate a brief 1-sentence summary of the text. Do not suggest any possible cause or disease for the text; just give a summary of the text. Start with phrases like "you are experiencing...", "you were feeling...", "you have been feeling...", or other related phrases.`
+                    content: instruction
                 }
             ],
             model:"llama-3.3-70b-versatile",
@@ -161,7 +162,9 @@ async function startnewchat(userId,message){
             question:message
         }
         const results=await sendToFLowise(flowisedata)
-        const summary=await getsummary(message)//get summary
+        instruction=`You are a health assistant; given the following text: ${message},generate a brief 1-sentence summary of the text.
+                 Do not suggest any possible cause or disease for the text; just give a summary of the text. Start with phrases like "you are experiencing...", "you were feeling...", "you have been feeling...", or other related phrases.`
+        const summary=await querymodel(instruction)//get summary
 
     
         //saving the new chat in a database
@@ -238,7 +241,9 @@ async function conversations(userId,message){
             question:message,
             chatId:chatId
         }
-        const summary=await getsummary(message)
+        instruction=`You are a health assistant; given the following text: ${message},generate a brief 1-sentence summary of the text. Do not suggest any possible cause or disease for the text; 
+                           just give a summary of the text. Start with phrases like "you are experiencing...", "you were feeling...", "you have been feeling...", or other related phrases.`
+         const summary=await querymodel(instruction)
         const results=await sendToFLowise(flowisedata)
     
   
@@ -394,7 +399,11 @@ router.post('/storehistory', async(req, res)=>{
         const {tittle, description}=req.body
         const message=description
         console.log(`messages: ${message}`)
-        const summary=await getsummary(message)
+
+        instruction=`You are a health assistant; given the following text: ${message},generate a brief 1-sentence summary of the text.Do not suggest any possible cause or disease for the text; 
+                just give a summary of the text. Start with phrases like "you are experiencing...", "you were feeling...", "you have been feeling...", or other related phrases.`
+         const summary=await querymodel(instruction)
+
         const userId=req.user.googleId
 
         const objectId=await history.findOne({
@@ -951,6 +960,390 @@ router.post('/updates',async(req,res)=>{
     }
 })
 
+//EVENTS
+router.get('/events',async(req,res)=>{
+    res.render('events.ejs')
+})
+
+//getevents from the database
+router.get('/allevents',async(req,res)=>{
+    try{
+        const db=await getdb()
+        const eventscollection=await db.collection('events')
+        const userId=req.user.googleId
+        const events=await eventscollection.findOne({
+            _id:userId,
+        })
+        // console.log("events", events)
+        res.status(200).json(events)
+    }catch(e){
+        console.error(`failed to get the events from the database ${e}`)
+    }
+})
+//function to sendmail
+async function sendmail(to,subject,body){
+    try{
+
+        const transporter=nodemailer.createTransport({
+            service:"gmail",
+            port:587,
+            secure:false,
+            auth:{
+                user:"spencernyaenya@gmail.com",
+                pass:"jiml nuuw vmui glda"
+            }
+        }
+        )
+    
+        const aboutmail={
+            from:'"afya24-7" <spencernyaenya@gmail.com>',
+            subject:subject || 'Health update',
+            text:body,
+            to:to
+        }
+        const infomail= await transporter.sendMail(aboutmail)
+        console.log(infomail)
+        return(infomail)
+    }catch(e){
+        console.error('error in sending email...',e)
+    }
+}
+
+//function to set an event uncomplete
+
+async function uncompletevent() {
+    try{
+        const db=await getdb()
+        const eventcollection=db.collection('events')
+        const userId=req.user.googleId
+        const date=new Date().toISOString()
+        console.log('date today..',date)
+
+        const uncompleted=await eventcollection.updateOne(
+            {
+                _id:userId,
+                "events.datedue":{$lt:date},
+                "events.status":"upcoming",
+                 events:{$elemMatch:{
+                    datedue:{$lt:date},
+                    status:'upcoming'
+                }}
+
+            },
+            {
+                $set:{
+
+                    "events.$.status":'uncompleted'
+
+                }
+            }
+        )
+        console.log('uncompleted...',uncompleted)
+
+        if(uncompleted.modifiedCount>0){
+            console.log('set uncomplete successfully', uncompleted)
+        } else{
+            console.log("setting uncomplete failed!!")
+        }
+
+    }catch(e){
+        console.error('unable to set event uncomplete...',e)
+    }
+    
+}
+
+//function for sending notification
+async function sendnotification(){
+    try{
+        console.log('cron entered successfully...')
+        const db=await getdb()
+        const eventcollection=db.collection('events')
+        const date =new Date()
+        const userId=req.user.googleId
+        console.log(date)
+
+        const datatosend= await eventcollection.findOne({
+            _id:userId
+            // "events.datedue":"2025-02-14T00:00:00.000Z"},
+        },
+            {
+                projection:{
+                    events:{
+                        $elemMatch:{
+                            datedue: date,
+                            status:"upcoming"
+                        }
+                    }
+                }
+        })
+        console.log("result from db ",datatosend)
+        // console.log("results3....",datatosend.events)
+        if (datatosend){
+            const results=datatosend.events
+            console.log("results....",results)
+            console.log("results2....",results[0].summary)
+            
+            const to="nyaenyaspencer21@gmail.com"
+            const subject=results[0].summary 
+            const instruction=` You are an intelligent reminder assistant who writes emails given a text .
+                                given : text =${results[0].description}  generate  a brief  email body, to inform about the text:${results.description} 
+                                include greetings , and always be polite
+                                always start with Dear sir, and finish with thank you, do not add anything or be verbous `
+        
+            const bodyinfo=await querymodel(instruction)
+            console.log('body information ...',bodyinfo)
+        
+            const body=bodyinfo
+    
+        
+            const sentemail=await sendmail(to,subject,body)
+            if(sentemail.messageId){
+                console.log(sentemail)
+                console.log("email sent")
+                res.status(200).json(sentemail)
+            }
+        }
+    }catch(e){
+        console.error('error in sending notification ',e)
+    }
+    
+
+
+}
+//sending notification for an event 
+try{
+    cron.schedule(' 0 7 * * *',async()=>{
+        try{
+            await uncompletevent()
+            await sendnotification()
+
+        }catch(e){
+            console.log('error in cron...',e)
+        }
+    }
+)
+} catch(e){
+    console.error('error in notification or updating uncomplete events...',e)
+    
+    
+}
+
+// manageevents....this is where are either set completed, cancelled or deleted/activated
+router.post('/manageevent',async(req,res)=>{
+    try{
+
+        const db=await getdb()
+        const eventcollection=db.collection('events')
+        const userId=req.user.googleId
+        const {description,date,task}=req.body
+        console.log('descriptions..',description  )
+        // const dates=new Date(date)
+        // !isNaN(datestr.getTime())?console.log('date entered is true date',datestr):console.error('dates entered not a real date')
+        console.log('date completed...',date)
+        if(task=='complete'){
+            console.log('completed task entered...')
+            const completeresults=await eventcollection.updateOne(
+                {
+                    _id:userId,
+                    'events.datedue':date,
+                    'events.description':description,
+                     "events":{$elemMatch:{description:description,datedue:date}}
+                },
+                {
+                    $set:{
+                        'events.$.status':'completed'
+                    }
+                }
+
+            )
+            console.log('completeresult...',completeresults)
+            if(completeresults.modifiedCount>0){
+                res.status(200).json(completeresults)
+            } else{
+                console.error('error in marking the status complete')
+            }
+            
+        } else if(task=='cancel'){
+            console.log('cancelled task entered...')
+            const cancelledresults=await eventcollection.updateOne(
+                {
+                    _id:userId,
+                    'events.datedue':date,
+                    "events":{$elemMatch:{description:description,datedue:date}}                    
+                },
+                {
+                    $set:{
+                        'events.$.status':'cancelled'
+                    }
+    
+                }
+
+            )
+            if(cancelledresults.modifiedCount>0){
+                console.log('event cancelled successfully')
+                res.status(200).json(cancelledresults)
+            } else{
+                console.error('error in cancelling an event')
+            }
+             
+        } else if(task=='delete'){
+            console.log('deleting event entered...')
+            const deletedresults=await eventcollection.updateOne(
+                {
+                    _id:userId,
+                    'events.datedue':date,
+                    'events.description':description,
+                    "events":{$elemMatch:{description:description,datedue:date}}
+                },
+                {
+                    $pull:{'events':{datedue:date}}
+    
+                }
+
+            )
+            if(deletedresults.modifiedCount>0){
+                res.status(200).json(deletedresults)
+            } else{
+                console.error('error in deleting an event')
+            }
+            
+
+        } else{
+            console.log('activating event ....')
+            const activateresults=await eventcollection.updateOne(
+                {
+                    _id:userId,
+                    'events.datedue':date,
+                    "events.description":description,
+                    "events":{$elemMatch:{description:description,datedue:date}}
+                },{
+                    $set:{
+                        'events.$.status':'upcoming'
+                    }
+                    
+                }
+
+            )
+            console.log('activated event...',activateresults)
+            if(activateresults.modifiedCount>0){
+                res.status(200).json(activateresults)
+            } else{
+                console.error('error in marking the status upcoming')
+            }
+
+        }
+
+    } catch(e){
+        console.error('error managing an event',e)
+        
+    }
+})
+
+
+
+
+//get the reminder from flowise
+router.post('/greminder',async(req,res)=>{
+    try{
+        const reminder=req.body.rem
+        const date=new Date()
+        console.log('instructions', reminder)
+        const instruction = `
+        You are an intelligent reminder assistant. Your task is to categorize reminders correctly and generate structured JSON responses    
+        Given the following details:
+        - Current Date: ${date}
+        - Reminder: ${reminder}
+        
+        Generate a structured reminder in the following JSON format, selecting the most appropriate type and description:
+                    {
+                        type:either personal / appointment
+                        description:brief  description about a 1 or 2 sentences about ${reminder}
+                        summary:brief summary like 'appointment with Dr.David/... or morning run on the hill'
+                        datedue:the date when the event is to be accomplished ,
+                        dateset:the current Date ,
+                        status:"upcoming"  
+                    }
+        
+    
+        Guidelines:
+        - Ensure 'summary' is meaningful and limited to 5 words.
+        - Format all dates to match the format : 2025-03-15T00:00:00.000Z.
+        - Respond strictly with the JSON object, without any additional text/ character.
+        
+        if no ${reminder} respond only with no reminder..`;
+
+    
+
+        const stringfiedresponse=await querymodel(instruction)
+        console.log("stringifiedresponse ...", stringfiedresponse)
+        let response
+        // if (typeof stringfiedresponse==='string'){
+        //    response=JSON.parse(stringfiedresponse)
+        // } else{
+        //     response=stringfiedresponse
+        // }
+
+        response= typeof stringfiedresponse =='string'? JSON.parse(stringfiedresponse):stringfiedresponse
+        console.log('response...',response)
+        modifresponse=[response]
+        console.log(`modifedresponse ${modifresponse}`)
+        const finalres=Object.values(modifresponse[0])
+        console.log('finalres ...', finalres)
+        Array.isArray(modifresponse)?console.log(finalres.type):console.log('not array')
+        res.status(200).json(modifresponse)                 
+
+    } catch(e){
+        console.error(`error in getting reminder ${e}`)
+    }
+
+})
+
+router.post('/storeevent', async(req,res)=>{
+    try{
+
+        console.log('store event entered')
+        const db=await getdb()
+        const eventcollection=await db.collection('events')
+        const {reminder}= req.body
+        const userId=req.user.googleId
+        console.log('reminder',reminder)
+
+        const objectId=await eventcollection.findOne({
+            _id:userId
+        })
+
+        if (!objectId){
+            await eventcollection.insertOne({_id:userId})
+        }
+
+        const response=await eventcollection.updateOne(
+            {
+                _id: userId
+            },
+            {
+                $push:{
+                    events:{
+                        type:reminder.type,
+                        description:reminder.description,
+                        summary:reminder.summary,
+                        datedue:reminder.datedue,
+                        dateset:reminder.dateset,
+                        status:"upcoming"   
+    
+                    }
+                }
+    
+            }
+        ) 
+      
+        
+        response.modifiedCount>0?res.status(200).json(response):console.log('no event stored ')
+       
+    }catch(e){
+        console.error('error in storing event',e)
+    }    
+
+})
 
 
 

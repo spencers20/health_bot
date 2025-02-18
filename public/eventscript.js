@@ -123,7 +123,7 @@ saveevent.addEventListener('click',async()=>{
         console.log('reminderdetails',rems)
         console.log('reminderdetails is an array ',Array.isArray(reminderdetails))
         const reminder=reminderdetails
-        await fetch('/storeevent',{
+        await fetch('/user/storeevent',{
             method:'POST',
             headers:{
                 'Content-Type':'application/json'
@@ -144,7 +144,7 @@ saveevent.addEventListener('click',async()=>{
 
 async function getevents(){
     try{
-       const response =await fetch('/events')
+       const response =await fetch('/user/allevents')
        const event=await response.json()
     //    console.log(`events ${Object.values(events.events)}`)
        Array.isArray(event.events)?console.log("events is an array"):console.log('events is not an array')
@@ -244,7 +244,7 @@ function eventlist(events){
                     date:completedate,
                     task:task
                 }
-                await fetch('/manageevent',{
+                await fetch('/user/manageevent',{
                     method:'POST',
                     headers:{
                         'Content-Type':'application/json'
@@ -384,10 +384,12 @@ function eventlist(events){
 
 function todayevents(events){
     try{
-        const date=new Date()
+        const date=new Date().toLocaleDateString('en-CA')
         console.log('date today..',date)
         events.forEach((event)=>{
-            if (event.datedue==date){
+            const formatteddate= new Date(event.datedue).toLocaleDateString('en-CA')
+            console.log('date formaatted',formatteddate)
+            if (formatteddate==date){
                  console.log("event....",event)
                 document.getElementById('eventtittle').innerHTML=event.type
                 document.getElementById('event').innerHTML=event.summary
@@ -397,7 +399,7 @@ function todayevents(events){
         })
 
     }catch(e){
-        console.error('error in getting todaye events ',e)
+        console.error('error in getting today events ',e)
     }
 
 }
@@ -407,7 +409,7 @@ genreminder.addEventListener('click',async()=>{
     try{
         const rem=reminder.value
         console.log('reminder',rem)
-        const response = await fetch('/greminder', {
+        const response = await fetch('/user/greminder', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -440,7 +442,7 @@ setreminder.addEventListener('click',async()=>{
         console.log('setreminder clicked')
         const reminder=reminderresult[0]
         console.log('reminderresults',reminder)
-        await fetch('/storeevent',{
+        await fetch('/user/storeevent',{
             method:'POST',
             headers:{
                 'Content-Type':'application/json'
