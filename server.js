@@ -62,7 +62,6 @@ app.get('/',(req , res)=>{
 // app.get('/symptomchecker',(req , res)=>{
 //     console.log('entered')
 //     res.render('symptom.ejs') <%=user.name%> 
-    
 // })
 
 async function getsummary(instruction){

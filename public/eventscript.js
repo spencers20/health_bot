@@ -141,7 +141,6 @@ saveevent.addEventListener('click',async()=>{
 })
 
 
-
 async function getevents(){
     try{
        const response =await fetch('/user/allevents')

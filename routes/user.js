@@ -9,6 +9,7 @@ const { group } = require('console')
 const cron=require('node-cron')
 
 
+
 router.use( async (req, res,next)=>{
     if (req.isAuthenticated()){
         next()
@@ -18,81 +19,6 @@ router.use( async (req, res,next)=>{
 })
 
 router.use(express.json())
-
-
-router.get('/',
-    async (req , res)=>{
-        console.log(req.user)
-        const db= await getdb()
-        const users=db.collection('users')
-        const userId=req.user.googleId
-
-        const details=await users.findOne({googleId:userId})
-
-        if(!details){
-            throw new Error("no user found")
-        }
-        console.log(JSON.stringify(details, null, 2))
-
-        res.render('chat.ejs',{user : req.user})
-    }
-)
-// this url takes you to the symptom checker
-router.get('/symptomchecker',async(req, res)=>{
-    // await gettips()
-    // setInterval(gettips,10000)
-    const db=await getdb()
-    const users=db.collection('users')
-    const userId=req.user.googleId
-    const details=await users.findOne({googleId:userId})
-
-    if(!details){
-        throw new Error("no user found")
-    }
-    console.log(JSON.stringify(details, null, 2))
-
-    res.render('symptom.ejs',{user : req.user})
-
-})
-
-// route to enter history
-router.get('/historyentry',async(req, res)=>{
-    const db=await getdb()
-    const users=db.collection('users')
-    const userId=req.user.googleId
-    const details=await users.findOne({googleId:userId})
-
-    if(!details){  
-        throw new Error("no user found")
-    }
-    console.log(JSON.stringify(details, null, 2)) 
-
-    res.render('history.ejs',{user : req.user}) 
-})
-
-// route to check the history of your entries ..entries.ejs
-router.get('/checkhistory', async(req, res)=>{
-    try{
-        
-        const db = await getdb()
-        const users=db.collection('users')
-        const userId=req.user.googleId
-        const details=await users.findOne({googleId:userId})
-
-        if(!details){
-            throw new Error("no user found")
-        }
-
-        res.render('entries.ejs',{user : req.user})
-
-    }catch(e){
-        error(`error in getting history ${e}`)
-    }
-})
-
-
-
-
 
 //function to send the payload to flowise
 async function sendToFLowise(flowisedata){
@@ -152,6 +78,82 @@ async function querymodel(instruction){
 
 }
 
+function containsnull(obj){
+    try{
+
+        let isNull=false
+    
+        function findnulls(obj,path=''){
+            if(Array.isArray(obj)){
+                obj.forEach((item,index)=>{
+                    const Newpath=`${path}[${index}]`
+                    if(item=== null || item===" "){
+                        isNull=true
+                        console.log(`null value at ${Newpath}`)
+                    }else if(typeof item==="object" && item !==null ){
+                         findnulls(item,Newpath)
+                    }
+                })
+            } else if( typeof obj==='object' && obj!== null){
+                for (const key in obj){
+                    const Newpath=`${path}.${key}`
+                    findnulls(obj[key],Newpath)
+                }
+            }else{
+                if(obj===null || obj ===""){
+                    isNull=true
+                }
+            }
+        }
+    
+        findnulls(obj)
+    
+        return isNull 
+    } catch(e){
+        console.log('errror in finding null',e)
+
+    }
+    
+}
+
+
+router.get('/',
+    async (req , res)=>{
+        console.log(req.user)
+        const db= await getdb()
+        const users=db.collection('users')
+        const userId=req.user.googleId
+
+        const details=await users.findOne({googleId:userId})
+
+        if(!details){
+            throw new Error("no user found")
+        }
+        console.log(JSON.stringify(details, null, 2))
+
+        res.render('chat.ejs',{user : req.user})
+    }
+)
+
+
+// this url takes you to the symptom checker
+router.get('/symptomchecker',async(req, res)=>{
+    // await gettips()
+    // setInterval(gettips,10000)
+    const db=await getdb()
+    const users=db.collection('users')
+    const userId=req.user.googleId
+    const details=await users.findOne({googleId:userId})
+
+    if(!details){
+        throw new Error("no user found")
+    }
+    console.log(JSON.stringify(details, null, 2))
+
+    res.render('symptom.ejs',{user : req.user})
+
+})
+
 //function to get new chatId and save to db for every new chat
 async function startnewchat(userId,message){
     try{
@@ -166,51 +168,55 @@ async function startnewchat(userId,message){
                  Do not suggest any possible cause or disease for the text; just give a summary of the text. Start with phrases like "you are experiencing...", "you were feeling...", "you have been feeling...", or other related phrases.`
         const summary=await querymodel(instruction)//get summary
 
-    
-        //saving the new chat in a database
-        const chattoadd={
-                chatId:results.chatId,
-                chatMessageId:results.chatMessageId,
-                messages:[
+        if (containsnull(results)){
+            console.error(`${results} contains null elements`)
 
-                    {
-                        question: results.question,
-                        response: results.text,
-                        summary:summary,
-                        chattime:new Date()
+        }else{
+            //saving the new chat in a database
+            const chattoadd={
+                    chatId:results.chatId,
+                    chatMessageId:results.chatMessageId,
+                    messages:[
     
-                    }
-                ],
-                
-                createdAt:new Date(),
-                updatedAt:new Date()
-            }
-                
-    
+                        {
+                            question: results.question,
+                            response: results.text,
+                            summary:summary,
+                            chattime:new Date()
         
-        
-            
-            
-        const db=await getdb()
-        const data=db.collection('data')
-        const result=await data.bulkWrite([
-            {
-                updateOne:{
-                    filter:{
-                        _id:userId
-                    },
-                    update:{
-                        $set:{activechatId:results.chatId},
-                        $push:{chats:chattoadd}
-                    }
+                        }
+                    ],
+                    
+                    createdAt:new Date(),
+                    updatedAt:new Date()
                 }
+
+            if (containsnull(chattoadd)){
+                console.error(`${chattoadd} contains null elements`)
+            } else{
+                const db=await getdb()
+                const data=db.collection('data')
+                const result=await data.bulkWrite([
+                    {
+                        updateOne:{
+                            filter:{
+                                _id:userId
+                            },
+                            update:{
+                                $set:{activechatId:results.chatId},
+                                $push:{chats:chattoadd}
+                            }
+                        }
+                    }
+                ])
+                if (result.acknowledged){
+                    console.log("added to the database successfully")
+                }
+            
+                return results
             }
-        ])
-        if (result.acknowledged){
-            console.log("added to the database successfully")
         }
-    
-        return results
+
     }catch(e){
         console.error(`starting new chat error: ${e}`)
     
@@ -262,6 +268,11 @@ async function conversations(userId,message){
     //         throw new Error(JSON.stringify({chatIderror:"chatId not found"}))
     //     }
     //save the new conversation to the db
+    if (containsnull(results)){
+        console.error(`${results} contains null elements`)
+
+    }else{
+    
         const newconversation={
             question:results.question,
             response:results.text,
@@ -269,6 +280,11 @@ async function conversations(userId,message){
             chattime: new Date()
           
         }
+
+        if(containsnull(newconversation)){
+            console.error(`${newconversation} contains null elements`)
+
+        }else{ 
     //update the messages in the db
         const result=await data.bulkWrite([{
             updateOne:{
@@ -290,6 +306,8 @@ async function conversations(userId,message){
     }
     
         return results 
+}
+    }
     }catch(e){
         console.error(`error in new conversation :${e}`)
     }
@@ -345,6 +363,45 @@ router.post('/chat',
 
     
 )
+
+// route to enter history
+router.get('/historyentry',async(req, res)=>{
+    const db=await getdb()
+    const users=db.collection('users')
+    const userId=req.user.googleId
+    const details=await users.findOne({googleId:userId})
+
+    if(!details){  
+        throw new Error("no user found")
+    }
+    console.log(JSON.stringify(details, null, 2)) 
+
+    res.render('entries.ejs',{user : req.user}) 
+})
+
+// route to check the history of your entries ..entries.ejs
+router.get('/checkhistory', async(req, res)=>{
+    try{
+        
+        const db = await getdb()
+        const users=db.collection('users')
+        const userId=req.user.googleId
+        const details=await users.findOne({googleId:userId})
+
+        if(!details){
+            throw new Error("no user found")
+        }
+
+        res.render('records.ejs',{user : req.user})
+
+    }catch(e){
+        error(`error in getting history ${e}`)
+    }
+})
+
+
+
+
 
 router.put('/newchat',
     async(req,res)=>{
@@ -414,33 +471,38 @@ router.post('/storehistory', async(req, res)=>{
             await history.insertOne({_id:userId})
         }
         const date=new Date()
-
-        const result=await history.bulkWrite ([
-            {
-                updateOne:{
-                   filter:{_id:userId},
-                   update:{
-                    $push:{
-                        histories :
+        const histories={
+            date:date,
+            tittle:tittle,
+            description:description,
+            summary:summary
+        }         
+        
+        if (containsnull(histories)){
+            console.log(`Null values found in  ${histories}`)
+        }else{
+            
+                    const result=await history.bulkWrite ([
                         {
-                            date:date,
-                            tittle:tittle,
-                            description:description,
-                            summary:summary
-                        }            
-                   }
-                   }
-                }
-
-            }
-        ])
-
-        if (result.ok==true){
-            console.log('history stored successfull')
-            res.status(200).json(result)
+                            updateOne:{
+                               filter:{_id:userId},
+                               update:{
+                                $push:{
+                                    histories :histories
+                               }
+                               }
+                            }
+            
+                        }
+                    ])
+            
+                    if (result.ok==true){
+                        console.log('history stored successfull')
+                        res.status(200).json(result)
+                    }
+            
+                    // console.log('history stored successfully')
         }
-
-        // console.log('history stored successfully')
 
     }
     catch(e){
@@ -620,9 +682,10 @@ async function combineddata (req) {
         ])
         
         console.log(chatdata.chatId)
+        let combinedData
         
-
-        const combinedData=[...chatdata, ...history]
+        containsnull(chatdata) || containsnull(history)?console.log(`null values in ${history} or ${chatdata}`):combinedData=[...chatdata, ...history]
+        
         console.log("combineddata..... ",combinedData)
         return combinedData
     }catch(e){
@@ -673,7 +736,7 @@ router.get('/myhistory',async(req,res)=>{
 
         //generate summaries if the summaries do not exist or is not updated to the current time 
         for (const chat of response[0].chats) {
-            if(!chat.summaryTime || chat.updatedAt.getTime()>chat.summaryTime.getTime){
+            if(!chat.summaryTime || chat.updatedAt.getTime()>chat.summaryTime.getTime()){
                 const flowisedata={
                     question:message,
                     chatId:chat.chatId
@@ -1316,28 +1379,33 @@ router.post('/storeevent', async(req,res)=>{
             await eventcollection.insertOne({_id:userId})
         }
 
-        const response=await eventcollection.updateOne(
-            {
-                _id: userId
-            },
-            {
-                $push:{
-                    events:{
-                        type:reminder.type,
-                        description:reminder.description,
-                        summary:reminder.summary,
-                        datedue:reminder.datedue,
-                        dateset:reminder.dateset,
-                        status:"upcoming"   
-    
+        const events={
+            type:reminder.type,
+            description:reminder.description,
+            summary:reminder.summary,
+            datedue:reminder.datedue,
+            dateset:reminder.dateset,
+            status:"upcoming"   
+        }
+
+        if (containsnull(events)){
+            console.log(`null value in ${events}`)
+        }else{
+            const response=await eventcollection.updateOne(
+                {
+                    _id: userId
+                },
+                {
+                    $push:{
+                        events:events
                     }
-                }
-    
-            }
-        ) 
-      
         
-        response.modifiedCount>0?res.status(200).json(response):console.log('no event stored ')
+                }
+            ) 
+          
+            
+            response.modifiedCount>0?res.status(200).json(response):console.log('no event stored ')
+        }
        
     }catch(e){
         console.error('error in storing event',e)
