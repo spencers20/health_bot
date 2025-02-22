@@ -140,7 +140,6 @@ saveevent.addEventListener('click',async()=>{
 
 })
 
-
 async function getevents(){
     try{
        const response =await fetch('/user/allevents')
@@ -400,7 +399,6 @@ function todayevents(events){
     }catch(e){
         console.error('error in getting today events ',e)
     }
-
 }
 
 //function to generate result from the AI model
@@ -408,7 +406,7 @@ genreminder.addEventListener('click',async()=>{
     try{
         const rem=reminder.value
         console.log('reminder',rem)
-        const response = await fetch('/user/greminder', {
+        const response = await fetch('/ask', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

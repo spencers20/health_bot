@@ -23,7 +23,7 @@ const image=document.getElementById('image')
 
 
 console.log(symptominput.value)
-console.log(age.value)
+
 
 let userinfo=[];
 let usersinfocontainer;
@@ -48,59 +48,40 @@ function formatTextToHTML(text) {
         disclaimer.style.display = 'none';
     }
 }
-  async function gettips(){
-    try{
+//   async function gettips(){
+//     try{
 
-        const response =await fetch('/tips')
-        const results = await response.json()
+//         const response =await fetch('/tips')
+//         const results = await response.json()
         
-        const randomtip=results[Math.floor(Math.random()*results.length)]
-        console.log('random tips',randomtip)
-        console.log('math random',Math.random())
-        console.log("Math.floor(Math.random()*results.length)", Math.floor(Math.random()*results.length))
-        headertip.textContent=randomtip.tittle
-        tip.textContent=randomtip.description
-        image.setAttribute('src',randomtip.image)
+//         const randomtip=results[Math.floor(Math.random()*results.length)]
+//         console.log('random tips',randomtip)
+//         console.log('math random',Math.random())
+//         console.log("Math.floor(Math.random()*results.length)", Math.floor(Math.random()*results.length))
+//         headertip.textContent=randomtip.tittle
+//         tip.textContent=randomtip.description
+//         image.setAttribute('src',randomtip.image)
 
-    }catch(e){
-        console.error(`error in getting tips from api : ${e}`)
-    }
-}
+//     }catch(e){
+//         console.error(`error in getting tips from api : ${e}`)
+//     }
+// }
 
 document.addEventListener('DOMContentLoaded',async()=>{
+   
     await gettips()
     setInterval(gettips,10000)
 
 })
 
 
-male.addEventListener('click',async()=>{
-    if (age.value){
-        userinfo={
-            age:age.value,
-            gender:'Male'    
-        }
-        }
-        else{
-            userinfo={
-                gender:'Male'}
-        }
-        console.log(userinfo)
+document.getElementById('readmore').addEventListener('click',()=>{
+    console.log('readmore clicked')
+    toggleDisclaimer()
 })
 
-female.addEventListener('click',async()=>{
-    if (age.value){
-    userinfo={
-        age:age.value,
-        gender:'female'    
-    }
-    }
-    else{
-        userinfo={
-            gender:'female'}
-    }
-    console.log(userinfo)
-})
+
+
 
 continu.addEventListener('click',async()=>{
     console.log('clicked')
@@ -188,38 +169,80 @@ symptominput.addEventListener('keydown' ,async( event)=>{
 
 })
 
+function thinkinanimation(results){
+    results.innerHTML=` <span id="startthinking" > Thinking </span>
+                        <span class="dot">.</span>
+                        <span class="dot">.</span>
+                        <span class="dot">.</span>
+         
+    `
+    setTimeout(()=>{
+        results.innerHTML=` <span id="startthinking" > Thinking </span>
+        <span class="dot">.</span>
+        <span class="dot">.</span>
+        <span class="dot">.</span>
+
+`
+    }, 1000)
+
+    const dots=document.querySelectorAll('.dot')
+    dots.forEach(dot=>{
+        dot.classList.add('fadedot')
+    })
+
+}
+
 checkbtn.addEventListener('click',async()=>{
     console.log ('checkbtn clicked')
     console.log (addedsymptoms) 
-    document.getElementById('loading').textContent='Checking in progress...'
     const messages=addedsymptoms.join(', ')
     const results=document.createElement('div')
     results.classList.add('results')
     results.textContent=''
+    const genanime=document.querySelector('.genanime')
+    // thinkinanimation(results)
+    genanime.innerHTML = `<span id="startthinking">Generating</span>
+                       <span class="dot">.</span>
+                       <span class="dot">.</span>
+                       <span class="dot">.</span>`;
+
+
+    const dots=document.querySelectorAll('.dot')
+    dots.forEach(dot=>{
+        dot.classList.add('fadedot')
+    })
+    
    
-    const response=await fetch('/user/chat',{
+    const response=await fetch('/askgroq',{
         method:'POST',
         headers:{
             'Content-Type':'application/json'
         },
         body:JSON.stringify({message:messages})
     })
+    
 
     const result=await response.json()
-    text=' MANAGING YOUR SYMPTOMS <br> <br>'+result.text
-    
-    console.log(result)
-    chatId=result.chatId
-    if( response.ok){
-        document.getElementById('userinformation').style.display='none'
-        const formattedText = formatTextToHTML(text);
-   
-        results.innerHTML = formattedText;
-        conditions.appendChild(results)
-    
-        moreinfo.style.visibility='visible'
+    text=' MANAGING YOUR SYMPTOMS <br> <br>'+result 
 
+    if(results){
+        setTimeout(()=>{
+            genanime.style.display="none"  
+            console.log(result)
+            // chatId=result.chatId
+            // if( response.ok){
+                // document.getElementById('userinformation').style.display='none'
+            const formattedText = formatTextToHTML(text);
+           
+            results.innerHTML = formattedText;
+            conditions.appendChild(results)
+            
+            moreinfo.style.display='block'
+    },2000)
     }
+    
+
+    // }
 
     document.addEventListener('scroll', function (e) {
         if (window.scrollY <= 0) {
@@ -237,7 +260,6 @@ checkbtn.addEventListener('click',async()=>{
 moreinfo.addEventListener('click',async()=>{
     moreinfo.style.visibility='hidden'
     checkbtn.style.visibility='hidden'
-    document.getElementById('loadinginfo').style.visibility="visible"
     const messages=addedsymptoms.join(',')
     
     
@@ -245,13 +267,13 @@ moreinfo.addEventListener('click',async()=>{
 
 
 
-    const response=await fetch('/user/chat',{
-        method:'POST',
-        headers:{
-            'Content-Type':'application/json'
-        },
-        body:JSON.stringify({message:messages})
-    })
+    // const response=await fetch('/user/chat',{
+    //     method:'POST',
+    //     headers:{
+    //         'Content-Type':'application/json'
+    //     },
+    //     body:JSON.stringify({message:messages})
+    // })
 
     const results=await response.json()
     console.log(results)
