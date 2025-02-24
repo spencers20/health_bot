@@ -6,8 +6,11 @@ const btn2=document.getElementById('btn2')
 const intro=document.getElementById('intro')
 const chatContainer=document.getElementById('chat-container')
 const newchat=document.querySelector('.new-chat')
-// const {getdb}=require('../config/database')
-// import {getdb} from '../config/database'
+const sidebar=document.querySelector('.side-bar')
+const editvalue=document.getElementById('edit-value')
+const thevalue=document.getElementById('tempvalue')
+const conditiondegree=document.getElementById('conditiondegree')
+const valueinput=document.getElementById('value-input')
 
 
 
@@ -18,9 +21,63 @@ function formatTextToHTML(text) {
       .replace(/(?:<li>.+?<\/li>)+/g, '<ul>$&</ul>'); // Wrap <li> in <ul>
   }
 
+async function gettips(){
+    try{
+        const alltips=await fetch('tips')
+        const tips= await alltips.json()
+        const randomtip=tips[Math.floor(Math.random()*tips.length)]
+        console.log('random picked tip..',randomtip)
+        const tipdescription=document.querySelector('.tip-description')
 
-let topRightMessage
-let respons
+        
+        tipdescription.textContent=randomtip.description
+       
+
+        tipimage=document.querySelector('.tip-image')
+     
+        tipimage.setAttribute('src',randomtip.image)
+      
+
+
+    }catch(e){
+        console.error('error in getting and displaying tips...',e)
+    }
+    
+}
+
+editvalue.addEventListener('click',()=>{
+    valueinput.innerHTML=''
+    thevalue.style.display='none'
+    conditiondegree.style.display='none'
+    valueinput.style.display='flex'
+})
+
+valueinput.addEventListener('keydown',(e)=>{
+    if (e.key==='Enter'){
+        const values=valueinput.value
+        thevalue.innerHTML=values + '&deg;c'
+        valueinput.style.display='none'
+        thevalue.style.display='flex'
+        conditiondegree.style.display='flex'
+        if(values >38){
+              conditiondegree.innerHTML='Critical'
+                conditiondegree.style.color='Red'
+        }
+
+    }
+})
+
+document.addEventListener('DOMContentLoaded',async()=>{
+    await gettips()
+    setInterval(async()=>{ await gettips()},10000);
+})
+
+
+
+
+
+
+
 
 //function for sending a message
 async function sendmessage() {

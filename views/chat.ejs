@@ -9,89 +9,100 @@
     
     * {
         box-sizing: border-box;
-        margin: 0;
-        padding: 0;
+        /* margin: 0; */
+        /* padding: 0; */
         font-family: Arial, sans-serif;
     }    
-    
     body {
-        display: flex;
-        height: 100vh;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: white;
         color: #333;
-        overflow: hidden  ;
-
-    
+        /* overflow: hidden; */
+        overscroll-behavior: none;
     }
 
     .main-body{
         width:100%;
         background-color:rgb(233, 233, 241) ;
         display:flex;
+        flex-direction: row;
         margin-top:20px
     }
-    .sidebar {
-        width:20%;
+    .side-bar {
+        width:23%;
         background-color: aliceblue;
         padding: 10px;
         display: flex;
         flex-direction: column;
         margin-left:20px;
         margin-top:30px;
-        margin:10px;
         height:450px;
+        position: fixed;
         border-radius:12px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        z-index: 5;
-        /* gap: 20px; */
-        /* overscroll-behavior: contain; */
+        /* z-index: 5; */
+       
+
     }
 
-    .logo {
-        font-size: 24px;
-        font-weight: bold;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #ddd;
+    .tip-image, .tip-description{
+    font-size: 15px;
+    margin-top:30px;
+    object-fit: contain;
+    width: 100%; 
+    height: auto; 
     }
 
-    .new-chat {
-        padding: 10px;
-        background-color: #e0f7fa;
-        color: #00796b;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
 
-    .section-title {
-        font-weight: bold;
-        font-size: 14px;
-        margin-bottom: 10px;
-    }
-
-    .chat-list .chat-item {
-        padding: 8px;
-        font-size: 14px;
-        color: #555;
-        cursor: pointer;
+    #edit-value:hover::after {
+    content: "edit value"; /* Correct way to add text */
+    /* position: absolute; */
+    background-color: rgba(66, 65, 65, 0.7); /* Optional: Tooltip background */
+    color: white;
+    padding: 5px ;
+    font-size: 12px;
+    border-radius: 5px;
+    white-space: nowrap;
+    top: 100%; /* Position below the element */
+    left: 50%;
+    transform: translateX(-50%);
+     }
+     .containermetric{
+        height: 180px; 
+        width: 150px; 
         display: flex;
-        flex-direction: column;
-    }
-
-    .feature-box {
-        background-color: #e0f7fa;
+        background-color: #e0f7fa; 
+        border-radius: 10px; 
+        box-shadow: 0 5px 10px black; 
+        flex-direction: column; 
         padding: 10px;
-        border-radius: 5px;
-        font-size: 12px;
-        color: #00796b;
+        margin-left: 20px;
+        padding: 5px;
     }
 
-    .profile {
-        margin-top: auto;
+    .symptomcheck{
+        margin-top:30px;
+        width:100%;
         display: flex;
+        border-radius: 12px;
+        background-color: #f7f7f7;
+        box-shadow: 0 4px 8px rgb(15, 15, 15);
+        flex-direction: row;
+        padding:10px;
+        margin-left: 50px;
         align-items: center;
-        gap: 10px;
+        justify-content: center;
+        min-height: 100px;
     }
 
+   
+
+
+
+
+ 
     .profile-icon {
         background-color: #000;
         color: #fff;
@@ -205,6 +216,7 @@
     /* padding-bottom: 10px; */
     /* border: 1px solid #ccc; */
 }
+  
 
     footer {
         margin-top: 20px;
@@ -226,56 +238,112 @@
 </head>
 <body>
 
-    <div class="head" style="width: 100%; height: 20%; background-color: white; ">
-        <div style="font-size: 25px; height:60px;background-color:rgb(187, 245, 235);font-weight: 600;">
+    <div class="head" style=" display :flex; width:100%; height: 20%; background-color: white; top:1px">
+        <div style=" display :flex;  width: 100%; font-size: 25px; justify-content: center; align-items: center; height:60px;background-color:rgb(187, 245, 235);font-weight: 600;">
             Myafya
         </div>
     </div>
 
     <div class="main-body" >
-        <div class="side-bar">
-            <div>
+        <div class="side-bar" > 
+            <span  style="align-self: center; margin-top: 10px; font-size: 10px;font-size:20px; font-weight: 600;">
                 Did you Know?
+            </span>
+            <span class="tip-description" >
+                    <!-- A balanced diet includes a variety of fruits, vegetables, whole grains, lean proteins, and healthy fats. It can help keep your body healthy and prevent chronic diseases. -->
+            </span>
+                <img class="tip-image" alt="">
+                
+        </div>
+
+        <div class="side-body" style="display: flex; flex-direction: column; margin-left:27%; ">
+            <div  style="margin-left: 40px; margin-top: 20px; width:100%;  display: flex; flex-direction: row;">
+                <div class="containermetric" >
+                    <span id="edit-value" style="margin-left:100px; cursor: pointer;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 20 20" fill="none">
+                            <path stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.8 12.963L2 18l4.8-.63L18.11 6.58a2.612 2.612 0 00-3.601-3.785L3.8 12.963z"/>
+                          <script xmlns=""/></svg>
+                    </span>
+                    <span style="margin-top:5px; align-self: center; font-size: 18px;">Temperature</span>
+                    <span id="tempvalue" style="font-size: 30px; align-self: center; margin-top: 10px; display: flex;">37 &deg;c</span>
+                    <input id="value-input" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; display: none;"  type="text" placeholder="37">
+                    <span id="conditiondegree" style="font-size: 15px;margin-top:20px; align-self:center"  >Normal</span>
+
+                </div>
+                <div class="containermetric" >
+                    <span id="edit-value" style="margin-left:100px; cursor: pointer;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 20 20" fill="none">
+                            <path stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.8 12.963L2 18l4.8-.63L18.11 6.58a2.612 2.612 0 00-3.601-3.785L3.8 12.963z"/>
+                          <script xmlns=""/></svg>
+                    </span>
+                    <span style="margin-top:5px; align-self: center; font-size: 18px;">Blood Pressure</span>
+                    <span id="tempvalue" style="font-size: 30px; align-self: center; margin-top: 10px; display: flex;">37 &deg;c</span>
+                    <input id="value-input" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; display: none;"  type="text" placeholder="37">
+                    <span id="conditiondegree" style="font-size: 15px;margin-top:20px; align-self:center"  >Normal</span>
+
+                </div>
+                <div class="containermetric" >
+                    <span id="edit-value" style="margin-left:100px; cursor: pointer;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 20 20" fill="none">
+                            <path stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.8 12.963L2 18l4.8-.63L18.11 6.58a2.612 2.612 0 00-3.601-3.785L3.8 12.963z"/>
+                          <script xmlns=""/></svg>
+                    </span>
+                    <span style="margin-top:5px; align-self: center; font-size: 18px;">Pulse Rate</span>
+                    <span id="tempvalue" style="font-size: 30px; align-self: center; margin-top: 10px; display: flex;">37 &deg;c</span>
+                    <input id="value-input" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; display: none;"  type="text" placeholder="37">
+                    <span id="conditiondegree" style="font-size: 15px;margin-top:20px; align-self:center"  >Normal</span>
+
+                </div>
+                <div class="containermetric" >
+                    <span id="edit-value" style="margin-left:100px; cursor: pointer;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 20 20" fill="none">
+                            <path stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.8 12.963L2 18l4.8-.63L18.11 6.58a2.612 2.612 0 00-3.601-3.785L3.8 12.963z"/>
+                          <script xmlns=""/></svg>
+                    </span>
+                    <span style="margin-top:5px; align-self: center; font-size: 18px;">Respiratory Rate</span>
+                    <span id="tempvalue" style="font-size: 30px; align-self: center; margin-top: 10px; display: flex;">37 &deg;c</span>
+                    <input id="value-input" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; display: none;"  type="text" placeholder="37">
+                    <span id="conditiondegree" style="font-size: 15px;margin-top:20px; align-self:center"  >Normal</span>
+
+                </div>
             </div>
 
-            <div class="tip-content">
+            <div class="symptomcheck" >
+                <div style="margin-left: 20px; align-items: center; justify-content: center;">
+                  
+                </div>
 
-            </div>
+                <div class="description" style="display: flex; flex-direction: column; margin-left:20px ;padding: 5px;">
+                    <span style="font-size:20px">
+                        Symptom Checker
+                    </span>
+                    <span style="margin-top: 10px;font-size: 15px;">
+                        Check your symptoms and chat with AI for personalized health insights.
+                    </span>
 
-            <div class="tip-image">
-                <img src="" alt="">
+                </div>
+                
+                <div style="align-self: center; margin-left: 100px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="30px" width="30px" version="1.1" id="Layer_1" viewBox="0 0 512 512" xml:space="preserve">
+                        <path style="fill:#23d3ff;" d="M256,512C114.839,512,0,397.156,0,256S114.839,0,256,0s256,114.844,256,256S397.161,512,256,512z"/>
+                        <path style="fill:#23d3ff;" d="M512,256C512,114.844,397.161,0,256,0v512C397.161,512,512,397.156,512,256z"/>
+                        <path style="fill:#FFFFFF;" d="M204.752,394.612c-5.408,0-10.72-2.621-13.933-7.469c-5.099-7.686-3-18.047,4.686-23.146  l164.568-109.165L195.505,145.666c-7.686-5.099-9.785-15.46-4.686-23.146c5.099-7.697,15.455-9.785,23.146-4.686l185.546,123.082  c4.664,3.098,7.469,8.317,7.469,13.916s-2.805,10.818-7.469,13.916L213.966,391.829  C211.128,393.709,207.921,394.612,204.752,394.612z"/>
+                        <path style="fill:#FFE6B3;" d="M399.511,240.915l-142.824-94.744v40.079l103.386,68.581l-103.386,68.581v40.079l142.825-94.744  c4.664-3.098,7.469-8.317,7.469-13.916S404.175,244.013,399.511,240.915z"/>
+                        <script xmlns=""/></svg>
+                </div>
 
             </div>
 
         </div>
+
+
 
     </div>
-    <!-- <div class="sidebar">
-        <div class="logo">HC</div>
-        <button class="new-chat" >New Chat</button>
-        <div class="section-title">Recent Chats</div>
-        <div class="chat-list">
-            <div class="chat-item">
-                <a href="/user/symptomchecker">symptom checker</a>
-                <a href="/user/historyentry"> update your health history</a>
-                <a href="/user/checkhistory">health tips</a>
-                <a href="/user/events">Care Coordination</a>
 
-
-            </div>
-
-        </div>
-
-    </div> -->
-        <!-- <div class="feature-box">
-            <span>New Feature</span>
-            <p>We've improved v0's ability to generate code from uploaded images</p> -->
-        <!-- <div class="profile">
-            <div class="profile-icon">S</div>
-            <span>spencers20</span> -->
+    
             
-        </div>
-    </div>
+      
+<!--    
     <div class="container">
         <h1 id="intro">Hellohow may i help you</h1>
         
@@ -293,9 +361,8 @@
         <footer>
          <div></div>
         </footer>
-    </div>
-    <script src="/script.js"></script>
-    <script type="module" src ="/script2.js"></script>
+    </div> -->
+    <script src="/script2.js"></script>
     
 </body>
 </html>
