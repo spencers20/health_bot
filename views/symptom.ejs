@@ -59,7 +59,7 @@
 
     }
     .menu-icon:hover{
-        background-color: rgb(248, 200, 200);
+        background-color: #f0f0f5;
         border-radius: 5px;
     }
             .heading1{ 
@@ -78,13 +78,14 @@
             .inside-container {
                 background-color: white;
                 margin-top:30px;
-                width:65%;
-                /* max-height: 530px; */
+                width:70%;
+                max-height: 530px;
                 margin-left:25%;
                 flex-direction: column;
                 display:flex;
                 box-shadow: 0 4px 8px rgba(60, 66, 45, 0.1);
                 border-radius: 20px;
+                
 
             }
 
@@ -110,6 +111,8 @@
             }
             .information {
                 /* position:relative; */
+                display: flex;
+                flex-direction: column;
                 text-align: center;
                 width:100%;
                 top:50px;
@@ -128,6 +131,21 @@
                 top:50px;
                 width:100%;
                } 
+            
+               .page{
+                display: flex;
+        transition:transform 1.2s ease
+       }
+       .off-right{
+        transform: translateX(100%);
+       }
+       .off-left{
+        transform: translateX(-100%);
+        
+       }
+       .active{
+        transform: translateX(0);
+       }
 
                
             /* .symptomconfirm {
@@ -207,29 +225,92 @@
         /* align-items: center; */
         /* justify-content: center; */
         display:flex;
-        flex-direction:row;
+        flex-direction:column;
         padding:10px;
         margin:10px
        }
 
        #symptom-textarea{
         margin-top: 10px;
-        height:100px;
-        width:400px;
+        height:80px;
+        width:80%;
         padding:10px;
         border: none; 
         background-color: #e0e2e2;
         outline: none;
         border-radius: 15px;
         font-size: 15px;
-        color:#333
+        color:#333;
+        align-self: center;
+        box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.1);
+       
 
        }
        .sub-suggestion{
         background-color: rgb(207, 223, 219);
         font-size: 15px;
-        margin-top: 10px;
-        border-bottom: 1px solid black;
+        margin-top: 5px;
+        display:flex;   
+        align-items: center; 
+        justify-content: center;
+        border-bottom:1px solid rgb(211, 208, 208);
+        min-height:20px;
+        border-radius: 20px;
+        cursor: pointer;
+        min-width:25%;
+        margin-right: 10px;
+        min-height: 30px;
+        
+
+       }
+
+       .chat-area{
+        
+      display: flex;
+      flex-direction: column;
+      flex: 1; /* Expand to fill remaining vertical space */
+      background-color: #fff;
+      position: relative;
+    
+        /* position:relative */
+       }
+       .chat-box{
+        flex: 1; /* This makes the chat area grow */
+        overflow-y: auto;
+        background-color: #f1f7f7;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+      
+       }
+
+       .user-message{
+         display: flex;
+          align-items: center;
+          margin: 5px;
+          padding: 10px;
+          background-color: rgb(226, 228, 227);
+          font-weight: 600;
+          border-radius: 10px;
+          max-width: 50%;
+          min-height: 30px;
+          line-height: 1.6;
+        
+
+       }
+
+       .bot-response{
+        
+          display: flex;
+          align-items: center;
+          margin: 5px;
+          padding: 10px;
+          /* background-color: rgb(121, 233, 177); */
+          margin-top:2px;
+          border-radius: 10px;
+          max-width: 100%;
+          /* min-height: 30px; */
+          line-height: 1.6;
         
 
        }
@@ -237,6 +318,8 @@
        .fadedot{
         animation:fadedot 1s infinite
        }
+
+       
        
        @keyframes fadedot{
         0%{
@@ -315,29 +398,37 @@
 
             <div class="inside-container">
                 <div class="containerheader"></div>
-                <div class="headers" style="display: flex; justify-content: center; gap: 30px; padding: 20px 0;">
+                <div class="headers" style="display: flex; justify-content: center; gap: 30px; padding: 20px 0;   ">
                     <p id="infos" style="cursor: pointer; font-weight: bold;" 
-                    onclick="document.querySelector('.information').style.display='block',
-                     document.querySelector('.symptoms').style.display='none' ,
-                     document.getElementById('condition').style.visibility='hidden', 
-                     document.getElementById('checkbtn').style.visibility='hidden'">
+                    onclick="
+                    changepage('information')
+                    // document.querySelector('.information').style.display='block',
+                    //  document.querySelector('.symptoms').style.display='none' ,
+                    //  document.querySelector('.condition').style.display='none', 
+                    //  document.getElementById('checkbtn').style.visibility='hidden'
+                     ">
                      
                      INFO</p>
                     <p style="cursor: pointer; font-weight: bold;" 
-                       onclick="document.querySelector('.information').style.display='none'; 
-                                document.querySelector('.symptoms').style.display='block';
-                                document.querySelector('.condition').style.display='none';">
+                       onclick="changepage('symptoms')
+                    //    document.querySelector('.information').style.display='none'; 
+                    //             document.querySelector('.symptoms').style.display='block';
+                    //             document.querySelector('.condition').style.display='none';
+                                ">
                         SYMPTOMS
                     </p>
                     <p style="cursor: pointer; font-weight: bold;" 
-                       onclick="document.querySelector('.information').style.display='none'; 
-                                document.querySelector('.symptoms').style.display='none';
-                                document.querySelector('.condition').style.display='block';">
-                        CONDITION
+                       onclick="
+                       changepage('condition')
+                    //    document.querySelector('.information').style.display='none'; 
+                    //             document.querySelector('.symptoms').style.display='none';
+                    //             document.querySelector('.condition').style.display='block';
+                                ">
+                        MEDCHAT
                     </p>
                 </div>
             
-                <div class="information" style="display: none; text-align: center;">
+                <div class="page information" style="display: flex; text-align: center;">
                     <h1 style="font-size: 32px; font-weight: bold; margin-bottom: 10px;">Symptom Checker</h1>
                     <p style="font-size: 18px; color: #555;">Identify potential health conditions and corresponding treatments based on your symptoms.</p>
                     
@@ -378,7 +469,7 @@
             
             
             
-                <div class="symptoms" style="display:none ;overflow-y: hidden;">
+                <div class="page symptoms" style="display:none ;overflow-y: hidden;">
                     
                     <div id="symptom-sides" style ="width:100% ; gap:10px;  display:flex; flex-direction: row; justify-content: space-between; ">
 
@@ -420,29 +511,46 @@
     
             
     
-            <!-- <div id="condition" style="visibility: hidden;"> -->
-                <div class ="condition" style="display:flex">
-                   <div class="conditionstart" >
-                    <div class="suggestions" style="flex-direction: column; width:30%; margin: 5px;padding: 5px;">
-                        <span class="sub-suggestion">How to dress a wound</span>
-                        <span class="sub-suggestion"> Nonspecific Symptoms </span>
-                        <span class="sub-suggestion"> Cold variants  </span>
-
-                        </div>
-                    <div style="flex-direction: column;align-items: center;justify-content: center;">
-                    <span id="condition-tittle" style="font-size: 20px; align-self:center"> What would you like to Learn More About?</span>
-                    <textarea id="symptom-textarea" placeholder="Ask about your health condition "></textarea>
-                    </div>
+          
+                <div class ="page condition" style="display:none;height: 100%;">
+                   <div class="conditionstart"  style="display: flex;">
+                       <div id="condition-tittle" style="font-size: 20px; align-self:center;font-weight: 600;"> What would you like to Learn More About?</div>
+                    <!-- <div style="flex-direction: row;"  > --> 
+                        <div class="suggestions" style="display:flex;flex-direction: row; margin: 5px;padding: 5px;align-items: center; justify-content: center;">
+                            <span class="sub-suggestion">How to dress a wound</span>
+                            <span class="sub-suggestion"> Nonspecific Symptoms </span>
+                            <span class="sub-suggestion"> Cold variants  </span>
+    
+                            </div>
+                        <textarea id="symptom-textarea" placeholder="Ask about your health condition "></textarea>
+                    
+                    <!-- </div> -->
                 </div>
+            
 
+                       <!-- FLEX GROW container for chat messages + sticky input -->
+      <div class="chat-area" style="display: none;" >
 
-                </div>
+      <!-- Chat messages area -->
+      <div class="chat-box">
+        <!-- <div  class="user-message ">
+          User message sample...
+        </div>
+        <div class="bot-response">
+          Bot response sample...
+        </div> -->
+    
+      </div>
 
-            </div>  
+      <!-- Sticky textarea container at bottom -->
+      <div classs="chatting-textarea" style="position: sticky;bottom: 0;background-color: #fff;padding: 10px;display: flex;justify-content: center;box-shadow: 0 -2px 5px rgba(0,0,0,0.1); ">
+        <textarea class="chat-textarea" placeholder="Ask about your health condition " style="width: 80%;height: 60px;padding: 10px;border: none;background-color: #e0e2e2;outline: none; border-radius: 15px;font-size: 15px;color: #333;box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.1);resize: none;">
+    </textarea>
+      </div>
+    </div>
     
             
     
-            </div>
 
           <!-- <p id="ccontainer" style="margin-top: 10px;">
             Health Condition:** Ataxia\n\n**Symptoms:**\n- Falling over more often\n- Inability to walk in a straight line\n- Becoming more clumsy\n- Slurred speech\n- Problems with swallowing which can cause choking or coughing\n- Tremors or shaking\n- Fatigue or tiredness\n- Problems with sight like blurred or jumpy vision caused by difficulty controlling eye movements\n\n**Treatment:**\nThere is no cure for ataxia, but treatments are available to help with symptoms and, in some cases, improve or stop the condition from getting worse if the underlying cause is treatable.\n\n**Treating the underlying cause:**\n- Ataxia with vitamin E deficiency can often be improved with vitamin E supplements.\n- Episodic ataxia can often be improved by taking a medication called acetazolamide and by avoiding triggers like caffeine, stress, and alcohol.\n- Acquired ataxia can sometimes be treated if the specific cause is something like an infection where antibiotics or antiviral treatment might help.\n\nPlease visit your doctor for further assistance."
@@ -450,6 +558,8 @@
           </p> -->
 
         </div>
+        </div>
+            </div>
         
         <script src="/symptomscript.js"></script>
 

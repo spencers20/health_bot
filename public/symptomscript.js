@@ -19,6 +19,11 @@ const buttons=document.getElementById('buttons')
 const tip=document.getElementById('tip')
 const headertip=document.getElementById('headertip')
 const image=document.getElementById('image')
+const symptomtextarea=document.getElementById('symptom-textarea')
+
+const conditionstart=document.querySelector('.conditionstart')
+const chatarea=document.querySelector('.chat-area')
+const subsuggestion=document.querySelectorAll('.sub-suggestion')
 
 
 
@@ -33,12 +38,33 @@ let chatId;
 
 
 
+
+// function formatTextToHTML(text) {
+//     return text
+//       .replace(/\n/g, '<br>') // Convert newlines to <br>
+//       .replace(/\* (.+?)(\n|$)/g, '<li>$1</li>') // Convert * bullet points to <li>
+//       .replace(/(?:<li>.+?<\/li>)+/g, '<ul>$&</ul>'); // Wrap <li> in <ul>
+//   }
+
 function formatTextToHTML(text) {
-    return text
-      .replace(/\n/g, '<br>') // Convert newlines to <br>
-      .replace(/\* (.+?)(\n|$)/g, '<li>$1</li>') // Convert * bullet points to <li>
-      .replace(/(?:<li>.+?<\/li>)+/g, '<ul>$&</ul>'); // Wrap <li> in <ul>
+    // Ensure the text is a string
+    text = String(text);
+  
+    // Convert newlines to <br> tags
+    let formattedText = text.replace(/\n/g, '<br>');
+  
+    // Convert bullet points starting with an asterisk (*) into <li> items.
+    // This regex looks for "* " at the beginning of a line (or after a <br>)
+    // followed by text until a <br> or end of string.
+    formattedText = formattedText.replace(/(^|<br>)\*\s+(.*?)(?=<br>|$)/g, '$1<li>$2</li>');
+  
+    // Wrap consecutive <li> elements into a <ul>
+    formattedText = formattedText.replace(/((?:<li>.*?<\/li>)+)/g, '<ul>$1</ul>');
+  
+    return formattedText;
   }
+  
+  
 
   function toggleDisclaimer() {
     const disclaimer = document.getElementById('disclaimer');
@@ -66,6 +92,146 @@ function formatTextToHTML(text) {
 //         console.error(`error in getting tips from api : ${e}`)
 //     }
 // }
+
+
+function thinkinanimation(genanime){
+
+    genanime.innerHTML = `<span id="startthinking">Generating</span>
+    <span class="dot">.</span>
+    <span class="dot">.</span>
+    <span class="dot">.</span>`;
+
+
+const dots=document.querySelectorAll('.dot')
+dots.forEach(dot=>{
+dot.classList.add('fadedot')
+})
+
+}
+
+async function chatalignment(){
+    try{
+
+    }catch(e){
+        console.error('error in creating chat structure...',e)
+    }
+    const usermessage=document.createElement('div')
+    usermessage.classList.add('user-message')
+    usermessage.innerHTML=symptomtextarea.value
+    chatbox.appendChild('usermessage')
+
+    const response=await fetch('/askgroq',{
+        method:'POST',
+        headers:{
+            'Content-Type':'application/json'
+        },
+        body:JSON.stringify({message:messages})
+    })
+    const text=response.json()
+    const results=formatTextToHTML(text)
+    const botmessage=document.createElement('div')
+    botmessage.classList.add('bot-response')
+    botmessage.innerHTML=results
+    chatbox.appendChild('botmessage')
+    
+}
+
+async function getresponse(symptomvalue){
+    try{
+        const chatbox=document.querySelector('.chat-box')
+        conditionstart.style.display='none'
+        chatarea.style.display='flex'
+        console.log(symptomvalue)
+        const usermessage=document.createElement('div')
+        usermessage.classList.add('user-message')
+        usermessage.innerHTML=symptomvalue
+        chatbox.appendChild(usermessage)
+        const messages=symptomvalue
+        
+        const botmessage1=document.createElement('div')
+        botmessage1.classList.add('bot-response')
+        botmessage1.innerHTML = `<span id="startthinking">Generating</span>
+        <span class="dot">.</span>
+        <span class="dot">.</span>
+        <span class="dot">.</span>`;
+        chatbox.appendChild(botmessage1)
+        const dots=document.querySelectorAll('.dot')
+        dots.forEach(dot=>{
+         dot.classList.add('fadedot')
+         })
+        
+        
+        // const response=await fetch('/askgroq',{
+        //     method:'POST',
+        //     headers:{
+        //         'Content-Type':'application/json'
+        //     },
+        //     body:JSON.stringify({message:messages})
+        // })
+        if(response){
+            
+        
+            const text=response.json()
+            const botmessage=document.createElement('div')
+            botmessage.classList.add('bot-response')
+           
+            // const formatedtext=formatTextToHTML(text)
+            setTimeout(()=>{
+                botmessage1.style.display='none'
+        
+                botmessage.innerHTML='i wenr home the other day'
+            },3000)
+            chatbox.appendChild(botmessage)
+        }
+        
+        
+        
+        
+        // chatarea.appendChild(chatbox)
+    }catch(e){
+        console.error('error in generating response...',e)
+    }
+ 
+}
+
+symptomtextarea.addEventListener('keydown',async(e)=>{
+    try{
+        if(e.key ==='Enter'){
+            e.preventDefault()
+            const symptomvalue=symptomtextarea.value
+            await getresponse(symptomvalue)
+        }
+
+    }catch(e){
+        console.error('error in creating chat structure...',e)
+    }
+
+})
+
+document.querySelector('.chat-textarea').addEventListener('keydown',async(e)=>{
+    try{
+        if(e.key ==='Enter'){
+            e.preventDefault()
+            const chattextarea=document.querySelector('.chat-textarea')
+            const symptomvalue=chattextarea.value
+            await getresponse(symptomvalue)
+        }
+
+    }catch(e){
+        console.error('error in creating chat structure...',e)
+    }
+
+})
+
+Array.from(subsuggestion).forEach(subsuggest=>{
+    subsuggest.addEventListener('click',async()=>{
+        const symptomvalue=subsuggest.innerText
+        await getresponse(symptomvalue)
+
+    })
+})
+
+
 
 document.addEventListener('DOMContentLoaded',async()=>{
    
@@ -169,28 +335,6 @@ symptominput.addEventListener('keydown' ,async( event)=>{
 
 })
 
-function thinkinanimation(results){
-    results.innerHTML=` <span id="startthinking" > Thinking </span>
-                        <span class="dot">.</span>
-                        <span class="dot">.</span>
-                        <span class="dot">.</span>
-         
-    `
-    setTimeout(()=>{
-        results.innerHTML=` <span id="startthinking" > Thinking </span>
-        <span class="dot">.</span>
-        <span class="dot">.</span>
-        <span class="dot">.</span>
-
-`
-    }, 1000)
-
-    const dots=document.querySelectorAll('.dot')
-    dots.forEach(dot=>{
-        dot.classList.add('fadedot')
-    })
-
-}
 
 checkbtn.addEventListener('click',async()=>{
     console.log ('checkbtn clicked')
@@ -303,6 +447,45 @@ moreinfo.addEventListener('click',async()=>{
 
     
 })
+
+const currentPage=document.querySelector('.information')
+currentPage.classList.add('active')
+
+function changepage(pageonview, direction='right'){
+    const newPage=document.querySelector(`${pageonview}`)
+    if(newPage==currentPage) return;
+    
+    if (direction==='right'){
+        currentPage.classList.remove('active')
+        currentPage.classList.add('off-left')
+        
+        newPage.classList.remove('off-left','off-right')
+        newPage.classList.add('off-right')
+
+        newPage.offsetWidth
+        newPage.classList.remove('off-right')
+        newPage.style.display='flex'
+        newPage.classList.add('active')
+    } else if(direction ==='left'){
+        currentPage.classList.remove('active')
+        currentPage.classList.add('off-right')
+
+        newPage.classList.remove('off-right','off-left')
+        newPage.classList.add('off-left')
+
+        newPage.offsetWidth
+        newPage.classList.remove('off-left')
+        newPage.style.display='flex'
+        newPage.classList.add('active')
+    }
+
+    setTimeout(()=>{
+        currentPage.classList.remove('off-left','off-right')
+        currentPage=newPage
+    },500)
+}
+
+
 
 
 

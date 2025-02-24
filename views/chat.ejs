@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UI Mockup</title>
+    <title>Myafya</title>
     <link rel="stylesheet" type="text/css" href="/styles.css">
     <style>
     
@@ -22,14 +22,28 @@
 
     
     }
+
+    .main-body{
+        width:100%;
+        background-color:rgb(233, 233, 241) ;
+        display:flex;
+        margin-top:20px
+    }
     .sidebar {
-        width: 250px;
-        background-color: #d6d4d4;
-        padding: 20px;
+        width:20%;
+        background-color: aliceblue;
+        padding: 10px;
         display: flex;
         flex-direction: column;
-        gap: 20px;
-        overscroll-behavior: contain;
+        margin-left:20px;
+        margin-top:30px;
+        margin:10px;
+        height:450px;
+        border-radius:12px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        z-index: 5;
+        /* gap: 20px; */
+        /* overscroll-behavior: contain; */
     }
 
     .logo {
@@ -211,7 +225,32 @@
     </style>
 </head>
 <body>
-    <div class="sidebar">
+
+    <div class="head" style="width: 100%; height: 20%; background-color: white; ">
+        <div style="font-size: 25px; height:60px;background-color:rgb(187, 245, 235);font-weight: 600;">
+            Myafya
+        </div>
+    </div>
+
+    <div class="main-body" >
+        <div class="side-bar">
+            <div>
+                Did you Know?
+            </div>
+
+            <div class="tip-content">
+
+            </div>
+
+            <div class="tip-image">
+                <img src="" alt="">
+
+            </div>
+
+        </div>
+
+    </div>
+    <!-- <div class="sidebar">
         <div class="logo">HC</div>
         <button class="new-chat" >New Chat</button>
         <div class="section-title">Recent Chats</div>
@@ -227,10 +266,10 @@
 
         </div>
 
+    </div> -->
         <!-- <div class="feature-box">
             <span>New Feature</span>
             <p>We've improved v0's ability to generate code from uploaded images</p> -->
-        </div>
         <!-- <div class="profile">
             <div class="profile-icon">S</div>
             <span>spencers20</span> -->
@@ -238,7 +277,7 @@
         </div>
     </div>
     <div class="container">
-        <h1 id="intro">Hello <%=user.name.split(" ")[1]? user.name.split(" ")[1]:user.name%> how may i help you</h1>
+        <h1 id="intro">Hellohow may i help you</h1>
         
         <div id="chat-container" style="display: block;"></div>
         <div class="search-bar">

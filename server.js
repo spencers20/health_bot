@@ -20,6 +20,7 @@ const nodemailer=require('nodemailer')
 // const collection=require('./database')
 // const collection=savesession.collection
 
+// <%=user.name.split(" ")[1]? user.name.split(" ")[1]:user.name%> 
 // getting views 
 app.set('views','./views')
 app.set('view_engine','ejs')
@@ -57,7 +58,7 @@ try{
 
 app.get('/',(req , res)=>{
     console.log('entered')
-    res.render('symptom.ejs')
+    res.render('chat.ejs')
 })
 // app.get('/symptomchecker',(req , res)=>{
 //     console.log('entered')
