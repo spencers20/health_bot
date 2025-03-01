@@ -58,7 +58,7 @@ try{
 
 app.get('/',(req , res)=>{
     console.log('entered')
-    res.render('chat.ejs')
+    res.render('records.ejs')
 })
 // app.get('/symptomchecker',(req , res)=>{
 //     console.log('entered')
@@ -102,6 +102,7 @@ app.post('/askgroq',async(req,res)=>{
 })
 
 
+
 app.get('/tips',async(req , res)=>{
     try{
         // console.log('tips url entered...')
@@ -120,7 +121,20 @@ app.get('/tips',async(req , res)=>{
 })
 
 
-
+app.get('/allevents',async(req,res)=>{
+    try{
+        const db=await getdb()
+        const eventscollection=await db.collection('events')
+        const userId="100984849132378172203"
+        const events=await eventscollection.findOne({
+            _id:userId,
+        })
+        // console.log("events", events)
+        res.status(200).json(events)
+    }catch(e){
+        console.error(`failed to get the events from the database ${e}`)
+    }
+})
 
 
 

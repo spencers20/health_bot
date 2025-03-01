@@ -11,13 +11,14 @@
         box-sizing: border-box;
         /* margin: 0; */
         /* padding: 0; */
-        font-family: Arial, sans-serif;
+        font-family: Arial, "Segoe UI", "Noto Color Emoji", sans-serif;
+        
     }    
     body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         margin: 0;
         padding: 0;
-        background-color: white;
+        background-color:rgb(235, 234, 234); 
         color: #333;
         /* overflow: hidden; */
         overscroll-behavior: none;
@@ -25,21 +26,32 @@
 
     .main-body{
         width:100%;
-        background-color:rgb(233, 233, 241) ;
+        background-color:rgb(242, 248, 248) ;
         display:flex;
-        flex-direction: row;
-        margin-top:20px
+        flex-direction: row; 
+        margin-top:10px;
+      
     }
-    .side-bar {
-        width:23%;
+
+    .side-bar{
+        width: 23%;
+        margin-top:30px;
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        height:550px;
+        margin-left:20px;
+
+
+    }
+    .side-card {
+        width:100%;
         background-color: aliceblue;
         padding: 10px;
         display: flex;
-        flex-direction: column;
-        margin-left:20px;
+        flex-direction: column; 
         margin-top:30px;
-        height:450px;
-        position: fixed;
+        height:450px; 
         border-radius:12px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         /* z-index: 5; */
@@ -56,7 +68,7 @@
     }
 
 
-    #edit-value:hover::after {
+    .edit-svg:hover::after {
     content: "edit value"; /* Correct way to add text */
     /* position: absolute; */
     background-color: rgba(66, 65, 65, 0.7); /* Optional: Tooltip background */
@@ -69,40 +81,102 @@
     left: 50%;
     transform: translateX(-50%);
      }
-     .containermetric{
+
+     .edit-value:hover ~ .card-metric-content {
+    opacity: 0; /* Set opacity to 0 for the targeted container when hovering over the edit icon */
+    transition: opacity 0.3s ease; /* Smooth transition */
+}
+
+
+     .card-metric{
         height: 180px; 
         width: 150px; 
         display: flex;
-        background-color: #e0f7fa; 
+        background-color:#fafaf7; 
         border-radius: 10px; 
-        box-shadow: 0 5px 10px black; 
+        box-shadow: 0  2px 5px rgb(173, 172, 172); 
         flex-direction: column; 
         padding: 10px;
         margin-left: 20px;
         padding: 5px;
+        transform: box-shadow 1.5s ease;
+       
     }
 
-    .symptomcheck{
+    .card-metric:hover{
+        box-shadow: 0  7px 14px rgb(122, 122, 122); 
+       
+    }
+
+    .lowerpart{
+        padding: 10px;
+        align-self: center;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+    .lowerpart:hover::after{
+        content: attr(card-tip);
+        background-color:rgba(66, 65, 65, 0.7) ;
+        color:rgb(255, 255, 255);
+        top:100%;
+        border-radius: 12px;
+        padding:5px;
+        font-size:12px ;
+        white-space: nowrap;
+        margin-top: 10px;
+        /* left:50%; */
+        /* transform: translateX(-50%); */
+
+    
+    }
+
+    .card-pages{
         margin-top:30px;
         width:100%;
         display: flex;
         border-radius: 12px;
-        background-color: #f7f7f7;
-        box-shadow: 0 4px 8px rgb(15, 15, 15);
+        background-color: #fafaf7;
+        box-shadow: 0 1px 3px rgb(173, 172, 172); 
         flex-direction: row;
         padding:10px;
         margin-left: 50px;
         align-items: center;
         justify-content: center;
         min-height: 100px;
+        transform: box-shadow 1.5s ease;
+        
     }
 
-   
+    .card-pages:hover{
+        box-shadow: 0  3px 6px rgb(133, 132, 132); 
+       
+    }
 
+    .metric-middle{
+        display: flex; 
+        align-items:center;
+        justify-content: center; 
+        flex-direction: column; 
+        align-self: center;
+        margin-top: 10px;
+        cursor: pointer;
+    }
 
+    .metric-middle:hover::after{
+        content: attr(metric-tip);
+        font-size:12px;
+        color:#40069e;
+        /* background-color: rgba(104, 103, 103, 0.7); */
+        border-radius: 12px;
+        padding: 2px;
+        flex-direction: row;
+        top:100%
+        /* padding:10px; */
 
+    }
 
- 
+    
     .profile-icon {
         background-color: #000;
         color: #fff;
@@ -114,73 +188,16 @@
         border-radius: 50%;
     }
 
+  
+    
 
-    .main-content {
-        flex: 1;
-        padding: 40px;
-        background-color: #fff;
-        text-align: center;
-    }
+  
 
-    .main-content h1 {
-        font-size: 36px;
-        margin-bottom: 10px;
-    }
-
-    .upgrade {
-        font-size: 14px;
-        color: #888;
-    }
-
-    .upgrade a {
-        color: #007bff;
-        text-decoration: none;
-    }
-
-    .search-bar {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin: 20px 0;
-    }
-
-    .search-bar input {
-        width: 300px;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-    }
-
-    .send-btn {    
-        padding: 10px 15px;
-        border: none;
-        color: #fff;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-
-    .suggestions button {    
-        margin: 5px;
-        padding: 10px;
-        background-color: #f5f5f5;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        cursor: pointer;
-    }
-    .response {
-        align-self: flex-start;
-        background-color:#fcfdf9 ;
-        margin-top: 20px;
-        padding: 10px;
-        border-radius:  5px;
-        max-width: 95%;
-
-
-    }
+    
 
     .userMessage {
         align-self: flex-start;
-        background-color: #e9ebec;
+        background-color:#52d7db;
         font-weight: bold;
         padding:10px;
         border-radius: 5px;
@@ -235,102 +252,340 @@
 
     
     </style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
+
 </head>
 <body>
 
-    <div class="head" style=" display :flex; width:100%; height: 20%; background-color: white; top:1px">
-        <div style=" display :flex;  width: 100%; font-size: 25px; justify-content: center; align-items: center; height:60px;background-color:rgb(187, 245, 235);font-weight: 600;">
+    <div class="head" style=" position: sticky; display :flex; width:100%; height: 40%;  top:0;background-color: rgb(235, 234, 234);   border-bottom: 1px solid rgb(235, 234, 234);">
+        <div style=" display :flex;  width: 100%; font-size: 25px; justify-content: center; align-items: center; height:90px;font-weight: 600;">
             Myafya
         </div>
     </div>
-
+  
     <div class="main-body" >
-        <div class="side-bar" > 
-            <span  style="align-self: center; margin-top: 10px; font-size: 10px;font-size:20px; font-weight: 600;">
-                Did you Know?
+        <div class="side-bar">
+            <span style="font-size: 20px; color: #888281;">
+                Good Morning, <%=user.name.split(" ")[1]?user.name.split(" ")[1]:user.name%>!
             </span>
-            <span class="tip-description" >
-                    <!-- A balanced diet includes a variety of fruits, vegetables, whole grains, lean proteins, and healthy fats. It can help keep your body healthy and prevent chronic diseases. -->
-            </span>
-                <img class="tip-image" alt="">
-                
+
+            <div class="side-card" >
+    
+                <span  style="align-self: center; margin-top: 10px; font-size: 10px;font-size:20px; font-weight: 600;">
+                    Did you Know?
+                </span>
+                <span class="tip-description" >
+                        <!-- A balanced diet includes a variety of fruits, vegetables, whole grains, lean proteins, and healthy fats. It can help keep your body healthy and prevent chronic diseases. -->
+                </span>
+                    <img class="tip-image" alt="">
+                    
+            </div>
+
         </div>
+       
 
         <div class="side-body" style="display: flex; flex-direction: column; margin-left:27%; ">
+            <div class="disclaimer" style="display: flex;flex-direction: row;margin-left:50px;padding: 10px;align-items: center;justify-content: center;">
+                <span>
+
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="#000000" width="35px" height="35px" viewBox="0 0 24 24" id="warning" data-name="Line Color" class="icon line-color">
+                        <script xmlns=""/>
+                        <circle id="primary" cx="12" cy="12" r="9" style="fill: none; stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"/>
+                        <line id="secondary" x1="12" y1="7" x2="12" y2="13" style="fill: none; stroke: rgb(188, 130, 44); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"/>
+                        <line id="secondary-upstroke" x1="12.05" y1="17" x2="11.95" y2="17" style="fill: none; stroke: rgb(188, 130, 44); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2;"/>
+                        <script xmlns=""/>
+                    </svg>
+                </span>
+
+                    <span style="color:rgb(44, 169, 188);font-size: 14px; margin-left: 20px;"> Please ensure that all filled values have been measured and approved by your healthcare provider.</span>
+
+            </div>
+        
             <div  style="margin-left: 40px; margin-top: 20px; width:100%;  display: flex; flex-direction: row;">
-                <div class="containermetric" >
-                    <span id="edit-value" style="margin-left:100px; cursor: pointer;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 20 20" fill="none">
-                            <path stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.8 12.963L2 18l4.8-.63L18.11 6.58a2.612 2.612 0 00-3.601-3.785L3.8 12.963z"/>
-                          <script xmlns=""/></svg>
-                    </span>
-                    <span style="margin-top:5px; align-self: center; font-size: 18px;">Temperature</span>
-                    <span id="tempvalue" style="font-size: 30px; align-self: center; margin-top: 10px; display: flex;">37 &deg;c</span>
-                    <input id="value-input" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; display: none;"  type="text" placeholder="37">
-                    <span id="conditiondegree" style="font-size: 15px;margin-top:20px; align-self:center"  >Normal</span>
+
+                <div class="card-metric" card-id="temperature"  >
+                    <div  class="edit-value" style="display: flex; flex-direction: row;  cursor: pointer;width: 90%;" >
+                        <div class="back-svg" style="opacity: 0;" >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" viewBox="0 0 1024 1024"><script xmlns=""/>
+                                <path fill="#000000" d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64z"/><path fill="#000000" d="m237.248 512 265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312L237.248 512z"/><script xmlns=""/></svg>
+                            </div>
+                        <div  class="edit-svg" style="margin-left: 80px;" >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 20 20" fill="none">
+                                <path stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.8 12.963L2 18l4.8-.63L18.11 6.58a2.612 2.612 0 00-3.601-3.785L3.8 12.963z"/>
+                              <script xmlns=""/></svg>
+                            </div>    
+                        </div>
+                    <div class="metric-middle"card-id="temperature" metric-tip="view temp. trend" >
+                        <span style="margin-top:5px; align-self: center; font-size: 18px;">Temperature</span>
+                        <span id="tempvalue" style="font-size: 30px; align-self: center; margin-top: 10px; display: flex;">37 &deg;c</span>
+                        <span id="conditiondegree" style="font-size: 15px;margin-top:10px; align-self:center"  >Normal</span>
+                    </div>
+
+                    <div class="inputvalues"  style="display: none;  flex-direction: column; ">
+                        <span style="align-self: center; margin-top: 10px;">Temperature</span>
+                        <input class="value-input" input-id="" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; "  type="text" placeholder="37">
+                    </div>
+                </div>
+                <div class="card-metric" card-tip="view B.Pressure trend"   >
+                    <div  class="edit-value" style="display: flex; flex-direction: row;  cursor: pointer;width: 90%;" >
+                        <div class="back-svg" style="opacity: 0;" >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" viewBox="0 0 1024 1024"><script xmlns=""/>
+                                <path fill="#000000" d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64z"/><path fill="#000000" d="m237.248 512 265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312L237.248 512z"/><script xmlns=""/></svg>
+                            </div>
+                        <div  class="edit-svg" style="margin-left: 80px;" >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 20 20" fill="none">
+                                <path stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.8 12.963L2 18l4.8-.63L18.11 6.58a2.612 2.612 0 00-3.601-3.785L3.8 12.963z"/>
+                              <script xmlns=""/></svg>
+                            </div>    
+                        </div>
+                    
+                    <div class="metric-middle"  card-id="pressure" metric-tip="view B.Pressure trend"  >
+                        <span style="margin-top:5px; align-self: center; font-size: 18px;">Blood Pressure</span>
+                        <span id="tempvalue" style="font-size: 25px; align-self: center; margin-top: 10px; display: flex;">120/88 <p style="font-size: 14px; margin-left: 2px;"> mm Hg</p></span>
+                        <span id="conditiondegree" style="font-size: 15px;margin-top:10px; align-self:center"  >Normal</span>
+                    </div>
+                    <div class="inputvalues"  style="display: none;  flex-direction: column;">
+                        <span style="align-self: center; margin-top: 5px;">Systolic</span>
+                        <input class="sysvalueinput" input-id="syst" style="font-size:20px;align-self: center; border:none; height:30px;width:100px; margin-top:10px; text-align: center; "  type="text" placeholder="120">
+                        <span style="align-self: center; margin-top: 5px;">Diastolic</span>
+                        <input class="value-input" input-id="dias" style="font-size:10px;align-self: center; border:none; height:30px;width:100px; margin-top:10px; text-align: center; "  type="text" placeholder="88">
+
+                    </div>
+
+                   
 
                 </div>
-                <div class="containermetric" >
-                    <span id="edit-value" style="margin-left:100px; cursor: pointer;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 20 20" fill="none">
-                            <path stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.8 12.963L2 18l4.8-.63L18.11 6.58a2.612 2.612 0 00-3.601-3.785L3.8 12.963z"/>
-                          <script xmlns=""/></svg>
-                    </span>
-                    <span style="margin-top:5px; align-self: center; font-size: 18px;">Blood Pressure</span>
-                    <span id="tempvalue" style="font-size: 30px; align-self: center; margin-top: 10px; display: flex;">37 &deg;c</span>
-                    <input id="value-input" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; display: none;"  type="text" placeholder="37">
-                    <span id="conditiondegree" style="font-size: 15px;margin-top:20px; align-self:center"  >Normal</span>
-
-                </div>
-                <div class="containermetric" >
-                    <span id="edit-value" style="margin-left:100px; cursor: pointer;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 20 20" fill="none">
-                            <path stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.8 12.963L2 18l4.8-.63L18.11 6.58a2.612 2.612 0 00-3.601-3.785L3.8 12.963z"/>
-                          <script xmlns=""/></svg>
-                    </span>
+                <div class="card-metric" card-tip="view pulse trend"   >
+                    <div  class="edit-value" style="display: flex; flex-direction: row;  cursor: pointer;width: 90%;" >
+                        <div class="back-svg" style="opacity: 0;" >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" viewBox="0 0 1024 1024"><script xmlns=""/>
+                                <path fill="#000000" d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64z"/><path fill="#000000" d="m237.248 512 265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312L237.248 512z"/><script xmlns=""/></svg>
+                            </div>
+                        <div  class="edit-svg" style="margin-left: 80px;" >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 20 20" fill="none">
+                                <path stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.8 12.963L2 18l4.8-.63L18.11 6.58a2.612 2.612 0 00-3.601-3.785L3.8 12.963z"/>
+                              <script xmlns=""/></svg>
+                            </div>    
+                        </div>
+                    
+                    <div class="metric-middle"  card-id="pulse" metric-tip="view Pulse trend">
                     <span style="margin-top:5px; align-self: center; font-size: 18px;">Pulse Rate</span>
-                    <span id="tempvalue" style="font-size: 30px; align-self: center; margin-top: 10px; display: flex;">37 &deg;c</span>
-                    <input id="value-input" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; display: none;"  type="text" placeholder="37">
-                    <span id="conditiondegree" style="font-size: 15px;margin-top:20px; align-self:center"  >Normal</span>
-
+                    <span id="tempvalue" style="font-size: 30px; align-self: center; margin-top: 10px; display: flex;">70 bpm</span>
+                    <span id="conditiondegree" style="font-size: 15px;margin-top:10px; align-self:center"  >Normal</span>
+                    
                 </div>
-                <div class="containermetric" >
-                    <span id="edit-value" style="margin-left:100px; cursor: pointer;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 20 20" fill="none">
-                            <path stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.8 12.963L2 18l4.8-.63L18.11 6.58a2.612 2.612 0 00-3.601-3.785L3.8 12.963z"/>
-                          <script xmlns=""/></svg>
-                    </span>
-                    <span style="margin-top:5px; align-self: center; font-size: 18px;">Respiratory Rate</span>
-                    <span id="tempvalue" style="font-size: 30px; align-self: center; margin-top: 10px; display: flex;">37 &deg;c</span>
-                    <input id="value-input" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; display: none;"  type="text" placeholder="37">
-                    <span id="conditiondegree" style="font-size: 15px;margin-top:20px; align-self:center"  >Normal</span>
+                <div class="inputvalues"  style="display: none;  flex-direction: column; ">
+                    <span style="align-self: center; margin-top: 10px;">Pulse Rate</span>
+                    <input class="value-input" input-id="" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; "  type="text" placeholder="70">
+                </div>
+            </div>
+                <div class="card-metric" card-tip="view Respiratory trend" >
+                  <div  class="edit-value" style="display: flex; flex-direction: row;  cursor: pointer;width: 90%;" >
+                        <div class="back-svg" style="opacity: 0;" >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15px" height="25px" viewBox="0 0 1024 1024"><script xmlns=""/>
+                                <path fill="#000000" d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64z"/><path fill="#000000" d="m237.248 512 265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312L237.248 512z"/><script xmlns=""/></svg>
+                            </div>
+                        <div  class="edit-svg" style="margin-left: 80px;" >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 20 20" fill="none">
+                                <path stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.8 12.963L2 18l4.8-.63L18.11 6.58a2.612 2.612 0 00-3.601-3.785L3.8 12.963z"/>
+                              <script xmlns=""/></svg>
+                            </div>    
+                        </div>
+                    
+                    <div class="metric-middle"  card-id="respiratory" metric-tip="view Respiratory trend">
+                        <span style="margin-top:5px; align-self: center; font-size: 18px;">Respiratory Rate</span>
+                        <span id="tempvalue" style="font-size: 30px; align-self: center; margin-top: 10px; display: flex;">15 bpm</span>
+                        <span id="conditiondegree" style="font-size: 15px;margin-top:10px; align-self:center"  >Normal</span>
+                    </div>
+                    <div class="inputvalues"  style="display: none;  flex-direction: column; ">
+                        <span style="align-self: center; margin-top: 10px;">Respiratory Rate</span>
+                        <input class="value-input" input-id="" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; "  type="text" placeholder="37">
+                    </div>
+                
 
                 </div>
             </div>
 
-            <div class="symptomcheck" >
-                <div style="margin-left: 20px; align-items: center; justify-content: center;">
+            <div class="card-pages symptom-check" >
+                <div style="align-items: center; justify-content: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="90px" height="90px" viewBox="0 0 48 48" fill="none">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M10.9517 12.1026C13.0377 9.60753 15.826 7.71984 19.0127 6.74341C19.3803 5.76034 20.0137 4.90717 20.8223 4.26465C15.6985 5.12736 11.271 8.04097 8.41314 12.1321C8.57095 12.1126 8.73138 12.1026 8.89375 12.1026H10.9517ZM7.35899 19.5082C6.6598 19.2093 6.06122 18.7124 5.64197 18.0846C5.22323 19.6525 5 21.3002 5 23.0001C5 28.8499 7.64365 34.0822 11.8014 37.5676L12.4223 35.4483C9.08653 32.3445 7 27.9159 7 23.0001C7 21.8032 7.12369 20.6352 7.35899 19.5082ZM19.4132 39.3741L18.8904 40.6132C18.8628 40.8377 18.8158 41.0557 18.7513 41.2658C20.4183 41.744 22.1793 42.0001 24 42.0001C25.8207 42.0001 27.5817 41.744 29.2487 41.2658C29.1842 41.0557 29.1372 40.8377 29.1096 40.6132L28.5868 39.3741C27.1277 39.782 25.5893 40.0001 24 40.0001C22.4107 40.0001 20.8723 39.782 19.4132 39.3741ZM35.5777 35.4483L36.1986 37.5676C40.3563 34.0822 43 28.8499 43 23.0001C43 21.3002 42.7768 19.6525 42.358 18.0846C41.9388 18.7124 41.3402 19.2093 40.641 19.5082C40.8763 20.6352 41 21.8032 41 23.0001C41 27.9159 38.9135 32.3445 35.5777 35.4483ZM37.0483 12.1026H39.1062C39.2686 12.1026 39.429 12.1126 39.5869 12.1321C36.948 8.35445 32.9708 5.58079 28.3429 4.4987C29.1073 5.18768 29.6869 6.07685 29.9917 7.08608C32.76 8.12888 35.1845 9.8733 37.0483 12.1026Z" fill="#1cb4cf"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M24.4443 4C21.826 4 19.6568 6.1046 19.6568 8.71967C19.6568 10.7117 20.9155 12.4075 22.6726 13.1025H16.7576C17.3158 13.6339 17.7207 14.325 17.8989 15.1025H39.1062C39.6126 15.1025 40 15.5087 40 15.9623C40 16.416 39.6126 16.8221 39.1062 16.8221H28.3298H26.9948L27.3701 18.1033L28.0708 20.4951C28.6429 20.1796 29.3005 20 30 20L30.0099 20L29.6648 18.8221H39.1062C40.683 18.8221 42 17.5545 42 15.9623C42 14.3702 40.683 13.1025 39.1062 13.1025H26.2161C27.9732 12.4075 29.2318 10.7117 29.2318 8.71967C29.2318 6.10461 27.0626 4 24.4443 4ZM33.8599 40.2552L30.267 27.9912C30.9642 27.9453 31.6126 27.7207 32.1669 27.3628L35.8279 39.859L35.8683 39.9967V40.1402C35.8683 41.7323 34.5512 43 32.9745 43C31.7127 43 30.7778 42.0524 30.1357 41.1311C29.4545 40.1536 28.87 38.8715 28.3743 37.5887C27.8743 36.295 27.4421 34.9397 27.0831 33.7919L26.9654 33.4151L26.9654 33.4151C26.77 32.789 26.6038 32.2566 26.4625 31.841H24.8295C24.5871 31.0389 24.0995 30.3432 23.454 29.841H24.1996H27.1577H27.8211L28.079 30.4523C28.3006 30.9776 28.5706 31.8438 28.8694 32.8024L28.8694 32.8024L28.9919 33.1948C29.3505 34.3412 29.7658 35.6411 30.2398 36.8678C30.7181 38.1055 31.2341 39.2093 31.7765 39.9876C32.358 40.8219 32.7699 41 32.9745 41C33.4376 41 33.8012 40.6603 33.8599 40.2552ZM17.7602 36.8678C17.8952 36.5186 18.0253 36.1634 18.1508 35.8075C18.6288 36.2925 19.2296 36.6561 19.9029 36.8477C19.813 37.0957 19.7206 37.3433 19.6257 37.5887C19.13 38.8715 18.5455 40.1536 17.8643 41.1311C17.2222 42.0524 16.2873 43 15.0255 43C13.4488 43 12.1318 41.7323 12.1318 40.1402V39.9967L12.1721 39.859L18.3352 18.8221H16.8347C17.3706 18.2839 17.7542 17.5938 17.9154 16.8221H19.6702H21.0052L20.6299 18.1033L14.1401 40.2552C14.1988 40.6603 14.5624 41 15.0255 41C15.2301 41 15.642 40.8219 16.2235 39.9876C16.7659 39.2093 17.2819 38.1055 17.7602 36.8678ZM11.1653 18.8221C10.6294 18.2839 10.2458 17.5938 10.0846 16.8221H8.89375C8.38736 16.8221 8 16.416 8 15.9623C8 15.5087 8.38736 15.1025 8.89375 15.1025H10.1011C10.2793 14.325 10.6842 13.6339 11.2424 13.1025H8.89375C7.31702 13.1025 6 14.3702 6 15.9623C6 17.5545 7.31702 18.8221 8.89375 18.8221H11.1653ZM21.6568 8.71967C21.6568 7.2431 22.8964 6 24.4443 6C25.9923 6 27.2318 7.2431 27.2318 8.71967C27.2318 10.1962 25.9923 11.4393 24.4443 11.4393C22.8964 11.4393 21.6568 10.1962 21.6568 8.71967Z" fill="#52d7db"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M14 18C15.1046 18 16 17.1046 16 16C16 14.8954 15.1046 14 14 14C12.8954 14 12 14.8954 12 16C12 17.1046 12.8954 18 14 18ZM14 20C16.2091 20 18 18.2091 18 16C18 13.7909 16.2091 12 14 12C11.7909 12 10 13.7909 10 16C10 18.2091 11.7909 20 14 20Z" fill="#52d7db"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M30 26C31.1046 26 32 25.1046 32 24C32 22.8954 31.1046 22 30 22C28.8954 22 28 22.8954 28 24C28 25.1046 28.8954 26 30 26ZM30 28C32.2091 28 34 26.2091 34 24C34 21.7909 32.2091 20 30 20C27.7909 20 26 21.7909 26 24C26 26.2091 27.7909 28 30 28Z" fill="#52d7db"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M21 35C22.1046 35 23 34.1046 23 33C23 31.8954 22.1046 31 21 31C19.8954 31 19 31.8954 19 33C19 34.1046 19.8954 35 21 35ZM21 37C23.2091 37 25 35.2091 25 33C25 30.7909 23.2091 29 21 29C18.7909 29 17 30.7909 17 33C17 35.2091 18.7909 37 21 37Z" fill="#52d7db"/>
+                        <script xmlns=""/></svg>
                   
                 </div>
 
-                <div class="description" style="display: flex; flex-direction: column; margin-left:20px ;padding: 5px;">
-                    <span style="font-size:20px">
-                        Symptom Checker
-                    </span>
-                    <span style="margin-top: 10px;font-size: 15px;">
-                        Check your symptoms and chat with AI for personalized health insights.
-                    </span>
+                <div id="info-card" style="display: flex;flex-direction: row;margin-left:20px ;cursor: pointer;" onclick="window.location.href='/user/symptomchecker' ">
+
+                    <div class="description" style="display: flex; flex-direction: column; margin-left:20px ;padding: 5px;">
+                        <span style="font-size:20px">
+                            Symptom Checker
+                        </span>
+                        <span style="margin-top: 10px;font-size: 16px; color: #023157;">
+                            Check your symptoms and chat with AI for personalized health insights.
+                        </span>
+    
+                    </div>
+                    
+                    <div style="align-self: center; margin-left: 100px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="30px" width="30px" version="1.1" id="Layer_1" viewBox="0 0 512 512" xml:space="preserve">
+                            <path style="fill:#23d3ff;" d="M256,512C114.839,512,0,397.156,0,256S114.839,0,256,0s256,114.844,256,256S397.161,512,256,512z"/>
+                            <path style="fill:#23d3ff;" d="M512,256C512,114.844,397.161,0,256,0v512C397.161,512,512,397.156,512,256z"/>
+                            <path style="fill:#FFFFFF;" d="M204.752,394.612c-5.408,0-10.72-2.621-13.933-7.469c-5.099-7.686-3-18.047,4.686-23.146  l164.568-109.165L195.505,145.666c-7.686-5.099-9.785-15.46-4.686-23.146c5.099-7.697,15.455-9.785,23.146-4.686l185.546,123.082  c4.664,3.098,7.469,8.317,7.469,13.916s-2.805,10.818-7.469,13.916L213.966,391.829  C211.128,393.709,207.921,394.612,204.752,394.612z"/>
+                            <path style="fill:#FFE6B3;" d="M399.511,240.915l-142.824-94.744v40.079l103.386,68.581l-103.386,68.581v40.079l142.825-94.744  c4.664-3.098,7.469-8.317,7.469-13.916S404.175,244.013,399.511,240.915z"/>
+                            <script xmlns=""/></svg>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="card-pages event-schedular">
+                <div style="align-items: center; justify-content: center;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="90px" height="90px" viewBox="0 0 1024 1024" class="icon" version="1.1"><path d="M864 992H160c-70.4 0-128-57.6-128-128V160c0-70.4 57.6-128 128-128h704c70.4 0 128 57.6 128 128v704c0 70.4-57.6 128-128 128z" fill="#FFFFFF"/><path d="M32 144.8v169.6h960V144.8c0-62.4-50.4-112.8-112.8-112.8H144.8C82.4 32 32 82.4 32 144.8z" fill="#EC7BB0"/><path d="M176.8 168.8m-56.8 0a56.8 56.8 0 1 0 113.6 0 56.8 56.8 0 1 0-113.6 0Z" fill="#FFFFFF"/><path d="M847.2 168.8m-56.8 0a56.8 56.8 0 1 0 113.6 0 56.8 56.8 0 1 0-113.6 0Z" fill="#FFFFFF"/><path d="M512 168.8m-56.8 0a56.8 56.8 0 1 0 113.6 0 56.8 56.8 0 1 0-113.6 0Z" fill="#FFFFFF"/><path d="M176.8 232.8c-35.2 0-64.8-28.8-64.8-64.8 0-35.2 28.8-64.8 64.8-64.8s64.8 28.8 64.8 64.8-28.8 64.8-64.8 64.8z m0-112.8c-26.4 0-48.8 21.6-48.8 48.8s21.6 48.8 48.8 48.8 48.8-21.6 48.8-48.8-21.6-48.8-48.8-48.8zM847.2 232.8c-35.2 0-64.8-28.8-64.8-64.8 0-35.2 28.8-64.8 64.8-64.8s64.8 28.8 64.8 64.8c-0.8 36-29.6 64.8-64.8 64.8z m0-112.8c-26.4 0-48.8 21.6-48.8 48.8s21.6 48.8 48.8 48.8 48.8-21.6 48.8-48.8-22.4-48.8-48.8-48.8zM512 232.8c-35.2 0-64.8-28.8-64.8-64.8 0-35.2 28.8-64.8 64.8-64.8s64.8 28.8 64.8 64.8-29.6 64.8-64.8 64.8zM512 120c-26.4 0-48.8 21.6-48.8 48.8s21.6 48.8 48.8 48.8 48.8-21.6 48.8-48.8S538.4 120 512 120z" fill="#6A576D"/><path d="M1000 322.4H24V144.8C24 78.4 78.4 24 144.8 24h734.4c66.4 0 120.8 54.4 120.8 120.8v177.6z m-960-16h944V144.8c0-57.6-47.2-104.8-104.8-104.8H144.8C87.2 40 40 87.2 40 144.8v161.6z" fill="#6A576D"/><path d="M864 1000H160c-75.2 0-136-60.8-136-136V160c0-75.2 60.8-136 136-136h704c75.2 0 136 60.8 136 136v704c0 75.2-60.8 136-136 136zM160 40C93.6 40 40 93.6 40 160v704c0 66.4 53.6 120 120 120h704c66.4 0 120-53.6 120-120V160c0-66.4-53.6-120-120-120H160z" fill="#6A576D"/><path d="M489.6 688.8c6.4 0 9.6 4.8 9.6 11.2S496 712 489.6 712h-120c-10.4 0-16-5.6-16-16 0-9.6 5.6-22.4 10.4-30.4 9.6-18.4 25.6-34.4 50.4-50.4l18.4-12c25.6-16.8 36.8-27.2 36.8-47.2 0-19.2-16-32-40.8-32-31.2 0-40.8 17.6-45.6 36-1.6 5.6-6.4 8-12 8h-4c-5.6-1.6-10.4-4.8-10.4-11.2 0-1.6 0-2.4 0.8-4 2.4-11.2 8.8-23.2 17.6-32 12-12 28.8-19.2 54.4-19.2 40 0 65.6 20.8 65.6 54.4 0 32-20 46.4-44 61.6l-17.6 10.4c-29.6 18.4-46.4 36-52.8 60h108.8zM534.4 529.6c-7.2 0-10.4-4.8-10.4-12 0-6.4 4-12 10.4-12H656c10.4 0 14.4 4.8 14.4 13.6 0 9.6-3.2 13.6-8.8 20.8-29.6 40-52.8 96.8-66.4 161.6-1.6 8.8-7.2 11.2-13.6 11.2h-0.8c-7.2 0-13.6-4-13.6-11.2 0-0.8 0-2.4 0.8-3.2 13.6-60 40-120.8 72.8-169.6H534.4z" fill="#6A576D"/><script xmlns=""/>
+                </svg>
+                  
+                </div>
+
+                <div id="info-card" style="display: flex;flex-direction: row;margin-left:20px ;cursor: pointer;" onclick="window.location.href='/user/events'">
+
+                    <div class="description" style="display: flex; flex-direction: column; ;padding: 5px;">
+                        <span style="font-size:20px ; display: flex; flex-direction: row;">
+                           <span> Upcoming event </span> 
+                           <span id="eventhome-date" style="margin-left: 20px;color: #40069e"></span>
+                        </span>
+                        <span id="eventhome-summary" style="margin-top: 5px;font-size: 15px;padding: 5px;color: #9e8206;">
+
+                        </span>
+                        <span  style="margin-top: 10px;font-size: 16px;padding: 5px; color: #023157;">
+                            Manage your health appointments ,personal events and <br> set reminders with the event event-schedular
+                        </span>
+    
+                    </div>
+                    
+                    <div style="align-self: center; margin-left: 100px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="30px" width="30px" version="1.1" id="Layer_1" viewBox="0 0 512 512" xml:space="preserve">
+                            <path style="fill:#23d3ff;" d="M256,512C114.839,512,0,397.156,0,256S114.839,0,256,0s256,114.844,256,256S397.161,512,256,512z"/>
+                            <path style="fill:#23d3ff;" d="M512,256C512,114.844,397.161,0,256,0v512C397.161,512,512,397.156,512,256z"/>
+                            <path style="fill:#FFFFFF;" d="M204.752,394.612c-5.408,0-10.72-2.621-13.933-7.469c-5.099-7.686-3-18.047,4.686-23.146  l164.568-109.165L195.505,145.666c-7.686-5.099-9.785-15.46-4.686-23.146c5.099-7.697,15.455-9.785,23.146-4.686l185.546,123.082  c4.664,3.098,7.469,8.317,7.469,13.916s-2.805,10.818-7.469,13.916L213.966,391.829  C211.128,393.709,207.921,394.612,204.752,394.612z"/>
+                            <path style="fill:#FFE6B3;" d="M399.511,240.915l-142.824-94.744v40.079l103.386,68.581l-103.386,68.581v40.079l142.825-94.744  c4.664-3.098,7.469-8.317,7.469-13.916S404.175,244.013,399.511,240.915z"/>
+                            <script xmlns=""/></svg>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="card-pages Journal-entry">
+                <div style="align-items: center; justify-content: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="90px" width="90px" version="1.1" id="Layer_1" viewBox="0 0 512 512" xml:space="preserve">
+                        <path style="fill:#FF8163;" d="M216.073,384.982l8.115,25.069c0.783,2.418,3.027,4.055,5.559,4.055h52.507  c2.532,0,4.775-1.636,5.557-4.055l8.116-25.069H216.073z"/>
+                        <path style="fill:#FFBAC5;" d="M512,387.883c0,2.965-2.425,5.39-5.39,5.39H5.39c-2.963,0-5.39-2.424-5.39-5.39V91.361  c0-2.963,2.425-5.39,5.39-5.39H506.61c2.964,0,5.39,2.426,5.39,5.39L512,387.883L512,387.883z"/>
+                        <path style="fill:#FFAA99;" d="M512,387.883c0,2.965-2.425,5.39-5.39,5.39H5.39c-2.963,0-5.39-2.424-5.39-5.39V91.361  c0-2.963,2.425-5.39,5.39-5.39H506.61c2.964,0,5.39,2.426,5.39,5.39L512,387.883L512,387.883z"/>
+                        <path style="fill:#AADDC0;" d="M281.262,434.306c-2.935,0-5.39-2.459-5.39-5.39v-95.9c0-2.976,2.413-5.388,5.39-5.388h38.316  c2.978,0,5.39,2.413,5.39,5.388v95.692c0,4.042-4.507,6.683-8.035,4.696l-15.929-8.971l-17.193,9.233  C283.014,434.092,282.138,434.306,281.262,434.306z"/>
+                        <path style="fill:#EDE5CA;" d="M489.79,365.654c0,2.963-2.425,5.388-5.39,5.388H27.6c-2.964,0-5.39-2.424-5.39-5.388V83.083  c0-2.963,2.425-5.39,5.39-5.39h456.8c2.964,0,5.39,2.426,5.39,5.39V365.654z"/>
+                        <path style="fill:#FFF9E9;" d="M256,365.654c0,2.963-2.425,5.388-5.39,5.388H27.6c-2.964,0-5.39-2.424-5.39-5.388V83.083  c0-2.963,2.425-5.39,5.39-5.39h223.012c2.963,0,5.39,2.426,5.39,5.39v282.571H256z"/>
+                        <path style="opacity:0.1;enable-background:new    ;" d="M44.153,365.654V83.083c0-2.963,2.425-5.39,5.39-5.39H27.6  c-2.964,0-5.39,2.426-5.39,5.39v282.572c0,2.963,2.425,5.387,5.39,5.387h21.943C46.578,371.043,44.153,368.618,44.153,365.654z"/>
+                        <path style="fill:#E84731;" d="M139.105,263.963c-1.982,0-3.88-0.796-5.28-2.204L82.302,209.84  c-7.285-7.333-11.296-17.084-11.296-27.457c0-10.372,4.011-20.118,11.296-27.455c7.283-7.333,16.967-11.374,27.27-11.374  c10.301,0,19.987,4.041,27.271,11.374l2.262,2.278l2.262-2.278c7.285-7.333,16.968-11.374,27.271-11.374  c10.301,0,19.985,4.041,27.27,11.374c7.284,7.336,11.296,17.084,11.296,27.455c0,10.374-4.012,20.125-11.296,27.457l-51.523,51.919  C142.984,263.166,141.084,263.963,139.105,263.963z"/>
+                        <path style="opacity:0.1;enable-background:new    ;" d="M161.742,241.435c-1.983,0-3.88-0.794-5.28-2.204l-51.523-51.919  c-7.285-7.333-11.296-17.084-11.296-27.455c0-4.831,0.881-9.522,2.547-13.902c-5.156,1.916-9.885,4.944-13.887,8.974  c-7.285,7.336-11.296,17.084-11.296,27.455c0,10.374,4.011,20.125,11.296,27.457l51.523,51.919c1.4,1.409,3.297,2.204,5.28,2.204  c1.98,0,3.879-0.796,5.28-2.204l21.312-21.478C164.519,241.024,163.152,241.435,161.742,241.435z"/>
+                        <path style="fill:#FF8163;" d="M406.742,180.953c-0.868,0-1.702-0.349-2.317-0.968l-22.612-22.784  c-3.196-3.218-4.957-7.498-4.957-12.049c0-4.551,1.762-8.83,4.957-12.051c3.197-3.218,7.447-4.989,11.967-4.989  c4.521,0,8.772,1.771,11.967,4.989l0.993,1.002l0.993-1.002c3.198-3.218,7.447-4.989,11.968-4.989c4.52,0,8.771,1.771,11.967,4.989  c3.196,3.22,4.957,7.5,4.957,12.051c0,4.551-1.762,8.83-4.957,12.049l-22.609,22.784  C408.445,180.604,407.611,180.953,406.742,180.953z"/>
+                        <g>
+                            <path style="fill:#E84731;" d="M302.758,150.313h39.744c4.465,0,8.083-3.618,8.083-8.083c0-4.465-3.618-8.083-8.083-8.083h-39.744   c-4.465,0-8.084,3.618-8.084,8.083C294.674,146.696,298.293,150.313,302.758,150.313z"/>
+                            <path style="fill:#E84731;" d="M302.758,189.036h51.434c4.465,0,8.083-3.618,8.083-8.083s-3.618-8.083-8.083-8.083h-51.434   c-4.465,0-8.084,3.618-8.084,8.083S298.293,189.036,302.758,189.036z"/>
+                            <path style="fill:#E84731;" d="M302.758,227.759h133.869c4.465,0,8.083-3.618,8.083-8.083c0-4.465-3.618-8.083-8.083-8.083H302.758   c-4.465,0-8.084,3.618-8.084,8.083S298.293,227.759,302.758,227.759z"/>
+                            <path style="fill:#E84731;" d="M436.627,250.312H302.758c-4.465,0-8.084,3.621-8.084,8.085c0,4.465,3.62,8.083,8.084,8.083h133.869   c4.465,0,8.083-3.618,8.083-8.083C444.712,253.932,441.093,250.312,436.627,250.312z"/>
+                            <path style="fill:#E84731;" d="M436.627,289.034H302.758c-4.465,0-8.084,3.621-8.084,8.085c0,4.464,3.62,8.083,8.084,8.083h133.869   c4.465,0,8.083-3.621,8.083-8.083C444.712,292.654,441.093,289.034,436.627,289.034z"/>
+                        </g>
+                        <path style="fill:#CE3B2C;" d="M191.439,309.009H89.893c-4.465,0-8.084-3.618-8.084-8.083s3.62-8.083,8.084-8.083h101.546  c4.465,0,8.084,3.618,8.084,8.083S195.904,309.009,191.439,309.009z"/>
+                        <script xmlns=""/></svg>
+                   
+                  
+                </div>
+
+                <div id="info-card" style="display: flex;flex-direction: row;margin-left:20px ;cursor: pointer;" onclick="window.location.href='/user/historyentry'">
+                    
+                                    <div class="descript" style="display: flex; flex-direction: column; margin-left:20px ;padding: 5px;">
+                                        <span style="font-size:20px">
+                                            Journal Entry
+                                        </span>
+                                        <span style="margin-top: 10px;font-size: 16px; color: #023157;">
+                                            Record your health updates, symptoms, and daily experiences  to track your <br> well-being over time.
+                                        </span>
+                    
+                                    </div>
+                                    
+                                    <div style="align-self: center; margin-left: 100px;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="30px" width="30px" version="1.1" id="Layer_1" viewBox="0 0 512 512" xml:space="preserve">
+                                            <path style="fill:#23d3ff;" d="M256,512C114.839,512,0,397.156,0,256S114.839,0,256,0s256,114.844,256,256S397.161,512,256,512z"/>
+                                            <path style="fill:#23d3ff;" d="M512,256C512,114.844,397.161,0,256,0v512C397.161,512,512,397.156,512,256z"/>
+                                            <path style="fill:#FFFFFF;" d="M204.752,394.612c-5.408,0-10.72-2.621-13.933-7.469c-5.099-7.686-3-18.047,4.686-23.146  l164.568-109.165L195.505,145.666c-7.686-5.099-9.785-15.46-4.686-23.146c5.099-7.697,15.455-9.785,23.146-4.686l185.546,123.082  c4.664,3.098,7.469,8.317,7.469,13.916s-2.805,10.818-7.469,13.916L213.966,391.829  C211.128,393.709,207.921,394.612,204.752,394.612z"/>
+                                            <path style="fill:#FFE6B3;" d="M399.511,240.915l-142.824-94.744v40.079l103.386,68.581l-103.386,68.581v40.079l142.825-94.744  c4.664-3.098,7.469-8.317,7.469-13.916S404.175,244.013,399.511,240.915z"/>
+                                            <script xmlns=""/></svg>
+                                    </div>
 
                 </div>
-                
-                <div style="align-self: center; margin-left: 100px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="30px" width="30px" version="1.1" id="Layer_1" viewBox="0 0 512 512" xml:space="preserve">
-                        <path style="fill:#23d3ff;" d="M256,512C114.839,512,0,397.156,0,256S114.839,0,256,0s256,114.844,256,256S397.161,512,256,512z"/>
-                        <path style="fill:#23d3ff;" d="M512,256C512,114.844,397.161,0,256,0v512C397.161,512,512,397.156,512,256z"/>
-                        <path style="fill:#FFFFFF;" d="M204.752,394.612c-5.408,0-10.72-2.621-13.933-7.469c-5.099-7.686-3-18.047,4.686-23.146  l164.568-109.165L195.505,145.666c-7.686-5.099-9.785-15.46-4.686-23.146c5.099-7.697,15.455-9.785,23.146-4.686l185.546,123.082  c4.664,3.098,7.469,8.317,7.469,13.916s-2.805,10.818-7.469,13.916L213.966,391.829  C211.128,393.709,207.921,394.612,204.752,394.612z"/>
-                        <path style="fill:#FFE6B3;" d="M399.511,240.915l-142.824-94.744v40.079l103.386,68.581l-103.386,68.581v40.079l142.825-94.744  c4.664-3.098,7.469-8.317,7.469-13.916S404.175,244.013,399.511,240.915z"/>
+
+            </div>
+
+            <div class="card-pages journal-record"  style="margin-bottom: 30px;">
+                <div style="align-items: center; justify-content: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="90px" height="90px" viewBox="0 0 32 32">
+
+                        <defs>
+                        
+                        <style>.cls-1{fill:#dd2853;}.cls-2{fill:#e291a8;}</style>
+                        
+                        </defs>
+                        
+                        <title/>
+                        
+                        <g data-name="Layer 15" id="Layer_15">
+                        
+                        <path class="cls-1" d="M25.63,6.22l-5-4A1,1,0,0,0,20,2H7A1,1,0,0,0,6,3V16a1,1,0,0,0,1,1h8v2a1,1,0,0,0,1,1h9a1,1,0,0,0,1-1V7A1,1,0,0,0,25.63,6.22Z"/>
+                        
+                        <path class="cls-2" d="M29,18H17V16a1,1,0,0,0-1-1H5a2.73,2.73,0,0,0-3,2.44v9.39C2,28.61,3.76,30,6,30H26c2.24,0,4-1.39,4-3.17V19A1,1,0,0,0,29,18Z"/>
+                        
+                        <path class="cls-2" d="M25.63,6.22l-5-4A1,1,0,0,0,19,3V7a1,1,0,0,0,1,1h5a1,1,0,0,0,.63-1.78Z"/>
+                        
+                        <path class="cls-1" d="M18,23H17V22a1,1,0,0,0-2,0v1H14a1,1,0,0,0,0,2h1v1a1,1,0,0,0,2,0V25h1a1,1,0,0,0,0-2Z"/>
+                        
+                        <path class="cls-2" d="M11,11H21a1,1,0,0,0,0-2H11a1,1,0,0,0,0,2Z"/>
+                        
+                        <path class="cls-2" d="M21,12H11a1,1,0,0,0,0,2H21a1,1,0,0,0,0-2Z"/>
+                        
+                        </g>
+                        
                         <script xmlns=""/></svg>
+                  
                 </div>
+
+                <div id="info-card" style="display: flex;flex-direction: row;margin-left:20px ;cursor: pointer;" onclick="window.location.href='/user/checkhistory'">
+                    <div class="description" style="display: flex; flex-direction: column; margin-left:20px ;padding: 5px;">
+                        <span style="font-size:20px">
+                        Journal Record
+                        </span>
+                        <span style="margin-top: 10px;font-size: 16px; color: #023157;">
+                            Access your journal and AI chat history for a complete health summary.
+                        </span>
+    
+                    </div>
+                    
+                    <div style="align-self: center; margin-left: 100px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="30px" width="30px" version="1.1" id="Layer_1" viewBox="0 0 512 512" xml:space="preserve">
+                            <path style="fill:#23d3ff;" d="M256,512C114.839,512,0,397.156,0,256S114.839,0,256,0s256,114.844,256,256S397.161,512,256,512z"/>
+                            <path style="fill:#23d3ff;" d="M512,256C512,114.844,397.161,0,256,0v512C397.161,512,512,397.156,512,256z"/>
+                            <path style="fill:#FFFFFF;" d="M204.752,394.612c-5.408,0-10.72-2.621-13.933-7.469c-5.099-7.686-3-18.047,4.686-23.146  l164.568-109.165L195.505,145.666c-7.686-5.099-9.785-15.46-4.686-23.146c5.099-7.697,15.455-9.785,23.146-4.686l185.546,123.082  c4.664,3.098,7.469,8.317,7.469,13.916s-2.805,10.818-7.469,13.916L213.966,391.829  C211.128,393.709,207.921,394.612,204.752,394.612z"/>
+                            <path style="fill:#FFE6B3;" d="M399.511,240.915l-142.824-94.744v40.079l103.386,68.581l-103.386,68.581v40.079l142.825-94.744  c4.664-3.098,7.469-8.317,7.469-13.916S404.175,244.013,399.511,240.915z"/>
+                            <script xmlns=""/></svg>
+                    </div>
+
+                </div>
+
 
             </div>
 
@@ -339,30 +594,22 @@
 
 
     </div>
+
+    <div id="popup" style="display: none; top :0; left: 0; right: 0; bottom:0;height: 100vh;width: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 100;position: fixed;align-items: center;justify-content: center;">
+     <div style="width: 50%; margin-left: 50px;background-color: white;padding: 5px;  height: 200px;">
+        <canvas id="popgraph"> </canvas>
+     </div> 
+    </div>
+  
+
+  
 
     
             
       
-<!--    
-    <div class="container">
-        <h1 id="intro">Hellohow may i help you</h1>
-        
-        <div id="chat-container" style="display: block;"></div>
-        <div class="search-bar">
-            <input id = "question" type="text" placeholder="Ask me a question...">
-            <button id = "btn" type="submit" class="send-btn" style="visibility: hidden;">check</button>
-        </div>
-        <div class="suggestions">
-            <button id = "btn2">Book appointment with doctor</button>
-            
-        </div>
 
-        
-        <footer>
-         <div></div>
-        </footer>
-    </div> -->
     <script src="/script2.js"></script>
+    <!-- <script src="/eventscript.js"></script> -->
     
 </body>
 </html>

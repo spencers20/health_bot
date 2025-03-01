@@ -13,8 +13,10 @@
         padding: 0;
         background-color: #f4f4f7;
         color: #333;
-        /* overflow: hidden; */
-        overscroll-behavior: none;
+        height: 100vh;
+        display:flex;
+        flex-direction: column;
+       
     }
 
     
@@ -22,29 +24,59 @@
     
     .container {
         display: flex;
-        /* height: 100%; */
+        max-height: 80vh;
         width:100%;
         flex-direction: row;
         margin-top: 20px;
         
     }
-    
-    .sidebar {
-       height:450px;
-       width:20%;
-       position: fixed;
-       z-index: 5;
-       margin-top: 30px;
-       background-color: aliceblue;
-       overflow-x: hidden;
-       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-       border-radius: 12px;
-       margin-left: 30px;
-      }
-      .sidebar h1{
-        color: white;
-        margin-left: 20px;
-    }
+  
+
+
+    .inside-container {
+    background-color: white;
+    margin-top: 30px;
+    width: 70%;
+    max-height: 80vh;
+    margin-left: 25%;
+    flex-direction: column;
+    display: flex;
+    overflow-y:auto; /* Allows scrolling inside the container */
+    box-shadow: 0 4px 8px rgba(60, 66, 45, 0.1);
+    border-radius: 20px;
+    position: relative;
+}
+        
+    .headers {
+            display: flex;
+            width:98%; 
+            border-top: 2px solid rgb(78, 78, 78);  
+            margin-top: 20px; 
+            justify-content: center; 
+            gap: 40px; 
+            padding: 10px;
+            /* position: sticky; */
+            /* top: 20px; */
+            z-index: 100;
+            background-color: white;
+        }
+        .sidebar {
+   height:450px;
+   width:20%;
+   position: fixed;
+   z-index: 5;
+   margin-top: 30px;
+   background-color: aliceblue;
+   overflow-x: hidden;
+   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+   border-radius: 12px;
+   margin-left: 30px;
+  }
+  .sidebar h1{
+    color: white;
+    margin-left: 20px;
+}
+            
 
     .menu-icon{
         margin: 10px; 
@@ -75,40 +107,9 @@
     
             }
 
-            .inside-container {
-                background-color: white;
-                margin-top:30px;
-                width:70%;
-                max-height: 530px;
-                margin-left:25%;
-                flex-direction: column;
-                display:flex;
-                box-shadow: 0 4px 8px rgba(60, 66, 45, 0.1);
-                border-radius: 20px;
-                
 
-            }
 
-            .containerheader {
-                /* position: relative; */
-                margin-bottom: 1px;
-                margin-top: 50px; 
-                width: 100%; /* Length of the line */
-                height: 2px;
-                background-color: black;
-    
-                 /* Center line horizontally */
-            }
-
-            .headers {
-           /* position:relative; */
-                /* top:0; */
-                width:100%;
-                justify-content:space-around;
-                font-size: 16px;
-                display:flex;
-
-            }
+          
             .information {
                 /* position:relative; */
                 display: flex;
@@ -340,7 +341,7 @@
     </head>
     <body>
     
-        <div style="height: 80px; background-color: white; position:sticky;width:100%;top:1px">
+        <div style="height: 10vh; background-color: white; position:sticky;width:100%;top:1px">
             <div class="heading1" >
                    <h1>MYAFYA</h1>
             </div>
@@ -397,35 +398,37 @@
 
 
             <div class="inside-container">
-                <div class="containerheader"></div>
-                <div class="headers" style="display: flex; justify-content: center; gap: 30px; padding: 20px 0;   ">
-                    <p id="infos" style="cursor: pointer; font-weight: bold;" 
-                    onclick="
-                    changepage('information')
-                    // document.querySelector('.information').style.display='block',
-                    //  document.querySelector('.symptoms').style.display='none' ,
-                    //  document.querySelector('.condition').style.display='none', 
-                    //  document.getElementById('checkbtn').style.visibility='hidden'
-                     ">
-                     
-                     INFO</p>
-                    <p style="cursor: pointer; font-weight: bold;" 
-                       onclick="changepage('symptoms')
-                    //    document.querySelector('.information').style.display='none'; 
-                    //             document.querySelector('.symptoms').style.display='block';
-                    //             document.querySelector('.condition').style.display='none';
-                                ">
-                        SYMPTOMS
-                    </p>
-                    <p style="cursor: pointer; font-weight: bold;" 
-                       onclick="
-                       changepage('condition')
-                    //    document.querySelector('.information').style.display='none'; 
-                    //             document.querySelector('.symptoms').style.display='none';
-                    //             document.querySelector('.condition').style.display='block';
-                                ">
-                        MEDCHAT
-                    </p>
+                <div style="top:0;background-color: white;position: sticky;z-index: 100;" >
+                    <div class="headers" >
+                        <p id="infos" style="cursor: pointer; font-weight: bold;" 
+                        onclick="
+                        // changepage('information')
+                        document.querySelector('.information').style.display='flex',
+                         document.querySelector('.symptoms').style.display='none' ,
+                         document.querySelector('.condition').style.display='none', 
+                         document.getElementById('checkbtn').style.visibility='hidden'
+                         ">
+                         
+                         INFO</p>
+                        <p style="cursor: pointer; font-weight: bold;" 
+                           onclick="
+                        //    changepage('symptoms')
+                                   document.querySelector('.information').style.display='none'; 
+                                    document.querySelector('.symptoms').style.display='flex';
+                                    document.querySelector('.condition').style.display='none';
+                                    ">
+                            SYMPTOMS
+                        </p>
+                        <p style="cursor: pointer; font-weight: bold;" 
+                           onclick="
+                        //    changepage('condition')
+                           document.querySelector('.information').style.display='none'; 
+                                    document.querySelector('.symptoms').style.display='none';
+                                    document.querySelector('.condition').style.display='flex';
+                                    ">
+                            MEDCHAT
+                        </p>
+                    </div>
                 </div>
             
                 <div class="page information" style="display: flex; text-align: center;">
@@ -469,11 +472,10 @@
             
             
             
-                <div class="page symptoms" style="display:none ;overflow-y: hidden;">
+                <div class="page symptoms" style="width:100% ;gap:10px;  display:none; flex-direction: row;overflow-y: auto;">
                     
-                    <div id="symptom-sides" style ="width:100% ; gap:10px;  display:flex; flex-direction: row; justify-content: space-between; ">
-
-                    <div id="symptom-left-side" style="width:40%; flex-direction: column; margin:0px;  ">
+                    
+                    <div id="symptom-left-side" style="width:40%; flex-direction: column; top:20px;position: sticky; z-index: 100;max-height: 80vh; ">
                         <input id ="symptominput" type="text" placeholder="symptoms" >
                         <!-- <p style=" text-align:center; font-size:20px" >CHECK SYMPTOMS</p> -->
                         <div class="symptomconfirm" style=" display:none; margin-left:30px; width :100%;background-color: rgb(211, 214, 218); padding:10px;margin:10px;color:#333;border-radius: 5px;  ">
@@ -494,7 +496,7 @@
                     </div>
                     <div id="symptom-right-side" style="width :60%; margin-right:3px ; flex-direction: column; padding:10px;margin:10px">
                         <div style="  margin-right: 5px; width:100% " >
-                            <div class="conditions" style=" max-height:400px;flex-direction: column;  align-items:flex-start ;overflow: auto; background-color:  #f1f7f7;border-radius: 10px; display:flex; margin-bottom: 10px;padding:10px;margin:10px">
+                            <div class="conditions" style="  flex-direction: column;  align-items:flex-start ; background-color:  #f1f7f7;border-radius: 10px; display:flex; margin-bottom: 10px;padding:10px;margin:10px">
                                 <div class="genanime" style="display: flex; flex-direction: row;" ></div>   
 
                                <!-- <p id="managesymptomtittle" style="position: relative; text-align:center; font-size:20px ;margin-bottom: 5px" >MANAGE YOUR SYMPTOMS </p>  -->
@@ -505,7 +507,7 @@
                             </div> 
                         </div>  
 
-                    </div>
+                   
     
                     </div> 
     

@@ -14,7 +14,7 @@ router.use( async (req, res,next)=>{
     if (req.isAuthenticated()){
         next()
     } else{
-        res.status.send('user unauthenticated')
+        res.status(401).send('user unauthenticated')
     }
 })
 
@@ -134,6 +134,66 @@ router.get('/',
         res.render('chat.ejs',{user : req.user})
     }
 )
+
+router.post('/insertmetric',async(req,res)=>{
+    try{
+        const date=new Intl.DateTimeFormat('en-CA').format(new Date())
+        console.log('date.....',date)
+        const userId=req.user.googleId
+    
+        console.log('insert metric entereed')
+        const db=await getdb()
+        const metricscollection=db.collection('metrics')
+        const {metricvalues}=req.body
+        console.log('metricvalues...', metricvalues)
+        const metrictype=metricvalues.metrics
+        const mvalue=metricvalues.values
+        const results= await metricscollection.updateOne(
+            {
+                _id:userId
+            },
+            {
+                $push:{
+                    [metrictype]:{
+                        date:date,
+                         value:mvalue
+
+                    }
+                }
+            }
+        )
+
+        if (results.modifiedCount>0){
+            console.log('inserted...')
+            res.status(200).json(results)
+           
+        }
+    }catch(e){
+        console.log('errror in inserting into the database..',e)
+    }
+
+
+})
+
+router.get('/getmetrics', async(req,res)=>{
+    try{
+        console.log('getmetrics enteredd... ')
+        const db=await getdb()
+        const userId=req.user.googleId
+        const metricscollection= await db.collection('metrics')
+        const metricsresults= await metricscollection.findOne({
+            _id:userId
+        })
+    
+        if (metricsresults){
+            console.log('metrics', metricsresults)
+            res.status(200).json(metricsresults)
+        }
+    }catch(e){
+        console.log('getmetrics errror...',e)
+    }
+
+})
 
 
 // this url takes you to the symptom checker

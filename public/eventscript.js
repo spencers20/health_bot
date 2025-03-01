@@ -14,6 +14,7 @@ const saveevent=document.getElementById('saveevent')
 const settitle=document.getElementById('settitle')
 const setremwithai=document.getElementById('setremwithai')
 const setdescription=document.getElementById('setdescription')
+const eventathome=document.getElementById('eventhome-date')
 // const height
 let reminderresult
 let options
@@ -144,6 +145,7 @@ async function getevents(){
     try{
        const response =await fetch('/user/allevents')
        const event=await response.json()
+    //    console.log('events loaded')
     //    console.log(`events ${Object.values(events.events)}`)
        Array.isArray(event.events)?console.log("events is an array"):console.log('events is not an array')
        const events=event.events.sort((a,b)=>new Date(b.datedue)-new Date(a.datedue))
@@ -154,6 +156,7 @@ async function getevents(){
     }
 
 }
+
 
 function eventlist(events){ 
     try{
@@ -549,6 +552,7 @@ async function allfunctions(){
     const events= await getevents()
      eventlist(events)
      todayevents(events)
+
     
      const upcoming=await upcomingreminders()
      const uncompleted=await uncompletedreminders()

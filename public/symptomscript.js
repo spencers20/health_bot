@@ -4,6 +4,7 @@ const checksymptom =document.querySelector('.checksymptom')
 const symptomconfirm =document.querySelector('.symptomconfirm')
 const checkbtn=document.getElementById('checkbtn')
 const conditions=document.querySelector('.conditions')
+// const conditionpage=document.querySelector('.condition')
 const moreinfo=document.getElementById('moreinfo')
 const condition=document.querySelector('.condition')
 const symptom=document.querySelector('.symptoms')
@@ -206,7 +207,7 @@ symptomtextarea.addEventListener('keydown',async(e)=>{
         console.error('error in creating chat structure...',e)
     }
 
-})
+})  
 
 document.querySelector('.chat-textarea').addEventListener('keydown',async(e)=>{
     try{
@@ -357,16 +358,35 @@ checkbtn.addEventListener('click',async()=>{
     })
     
    
-    const response=await fetch('/askgroq',{
-        method:'POST',
-        headers:{
-            'Content-Type':'application/json'
-        },
-        body:JSON.stringify({message:messages})
-    })
+    // const response=await fetch('/askgroq',{
+    //     method:'POST',
+    //     headers:{
+    //         'Content-Type':'application/json'
+    //     },
+    //     body:JSON.stringify({message:messages})
+    // })
     
 
-    const result=await response.json()
+    // const result=await response.json()
+
+    const result=` I'd be happy to help with that. However, you haven't described the headache yet. Please provide more details about your headache, such as:
+
+* How long you've been experiencing it
+* The severity of the pain
+* Any triggers or factors that make it worse
+* Any other symptoms you're experiencing
+
+Once I have more information, I can provide some related treatment options.
+
+(Please keep in mind that I'm not a medical professional, and my responses should not be considered a substitute for professional medical advice.)
+
+Please go ahead and describe your headache, and I'll do my best to provide some helpful information.
+
+And remember, after considering the treatment options I provide, it's essential to consult a doctor for a proper diagnosis and personalized advice.
+
+So, please describe your headache, and I'll get started.
+
+And always, at the end of our conversation: **Please visit a doctor for proper evaluation and treatment.**`
     text=' MANAGING YOUR SYMPTOMS <br> <br>'+result 
 
     if(results){
@@ -381,7 +401,7 @@ checkbtn.addEventListener('click',async()=>{
             results.innerHTML = formattedText;
             conditions.appendChild(results)
             
-            moreinfo.style.display='block'
+            moreinfo.style.display='flex'
     },2000)
     }
     
@@ -402,88 +422,59 @@ checkbtn.addEventListener('click',async()=>{
 
 
 moreinfo.addEventListener('click',async()=>{
-    moreinfo.style.visibility='hidden'
-    checkbtn.style.visibility='hidden'
+    moreinfo.style.display='none'
+    symptom.style.display='none'
+    condition.style.display='flex' 
     const messages=addedsymptoms.join(',')
-    
+    text=['General information','Related Conditions',`${messages} variants`]
+    Array.from(subsuggestion).forEach((subsuggest,index)=>{
+        if(index<text.length){
+                subsuggest.textContent=text[index]
+        }
+})
     
     console.log('moreinfo clicked')
-
-
-
-    // const response=await fetch('/user/chat',{
-    //     method:'POST',
-    //     headers:{
-    //         'Content-Type':'application/json'
-    //     },
-    //     body:JSON.stringify({message:messages})
-    // })
-
-    const results=await response.json()
-    console.log(results)
-    if( response.ok){
-        symptom.style.display='none'
-        condition.style.display='block'
-        
-        const aboutsymptom=document.createElement('div')
-        aboutsymptom.classList.add('aboutsymptom')
-        checkedsymptoms.textContent='SYMPTOMS: '+ messages
-        document.getElementById('loadinginfo').style.display='none'
-        document.getElementById('userages').textContent=`Age :${userinfo.age}`
-        document.getElementById('usergenders').textContent=`Gender :${userinfo.gender}`
-        document.getElementById('yoursymptoms').textContent=`SYMPTOMS : ${messages}`
-
-        const formattedText=formatTextToHTML(results.text)
-
-    
-        aboutsymptom.innerHTML=formattedText
-        moreinformation.appendChild(aboutsymptom)
-    
-        relatdconditions.style.visibility='visible' 
-            
-    
-
-    }
-
-    
+  
 })
 
-const currentPage=document.querySelector('.information')
-currentPage.classList.add('active')
 
-function changepage(pageonview, direction='right'){
-    const newPage=document.querySelector(`${pageonview}`)
-    if(newPage==currentPage) return;
+
+// const currentPage=document.querySelector('.information')
+// currentPage.classList.add('active')
+
+// function changepage(pageonview, direction='right'){
+//     const newPage=document.querySelector(`${pageonview}`)
+//     if(newPage==currentPage) return;
     
-    if (direction==='right'){
-        currentPage.classList.remove('active')
-        currentPage.classList.add('off-left')
+//     if (direction==='right'){
+//         currentPage.classList.remove('active')
+//         currentPage.classList.add('off-left')
         
-        newPage.classList.remove('off-left','off-right')
-        newPage.classList.add('off-right')
+//         newPage.classList.remove('off-left','off-right')
+//         newPage.classList.add('off-right')
 
-        newPage.offsetWidth
-        newPage.classList.remove('off-right')
-        newPage.style.display='flex'
-        newPage.classList.add('active')
-    } else if(direction ==='left'){
-        currentPage.classList.remove('active')
-        currentPage.classList.add('off-right')
+//         newPage.offsetWidth
+//         newPage.classList.remove('off-right')
+//         newPage.style.display='flex'
+//         newPage.classList.add('active')
+//     } else if(direction ==='left'){
+//         currentPage.classList.remove('active')
+//         currentPage.classList.add('off-right')
 
-        newPage.classList.remove('off-right','off-left')
-        newPage.classList.add('off-left')
+//         newPage.classList.remove('off-right','off-left')
+//         newPage.classList.add('off-left')
 
-        newPage.offsetWidth
-        newPage.classList.remove('off-left')
-        newPage.style.display='flex'
-        newPage.classList.add('active')
-    }
+//         newPage.offsetWidth
+//         newPage.classList.remove('off-left')
+//         newPage.style.display='flex'
+//         newPage.classList.add('active')
+//     }
 
-    setTimeout(()=>{
-        currentPage.classList.remove('off-left','off-right')
-        currentPage=newPage
-    },500)
-}
+//     setTimeout(()=>{
+//         currentPage.classList.remove('off-left','off-right')
+//         currentPage=newPage
+//     },500)
+// }
 
 
 
