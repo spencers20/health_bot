@@ -58,7 +58,7 @@ try{
 
 app.get('/',(req , res)=>{
     console.log('entered')
-    res.render('records.ejs')
+    res.render('login.ejs')
 })
 // app.get('/symptomchecker',(req , res)=>{
 //     console.log('entered')
@@ -95,7 +95,8 @@ async function getsummary(instruction){
 app.post('/askgroq',async(req,res)=>{
     console.log('asking groq.....')
     const {message}=req.body
-    const instruction=`given the following ${message} , give me related treatement options and alwas finish by asking the user to alwas visit the doctor`
+    console.log('question asked...',message)
+    const instruction=` you are a health assistant who answers health related questions,given the following ${message} , give me related insights and answer the question correctly and alwas finish by asking the user to alwas visit the doctor`
     const results=await  getsummary(instruction)
     console.log('results from groq...',results)
     res.status(200).json(results)

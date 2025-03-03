@@ -3,14 +3,111 @@
 <head>  
     
 </head>
+<style>
+
+   body{
+      display:flex;
+      flex-direction: column;
+      background-color:rgb(248, 250, 249)
+   }
+
+   .middle{
+      display: flex;
+      align-items: center;
+      justify-self: center;
+      flex-direction: column;
+      margin-top: 40px;
+      background-color:(246, 248, 249)
+   }
+
+   .outertextarea{
+      height: auto; 
+      border: none;
+      outline: none;
+      width: 50%;
+      padding:12px;
+      margin-top:10px; 
+      border-radius: 7px;
+      min-height: 150px;
+      color: #333;
+      background-color: rgb(221, 221, 221);
+   }
+
+   .outertextarea :focus{
+      border-bottom: 2px solid blue;
+
+   }
+
+   #searchbtn{
+      height: 40px;
+      padding:12px;
+      margin:10px;
+      background-color: rgb(98, 98, 219);  
+      color:white;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer; 
+      }
+
+   .response{
+      width:60%;
+      background-color: rgb(255, 255, 255);
+      border-radius: 10px;
+      padding: 10px;
+      margin:10px;
+      color:#3e054d ;
+      /* display: none; */
+      display: block;
+      white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+
+   }
+
+   .fadedot{
+      animation: fadedot 1s infinite;
+   }
+
+   @keyframes fadedot {
+      0%{
+         opacity: 0;
+      }
+      50%{
+         opacity: 1;
+      }
+      100%{
+         opacity: 0;
+      }
+      
+   }
+</style>
 
 <body>
-    <header style="background-color: aqua;">
-        heading
+   <div class="head" style="top:0;height: 80px; background-color: rgb(226, 240, 237); display: flex;position: sticky;width: 100%;align-items: center; justify-content: space-between;">
+    <div style="margin: 10px;" >AFYASPHERE</div>
+    <div style="margin: 10px; cursor: pointer; border-radius: 5px; background-color: rgb(127, 116, 151); align-items: center;margin: 10px;padding: 10px;" onclick="window.location.href='/google'">login</div>
+   </div>
 
-    </header>
-    <p>
-        <a href="/google">login</a>
-    </p>
+   <div class="middle">
+      <div style="font-size: 30px;">
+         Get insights to your health related concerns
+      </div>
+
+      <textarea class="outertextarea"  placeholder="what are the variants of cold ?"></textarea>
+
+      <div style="margin:15px; max-width:40%;color:rgb(4, 26, 23) ;display: flex; flex-direction: row;align-items: center;justify-content: center;"> 
+         <svg xmlns="http://www.w3.org/2000/svg" width="60px" height="60px" viewBox="0 0 24 24" fill="none"><script xmlns=""/>
+            <g id="Warning / Warning">
+            <path id="Vector" d="M12 6V14M12.0498 18V18.1L11.9502 18.1002V18H12.0498Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            <script xmlns=""/></svg>
+         This tool is not a substitute for professional medical advice; always consult a healthcare professional before making any decisions.
+      </div>
+      <button id="searchbtn"> Check</button>
+
+      <div class="response"></div>
+
+   <script src="/script.js"></script>
+   
 </body>
 </html> 

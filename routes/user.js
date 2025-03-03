@@ -1097,7 +1097,7 @@ router.get('/allevents',async(req,res)=>{
         const events=await eventscollection.findOne({
             _id:userId,
         })
-        // console.log("events", events)
+        // console.log("events", events) .....,{Headers: {'Access-Control-Allow-Origin' : '*'}}
         res.status(200).json(events)
     }catch(e){
         console.error(`failed to get the events from the database ${e}`)
