@@ -15,6 +15,7 @@ const { get } = require('http');
 const { CommandStartedEvent } = require('mongodb');
 const Groq=require('groq-sdk')
 const nodemailer=require('nodemailer')
+const bcrypt=require('bcrypt')
 
 
 // const collection=require('./database')
@@ -55,6 +56,45 @@ try{
 } catch(e){
     console.error(`error in cron : ${e}`)
 }
+
+app.post('/loginuser', async (req, res) => {
+    try {
+        console.log('Logging in user...');
+        
+        const { userId, password } = req.body;
+        console.log('User ID:', userId);
+
+        const db = await getdb();
+        const userCollection = db.collection('users');
+
+        // Fetch user from DB
+        const user = await userCollection.findOne({ _id: userId });
+
+        // Handle invalid user
+        if (!user) {
+            console.log('User not found');
+            return res.status(400).send('Please enter a valid ID');
+        }
+
+        // Verify password
+        const confirmedPass = await bcrypt.compare(password, user.password);
+        if (!confirmedPass) {
+            console.log('Incorrect password');
+            return res.status(400).send('Enter the correct password');
+        }
+
+        console.log('User authenticated:', user);
+
+        // Redirect to user page
+        return res.redirect('/user');
+        // return res.render('chat.ejs')
+
+    } catch (e) {
+        console.error('Error in logging in user:', e);
+        return res.status(500).send('Internal Server Error');
+    }
+});
+
 
 app.get('/',(req , res)=>{
     console.log('entered')

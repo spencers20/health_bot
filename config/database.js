@@ -97,5 +97,53 @@ async function resetactiveChatIds(){
 } 
 
 
-module.exports={savesession, getcollection,initializecollection, getdb, resetactiveChatIds}
+function generatemyid(myname){
+    let letters;
+    const randomnumber=Math.floor(Math.random()*1e10).toString()
+    const number=randomnumber.slice(0,6)
+    console.log('random number generated...',number)
+
+    const name=myname.trim().split(" ") //split name to an array
+    if (name.length<2){
+        letters=name[0][0].toUpperCase()+name[0][2].toUpperCase()
+    }else{
+        letters=name[0][0].toUpperCase()+name[1][0].toUpperCase()
+    }
+
+    const myid=letters+number
+    console.log('geneeratesd id..',myid)
+    return myid
+}
+
+//function to sendmail
+async function sendmail(to,subject,body){
+    try{
+
+        const transporter=nodemailer.createTransport({
+            service:"gmail",
+            port:587,
+            secure:false,
+            auth:{
+                user:"spencernyaenya@gmail.com",
+                pass:"jiml nuuw vmui glda"
+            }
+        }
+        )
+    
+        const aboutmail={
+            from:'"Afyasphere" <spencernyaenya@gmail.com>',
+            subject:subject || 'Health update',
+            text:body,
+            to:to
+        }
+        const infomail= await transporter.sendMail(aboutmail)
+        console.log(infomail)
+        return(infomail)
+    }catch(e){
+        console.error('error in sending email...',e)
+    }
+}
+
+
+module.exports={savesession, generatemyid, sendmail,initializecollection, getdb, resetactiveChatIds}
 // module.exports =savesession.collection

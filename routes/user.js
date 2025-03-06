@@ -7,8 +7,13 @@ const PDFDocument =require('pdfkit')
 const fs=require('fs')
 const { group } = require('console')
 const cron=require('node-cron')
+const { google } = require('googleapis')
+const {generatemyid,sendmail}=require('../config/database')
+const bcrypt=require('bcrypt')
+const Nodecache=require('node-cache')
+const { userInfo } = require('os')
 
-
+const cache=new Nodecache({stdTTL:60})
 
 router.use( async (req, res,next)=>{
     if (req.isAuthenticated()){
@@ -50,6 +55,8 @@ async function sendToFLowise(flowisedata){
     }
     
 }
+
+
 
 //get summaries from the users input
 async function querymodel(instruction){
@@ -119,19 +126,27 @@ function containsnull(obj){
 
 router.get('/',
     async (req , res)=>{
-        console.log(req.user)
-        const db= await getdb()
-        const users=db.collection('users')
-        const userId=req.user.googleId
+        try{
+            console.log(req.session.user)
+            console.log('user logged in')
+            const user=req.user.user
+            const nurse=req.user.nurse
+            console.log('nurse/...',nurse)
 
-        const details=await users.findOne({googleId:userId})
-
-        if(!details){
-            throw new Error("no user found")
+            if (!nurse){
+                return res.render('chat.ejs',{user})
+            } else{
+                return res.render('chat.ejs',{user,nurse})
+            }
+  
+          
+    
+        }catch(e){
+            console.error('error in the home page...',e)
         }
-        console.log(JSON.stringify(details, null, 2))
 
-        res.render('chat.ejs',{user : req.user})
+
+        
     }
 )
 
@@ -1103,34 +1118,7 @@ router.get('/allevents',async(req,res)=>{
         console.error(`failed to get the events from the database ${e}`)
     }
 })
-//function to sendmail
-async function sendmail(to,subject,body){
-    try{
 
-        const transporter=nodemailer.createTransport({
-            service:"gmail",
-            port:587,
-            secure:false,
-            auth:{
-                user:"spencernyaenya@gmail.com",
-                pass:"jiml nuuw vmui glda"
-            }
-        }
-        )
-    
-        const aboutmail={
-            from:'"afya24-7" <spencernyaenya@gmail.com>',
-            subject:subject || 'Health update',
-            text:body,
-            to:to
-        }
-        const infomail= await transporter.sendMail(aboutmail)
-        console.log(infomail)
-        return(infomail)
-    }catch(e){
-        console.error('error in sending email...',e)
-    }
-}
 
 //function to set an event uncomplete
 
