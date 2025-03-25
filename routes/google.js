@@ -1,12 +1,176 @@
 const express=require('express')
 const router=express.Router()
 const passport=require('passport')
-const {getdb,generatemyid,sendmail}=require('../config/database')
+const {getdb,sendmail}=require('../config/database')
 const bcrypt=require('bcrypt')
+const multer=require('multer')
+const { file } = require('pdfkit')
+const {generatemyid,querymodel}=require('../config/reuse')
+
+
 
 
 router.use(express.json())
 
+const storage=multer.diskStorage({
+    destination:(req, file,cb)=>{
+        cb(null,'images/')
+    },
+    filename:(req,file,cb)=>{
+        cb(null,Date.now()+'-'+file.originalname)
+    }
+})
+
+const fileFilter=(req,file,cb)=>{
+    const allowedtypes=['image/jpeg', 'image/png', 'application/pdf']
+    allowedtypes.includes(file.mimetype)?cb(null,true):cb(new Error('Invalid file'))
+
+}
+const upload=multer({storage,fileFilter})
+
+//creating user doctor to the system
+router.post('/createdoc',upload.single('photo'),async(req,res)=>{
+    try{
+        const db=await getdb()
+        let docname=req.body.name
+        const instruction=`given the following speciality of a doctor ${req.body.speciality} generate a brief description about speciality example for GP , "Provides general healthcare and treats common illnesses."your response should   return only the brief description nothing more and should generally have a maximum of 8 words only`
+        const description=await querymodel(instruction)
+        const docs=await db.collection('doctors')
+        const doclicense=await docs.findOne({licensenumber:req.body.licensenumber})
+        if(doclicense){
+            res.status(200).json({message:'Doctor already in system,'})
+            return
+        }
+        
+        let docid
+        let docidindb
+        let attempts=0
+        let maxattempts=10
+        do{
+           const genid=generatemyid(docname)
+           docid='D'+genid.slice(2,9)+genid.slice(0,2)
+           docidindb=await docs.findOne({
+            _id:docid
+           })
+           attempts++
+           if(attempts>maxattempts){
+            throw new Error('Failed to generate docid, try again')
+           }
+            
+        }while(docidindb)
+
+        const  doctor={
+            _id:docid,
+            name:docname,
+            id:req.body.id,
+            licensenumber:req.body.licensenumber,
+            speciality:req.body.speciality,
+            description:description,
+            phone:req.body.phonenumber,
+            birthdate:req.body.birthdate,
+            image:`http://localhost:3000/${req.file.path}`,
+            imagefileType:req.file.mimetype,
+            role:'Doctor',
+            status:'closed'
+
+        }
+        console.log('doctor details/..',doctor)
+        
+        const insertdoc=await docs.insertOne(doctor)
+        console.log('inserteddoc....',insertdoc)
+        if(insertdoc.acknowledged){
+            const email=req.body.email
+            console.log('new doctoe created')
+            const subject='Doctor Account created successfully'
+            const body=`Here is your Doctor Id  ${docid}, use it as your username to login into your app , use  your national id as your password`
+            const sentmail=await sendmail(email,subject,body)
+            console.log('email sent...',sentmail)
+
+            if(insertdoc.insertedId==docid ){
+                console.log('Doctor...inserted successfully...',docid)
+                sentmail.accepted.length>0?res.status(200).json({message:'The Doctor has been added successfully. Please ask them to check their email for further details.'}):res.status(200).json({message:'Doctor created successfully, check db for details'})
+
+                }
+
+        }
+
+    }catch(e){
+        console.log('error in creating doc..',e)
+        res.json({error:'error in creating doc'})
+    }
+})
+
+router.post('/createnurse',upload.single('photo'),async(req,res)=>{
+    try{
+        const db=await getdb()
+        let nursename=req.body.name
+        const imageurl=req.file?`http://localhost:3000/${req.file.path}`:''
+        const imagefiletype=req.file?req.file.mimetype:''
+        const nursecollection=await db.collection('nurses')
+        const nurseindb=await nursecollection.findOne({
+            licensenumber:req.body.licensenumber
+        })   
+        if(nurseindb){
+            res.status(200).json({message:'Nurse already in system,'})
+            return
+        }
+        
+        let nurseid
+        let nurseidindb
+        let attempts=0
+        let maxattempts=10
+        do{
+            const genid=generatemyid(nursename)
+            nurseid='N'+genid.slice(2,9)+genid.slice(0,2)
+            nurseidindb=await nursecollection.findOne({
+                _id:nurseid
+            })
+            attempts++
+
+            if(attempts>maxattempts){
+                throw new Error('Maximum attempts reached , try again to add nurse to system')
+            
+            }
+
+        }while(nurseidindb)
+       
+        const  nurse={
+            _id:nurseid,
+            name:nursename,
+            id:req.body.id,
+            licensenumber:req.body.licensenumber,
+            phone:req.body.phonenumber,
+            birthdate:req.body.birthdate,
+            email:req.body.email,
+            image:imageurl,
+            fileType:imagefiletype,
+            role:'Nurse',
+            status:'active'
+
+        }
+       
+        const insertnurse=await db.collection('nurses').insertOne(nurse)
+        if(insertnurse.acknowledged){
+            const email=req.body.email
+            console.log('new nurse created')
+            const subject='Nurse Account created successfully'
+            const body=`Here is your Nurse Id  ${nurseid}, use it as your username to login into your app , use  your national id as your password`
+            const sentmail=await sendmail(email,subject,body)
+            console.log('email sent...',sentmail)
+
+            if(insertnurse.insertedId==nurseid ){
+                console.log('user...inserted successfully...',nurseid)
+                sentmail.accepted.length>0?res.status(200).json({message:'The nurse has been added successfully. Please ask them to check their email for further details.'}):res.status(200).json({message:'Nurse created successfully, check db for details'})
+
+                }
+
+        }
+
+    }catch(e){
+        console.log('error in creating nurse..',e)
+        res.json({error:'error in creating nurse'})
+    }
+})
 
 router.get('/',
     passport.authenticate('google', { scope: ['profile','email'] })
@@ -24,7 +188,7 @@ router.get('/callback',
 router.post('/createuser',async(req,res)=>{
     try{
         console.log('creating user...')
-        const {myname,mail,password}=req.body
+        const {myname,mail,password,gender,birthdate,disordervalue}=req.body
         const  db=await getdb()
         const usercollection=await db.collection('users')
         console.log(`credentials ..${myname},.${mail}.${password}`,)
@@ -34,9 +198,18 @@ router.post('/createuser',async(req,res)=>{
         // const mail=credentials.email
         let myid;
         let user;
+        let attempts=0
+        let maxattempts=10
         do{
             myid=generatemyid(myname)
             user=await usercollection.findOne({_id:myid})
+
+            attempts++
+
+            if(attempts>maxattempts){
+                throw new Error('Maximum attempts reached , try again to add nurse to system')
+            
+            }
 
         } while(user)
 
@@ -45,7 +218,10 @@ router.post('/createuser',async(req,res)=>{
                 name:myname,
                 email:mail,
                 password:hashedpassword,
-                role:'PersonOfCare'
+                age:birthdate,
+                gender:gender,
+                role:'PersonOfCare',
+                disorder:disordervalue
             }
 
         const newuser=await usercollection.insertOne(mycredentials)
@@ -64,49 +240,11 @@ router.post('/createuser',async(req,res)=>{
         }
   
 
-    }catch(e){
+     }catch(e){
         console.error('error in creating user...',e)
     }
 
 })
-
-
-// router.post('/loginuser', async (req, res) => {
-//     try {
-//         console.log('Logging in user...');
-        
-//         const { userId, password } = req.body;
-//         console.log('User ID:', userId);
-
-//         const db = await getdb();
-//         const userCollection = db.collection('users');
-
-//         // Fetch user from DB
-//         const user = await userCollection.findOne({ _id: userId });
-
-//         // Handle invalid user
-//         if (!user) {
-//             console.log('User not found');
-//             return res.status(400).send('Please enter a valid ID');
-//         }
-
-//         // Verify password
-//         const confirmedPass = await bcrypt.compare(password, user.password);
-//         if (!confirmedPass) {
-//             console.log('Incorrect password');
-//             return res.status(400).send('Enter the correct password');
-//         }
-
-//         console.log('User authenticated:', user);
-
-//         // Redirect to user page
-//         return res.redirect('/user');
-
-//     } catch (e) {
-//         console.error('Error in logging in user:', e);
-//         return res.status(500).send('Internal Server Error');
-//     }
-// });
 
 
 
@@ -134,13 +272,15 @@ router.post('/loginuser', (req, res, next) => {
             // Redirect based on user role
             if (user.role === 'PersonOfCare') {
                 console.log('user is personof care')
-                // req.session.user=req.user
+                req.session.user=req.user
                    return res.json({redirect:'/user'});
                 // return res.render('chat.ejs',{user})
-            } else if (user.role === 'doctor') {
-                return res.json({redirect:'/doctor'});
+            } else if (user.role === 'Doctor') {
+                console.log('user is a doctor')
+                req.session.doc=req.user
+                return res.json({redirect:'/doctors'});
             } else {
-                return res.json({redirect:'/nurse'});
+                return res.json({redirect:'/admin'});
             }
         });
     })(req, res, next); // Call Passport manually
@@ -155,4 +295,6 @@ router.post('/usernurse',
         return res.json({redirect:'/user'})
     }
 )
+
+
 module.exports= router

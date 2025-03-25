@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -26,10 +27,10 @@
         }
         .history-main{
             margin-top:20px ;
-            height:100%;
+            max-height:100vh;
             overflow: hidden ;
             display:flex;
-            background-color:rgb(233, 233, 241);
+           
 
         }
 
@@ -56,7 +57,7 @@
             padding: 20px;
             width:65%;
             background-color: rgb(255, 255, 255);
-            height:450px;
+            max-height: 80vh;
             z-index: 1;
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -76,6 +77,7 @@
             justify-content: center;
             padding: 5px;
             cursor: pointer;
+            /* gap:20px */
             /* border-bottom:1px solid rgb(184, 190, 190) ; */
            
             /* border-right-style: solid;
@@ -143,11 +145,11 @@
     #save:hover {
         background-color: #e1e1f1;
     }
-</style>
+</style> 
 
 </head>
 <body>
-    <div class ="history-upbar">
+    <!-- <div class ="history-upbar">
 
         <p style=" margin-left:600px; text-align: center ; font-size: 30px; font-weight: bold;"> AFYASPHERE
             <p>
@@ -155,7 +157,8 @@
 
 
 
-    </div>  
+    </div>   -->
+    <div class="header-container" style="position: sticky;"></div>
 
     
     <div class="history-main">
@@ -165,30 +168,51 @@
                 <p style="font-size: 14px;margin-top: 0px;color: #777;"> keep record of your wellbeing</p>
             </div>
     
-            <div id="newentry" class="entries" style="margin-top:30px ;">
-                <svg  style="margin-bottom:10px;  "xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <!-- Circle -->
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <!-- Vertical Line of Plus -->
-                    <line x1="12" y1="8" x2="12" y2="16"></line>
-                    <!-- Horizontal Line of Plus -->
-                    <line x1="8" y1="12" x2="16" y2="12"></line>
-                  </svg>
-                  
-    
-                  <span style=" margin-right:40px ;margin-left :10px ;font-size: 17px; margin-bottom: 10px;"> New entry</span>
-                  
-    
-            </div>
+        
 
-            <span class="entries"  onclick="window.location.href='/user/'">
+            <div class="entries"  onclick="window.location.href='/user/'">
             
                 <svg  style="margin-right:10px ; " xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" viewBox="0 0 24 24" fill="none"><path d="M9 20H7C5.89543 20 5 19.1046 5 18V10.9199C5 10.336 5.25513 9.78132 5.69842 9.40136L10.6984 5.11564C11.4474 4.47366 12.5526 4.47366 13.3016 5.11564L18.3016 9.40136C18.7449 9.78132 19 10.336 19 10.9199V18C19 19.1046 18.1046 20 17 20H15M9 20V14C9 13.4477 9.44772 13 10 13H14C14.5523 13 15 13.4477 15 14V20M9 20H15" stroke="#464455" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             
             <span  style=" margin-right:63px ; font-size: 17px; margin-bottom: 10px; cursor:pointer; align-self: center;"> Home  </span>
-        </span>
+            </div>
 
+        <div class="entries" onclick="window.location.href='/user/symptomchecker'">
+            <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24">
+                <!-- Clipboard -->
+                <rect x="12" y="4" width="40" height="56" rx="4" ry="4" fill="#f0f0f0" stroke="#000" stroke-width="2"/>
+                <rect x="12" y="4" width="40" height="10" rx="2" ry="2" fill="#a0a0a0"/>
+                
+                <!-- Checkmark -->
+                <path d="M20 32l8 8 16-16" stroke="#28a745" stroke-width="4" fill="none"/>
+              </svg>   
+              
+ 
+              <span style="margin-left :10px ;font-size: 17px; margin-bottom: 10px;"> Check Symptom</span>
+              
+        </div>
+         
+        <div class="entries" onclick="window.location.href='/user/doctorspage'">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000" height="24px" width="24px" version="1.1" id="Capa_1" viewBox="0 0 201.324 201.324" xml:space="preserve"><script xmlns=""/>
+                <circle cx="95.596" cy="10.083" r="10.083"/>
+                <circle cx="149.018" cy="10.083" r="10.083"/>
+                <path d="M179.06,19.254c-5.123-8.873-14.298-14.17-24.544-14.17v10c6.631,0,12.568,3.428,15.884,9.17  c3.316,5.743,3.316,12.599,0.001,18.342l-32.122,55.636c-3.315,5.742-9.253,9.17-15.884,9.171c-6.631,0-12.569-3.428-15.885-9.171  L74.389,42.595c-3.315-5.742-3.315-12.599,0-18.341s9.254-9.171,15.885-9.171v-10c-10.246,0-19.422,5.297-24.545,14.171  s-5.123,19.468,0,28.341l32.121,55.636c4.272,7.399,11.366,12.299,19.545,13.727v26.832c0,26.211-15.473,47.535-34.492,47.535  c-19.019,0-34.491-21.324-34.491-47.535v-31.948C59.802,109.52,68.4,99.424,68.4,87.356c0-13.779-11.21-24.989-24.989-24.989  s-24.989,11.21-24.989,24.989c0,12.067,8.598,22.163,19.989,24.486v31.948c0,31.725,19.959,57.535,44.492,57.535  c24.532,0,44.491-25.81,44.491-57.535v-26.832c8.178-1.428,15.273-6.328,19.544-13.727l32.122-55.636  C184.184,38.722,184.184,28.127,179.06,19.254z"/>
+                <script xmlns=""/></svg>
+ 
+              <span style="margin-left :15px ;font-size: 17px; margin-bottom: 10px;">Doctor Access</span>
+              
+        </div>
+
+
+
+        <div class="entries" onclick="window.location.href='/user/events'">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 64 64" stroke-width="3" stroke="#000000" fill="none"><path d="M36.66,54.45H8.84A2.5,2.5,0,0,1,6.35,52V12.12A2.49,2.49,0,0,1,8.84,9.63H48.68a2.49,2.49,0,0,1,2.49,2.49v22.4"/><line x1="6.35" y1="20.63" x2="51.17" y2="20.63"/><line x1="16.46" y1="9.63" x2="16.46" y2="4.63"/><line x1="40.42" y1="9.63" x2="40.42" y2="4.63"/><circle cx="45.22" cy="45.44" r="12.43"/><polyline points="45.22 36.7 45.22 45.82 49.57 49.16"/><script xmlns=""/></svg>
+              
+
+              <span id="starred" style="margin-left :10px ;font-size: 17px; margin-bottom: 10px;"> Event Scheduler</span>
+              
+        </div>
             
     
             <div class="entries"  onclick="window.location.href='/user/checkhistory'">
@@ -205,30 +229,9 @@
                   
             </div>
     
-            <div class="entries" onclick="window.location.href='/user/events'">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 64 64" stroke-width="3" stroke="#000000" fill="none"><path d="M36.66,54.45H8.84A2.5,2.5,0,0,1,6.35,52V12.12A2.49,2.49,0,0,1,8.84,9.63H48.68a2.49,2.49,0,0,1,2.49,2.49v22.4"/><line x1="6.35" y1="20.63" x2="51.17" y2="20.63"/><line x1="16.46" y1="9.63" x2="16.46" y2="4.63"/><line x1="40.42" y1="9.63" x2="40.42" y2="4.63"/><circle cx="45.22" cy="45.44" r="12.43"/><polyline points="45.22 36.7 45.22 45.82 49.57 49.16"/><script xmlns=""/></svg>
-                  
+          
     
-                  <span id="starred" style="margin-left :10px ;font-size: 17px; margin-bottom: 10px;"> Event Scheduler</span>
-                  
-            </div>
-    
-            <div class="entries" onclick="window.location.href='/user/symptomchecker'">
-                <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24">
-                    <!-- Clipboard -->
-                    <rect x="12" y="4" width="40" height="56" rx="4" ry="4" fill="#f0f0f0" stroke="#000" stroke-width="2"/>
-                    <rect x="12" y="4" width="40" height="10" rx="2" ry="2" fill="#a0a0a0"/>
-                    
-                    <!-- Checkmark -->
-                    <path d="M20 32l8 8 16-16" stroke="#28a745" stroke-width="4" fill="none"/>
-                  </svg>   
-                  
-                  
-                  
-     
-                  <span style="margin-left :10px ;font-size: 17px; margin-bottom: 10px;"> Check Symptom</span>
-                  
-            </div>
+            
     
     
     
@@ -243,24 +246,42 @@
                 </span>
             </div>
            <div class="border-line"></div>
-           <div class="calender" style="margin-top: 10px; ">
-               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
-              <span id="currentdate" style="font-size: 20px; margin-left: 10px;">  </span>
+           <div class="newentry-n-page" style="margin-top: 10px; gap:78%">
+            <div id="newentry" class="entries" style="margin-top:30px ;">
+                <svg  style="margin-bottom:10px;  "xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- Circle -->
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <!-- Vertical Line of Plus -->
+                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                    <!-- Horizontal Line of Plus -->
+                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                  </svg>
+                  
+    
+                  <span style=" margin-right:40px ;margin-left :10px ;font-size: 17px; margin-bottom: 10px;"> New entry</span>
+                  
+    
+            </div>
+
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar">
+                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                 <line x1="16" y1="2" x2="16" y2="6"></line>
+                 <line x1="8" y1="2" x2="8" y2="6"></line>
+                 <line x1="3" y1="10" x2="21" y2="10"></line>
+               </svg>
+               <span id="currentdate" style="font-size: 20px; margin-left: 10px;">  </span>
+            </div>
 
            </div>
            <div class="border-line"></div>
-           <textarea  id="describe"name="description"  placeholder="Describe how you feel. Example: 
+           <textarea  id="describe"name="description" style="padding: 10px; margin-right: 10px; width:99%" placeholder="Describe how you feel. Example: 
 
            Today started with an uneasy feeling in my stomach—an odd mix of dull pain and bloating. By midday, the discomfort turned into sharp, twisting cramps that made it hard to focus. Eating only made it worse, and waves of nausea came and went. I tried sipping warm tea, but relief was temporary. The pain lingered, making me sluggish and uneasy. By evening, rest and hydration helped slightly, but the discomfort still sat like a heavy knot in my stomach. Hopefully, tomorrow brings relief." style="width:100%; height: 300px; border:none; outline:none;margin-top: 10px; font-size: 16px;"></textarea>
         </div>
     </div>
- 
-
+    
+    <script src="/header.js" ></script>
     <script src="/historyscript.js"> </script>
 </body>
 </html>

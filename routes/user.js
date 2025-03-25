@@ -8,20 +8,19 @@ const fs=require('fs')
 const { group } = require('console')
 const cron=require('node-cron')
 const { google } = require('googleapis')
-const {generatemyid,sendmail}=require('../config/database')
+const {sendmail}=require('../config/database')
 const bcrypt=require('bcrypt')
 const Nodecache=require('node-cache')
 const { userInfo } = require('os')
-
+const {isAuthenticated}=require('../middleware/auth')
 const cache=new Nodecache({stdTTL:60})
+const puppeteer=require('puppeteer')
+const {querymodel}=require('../config/reuse')
 
-router.use( async (req, res,next)=>{
-    if (req.isAuthenticated()){
-        next()
-    } else{
-        res.status(401).send('user unauthenticated')
-    }
-})
+
+
+
+router.use(isAuthenticated);
 
 router.use(express.json())
 
@@ -59,31 +58,7 @@ async function sendToFLowise(flowisedata){
 
 
 //get summaries from the users input
-async function querymodel(instruction){
-    const  groq = new Groq({api_key:process.env.GROQ_API_KEY})
-    try{
 
-        const chatCompletions=await groq.chat.completions.create({
-            messages :[
-                {
-                    role:"user",
-                    content: instruction
-                }
-            ],
-            model:"llama-3.3-70b-versatile",
-            temperature:1,
-        })
-        console.log(`chatCompletions: ${chatCompletions}`)
-
-        const summary=chatCompletions.choices[0]?.message?.content || "No summary found"
-
-        return summary
-    } catch(e){
-        console.log(`error in generating summaries ${e}`)
-    }
-
-
-}
 
 function containsnull(obj){
     try{
@@ -128,60 +103,149 @@ router.get('/',
     async (req , res)=>{
         try{
             console.log(req.session.user)
-            console.log('user logged in')
+            console.log('user logged in',req.user)
+            // console.log('nurse/...',nurse)
+            // console.log(user)
             const user=req.user.user
+           
             const nurse=req.user.nurse
-            console.log('nurse/...',nurse)
-
             if (!nurse){
-                return res.render('chat.ejs',{user})
+                req.session.user=req.user
+                return res.render('chat.ejs',{user:req.user})
             } else{
+                req.session.user=req.user.user
                 return res.render('chat.ejs',{user,nurse})
             }
-  
-          
     
         }catch(e){
             console.error('error in the home page...',e)
         }
-
-
         
     }
 )
 
+router.get('/logout',async(req,res)=>{
+    try{
+        delete req.session.user
+        return res.render('index.ejs')
+
+    }catch(e){
+        console.errror('errroe in logging out user',e)
+    }
+})
+
+router.get('/nursenme',async(req,res)=>{
+    try{
+        const user=req.session.user
+        const nurse=req.user?req.user.nurse:""
+        res.status(200).json({user,nurse})
+
+    }catch(e){
+        console.log('error sending nurse and user')
+    }
+})
 router.post('/insertmetric',async(req,res)=>{
     try{
-        const date=new Intl.DateTimeFormat('en-CA').format(new Date())
-        console.log('date.....',date)
-        const userId=req.user.googleId
-    
         console.log('insert metric entereed')
+        const date=new Intl.DateTimeFormat('en-CA').format(new Date())
+        // const report
+        console.log('date.....',date)
+        const amuser=req.user.user
+        const nurse=req.user.nurse
         const db=await getdb()
-        const metricscollection=db.collection('metrics')
-        const {metricvalues}=req.body
-        console.log('metricvalues...', metricvalues)
-        const metrictype=metricvalues.metrics
-        const mvalue=metricvalues.values
-        const results= await metricscollection.updateOne(
+        const metricscollection=db.collection('allmetrics')
+        const reportscollection=db.collection('reports')
+        const allmetrics=req.body
+        req.session.metrics=allmetrics
+        console.log('metricvalues...', allmetrics)
+        // const metrictype=metricvalues.metrics
+        // const mvalue=metricvalues.values
+        if (!nurse){
+          
+         res.json({success:false,message:'Fill in with the approval of a nurse'}) 
+        } 
+        nursedetails={
+            id:nurse._id,
+            name:nurse.name
+        }
+        
+        console.log('am user ...', amuser)
+        const userId=amuser._id
+        const userfound=await reportscollection.findOne(
             {
-                _id:userId
-            },
-            {
-                $push:{
-                    [metrictype]:{
-                        date:date,
-                         value:mvalue
+            _id:userId
+            }
+    )
+        if(!userfound){
+            await reportscollection.insertOne({
+                _id:userId,
+                name:amuser.name,
+                birthdate:amuser.age,
+                gender:amuser.gender,
+                reports:[]
+            })
+        } 
 
+        const metricuser=await metricscollection.findOne({
+            _id:userId
+        })
+
+        if(!metricuser){
+            await metricscollection.insertOne(
+                {
+                    _id:userId
+                }
+            )
+        }
+      
+        
+        const repoid=new Date()
+        console.log('new repo id...',repoid)
+
+
+        const [reportupdate,metricupdate]=await Promise.all([
+
+            reportscollection.updateOne(
+                {
+                    _id:userId
+                },
+                {$push:{
+                    reports:{
+                        reportId:repoid,
+                        status:'pending',
+                        metrics:allmetrics,
+                        nurse:nursedetails,
+
+    
+                    } 
+                }
+                }
+            ),
+            metricscollection.updateOne(
+                {
+                    _id:userId
+                },
+                {
+                    $push:{
+                        metrepos:{
+                            date:repoid,
+                            metrics:allmetrics
+                        }
                     }
                 }
-            }
-        )
+            )
 
-        if (results.modifiedCount>0){
+  
+        ])
+        
+
+        if (metricupdate.modifiedCount>0 && reportupdate.modifiedCount>0){
             console.log('inserted...')
-            res.status(200).json(results)
+            res.status(200).json({success:true,repoid})
            
+        }else{
+            console.log('failed to update to all')
+            res.status(400).json({success:false,message:'Failed to update to all'})
         }
     }catch(e){
         console.log('errror in inserting into the database..',e)
@@ -194,13 +258,25 @@ router.get('/getmetrics', async(req,res)=>{
     try{
         console.log('getmetrics enteredd... ')
         const db=await getdb()
-        const userId=req.user.googleId
-        const metricscollection= await db.collection('metrics')
+        const nurse=req.user.nurse
+        let amuser
+        if (!nurse){
+         amuser=req.user      
+        } else{
+         amuser=req.user.user
+        
+        }
+        console.log('am user ...', amuser)
+        const userId=amuser._id
+        const metricscollection= await db.collection('allmetrics')
         const metricsresults= await metricscollection.findOne({
             _id:userId
         })
     
-        if (metricsresults){
+        if (!metricsresults){
+            res.json('no values inserted yet')
+        }else{
+
             console.log('metrics', metricsresults)
             res.status(200).json(metricsresults)
         }
@@ -209,6 +285,7 @@ router.get('/getmetrics', async(req,res)=>{
     }
 
 })
+
 
 
 // this url takes you to the symptom checker
@@ -322,26 +399,12 @@ async function conversations(userId,message){
             question:message,
             chatId:chatId
         }
-        instruction=`You are a health assistant; given the following text: ${message},generate a brief 1-sentence summary of the text. Do not suggest any possible cause or disease for the text; 
+        instruction=`You are a health assistant; given the following  text:  ${message},generate a brief 1-sentence summary of the text. Do not suggest any possible cause or disease for the text; 
                            just give a summary of the text. Start with phrases like "you are experiencing...", "you were feeling...", "you have been feeling...", or other related phrases.`
          const summary=await querymodel(instruction)
         const results=await sendToFLowise(flowisedata)
     
   
-    
-     //checking the existence of a chatId in the database
-    //  const findchatId = await data.findOne({
-    //     _id: userId,
-    //     chats: {
-    //         $elemMatch: {
-    //             chatId: chatId
-    //         }
-    //     }
-    // });
-    // //throw an error if no chatId is found
-    //     if (!findchatId){
-    //         throw new Error(JSON.stringify({chatIderror:"chatId not found"}))
-    //     }
     //save the new conversation to the db
     if (containsnull(results)){
         console.error(`${results} contains null elements`)
@@ -439,6 +502,566 @@ router.post('/chat',
     
 )
 
+//login to the doctors page
+router.get('/doctorspage',async(req,res)=>{
+    try{
+        if(req.user.nurse){
+            res.render('usedoctor.ejs',{user:req.user.user, nurse:req.user.nurse})
+        }else{
+            res.render('usedoctor.ejs',{user:req.user})
+        }
+        
+    }catch(e){
+        console.error('error in accessing the doctors page...',e)
+    }
+})
+
+//get the all reports of a specific user
+router.get('/reportnow', async(req,res)=>{
+    try{
+        // const{reportId}=req.body
+        const db=await getdb()
+        const repocollection=await db.collection('reports')
+        
+        let amuser=req.session.user
+        let userId=amuser._id
+        console.log('userId..',userId)
+        let myreport
+        myreport=await repocollection.aggregate([
+            {$match:{_id:userId}},
+            {$unwind:"$reports"},
+            {$sort:{"reports.reportId":-1}},
+            {$group:{
+                _id:"$_id",
+                name:{$first:"$name"},
+                birthdate:{$first:"$birthdate"},
+                gender:{$first:"$gender"},
+                reports:{$push:"$reports"}
+            }}
+
+        ]).toArray()
+        // console.log('')
+        if(myreport || myreport.lenght>0){
+            console.log('reportfound',myreport)
+            res.status(200).json(myreport)
+        } else{
+            console.log('report not found')
+            myreport=[]
+            res.json(myreport)
+        }
+        
+
+    }catch(e){
+        console.error('not getting the current report',e)
+    }
+})
+
+//sending a booking appoint for response
+router.post('/savetodoc',async(req,res)=>{  
+    try{ 
+        // let savebooking
+        console.log("saving bookng....")
+        const db=await getdb()
+        const docappcollection=await db.collection('docappointments')
+        const {seldoctor,patient}=req.body
+        let amuser;
+        if (!req.user){
+            amuser=req.user.user
+        }else{
+            amuser=req.user
+        }
+        let userId=amuser._id
+        const settime=patient.session
+        patientbook={
+            name:amuser.name,
+            id:userId,
+            session:settime,
+            type:patient.type,
+            status:"pending"
+
+        }
+        const userevents=await db.collection('events')
+        const userinevents= await userevents.findOne({
+            _id:userId
+        })
+
+        if(!userinevents){
+            await userevents.insertOne({
+                _id:userId,
+                events:[]
+
+            })
+        }
+        const appointevent={
+            type:"appointment",
+            description:`a ${patient.type} appointment with ${seldoctor.name} on ${seldoctor.date} at ${settime} `,
+            summary:`A ${patient.type} appointment with  Dr.${seldoctor.name} `,
+            datedue:new Date(seldoctor.date),
+            dateset:new Date(),
+            status:"upcoming"
+        }
+        console.log('doc details',seldoctor)
+        console.log(new Date(seldoctor.date))
+        let acceptedpatient
+        !Array.isArray(patient)? acceptedpatient=[patient]:acceptedpatient=patient
+        
+            console.log('patient does  exist ')
+        const [savebooking, mydocappointment]=await Promise.all([
+                 docappcollection.updateOne(
+                   {_id:seldoctor.doctor,
+                   "appointmentdates.date":seldoctor.date
+                   },
+                   {
+                       $push:{
+                       "appointmentdates.$.patients": patientbook
+                      }, 
+                      $pull:{
+                       "appointmentdates.$.appointmenttime": settime
+                      },
+                      $addToSet:{"appointmentdates.$.bookedtime":settime}
+   
+               }
+               ),
+               userevents.updateOne({
+                _id:userId
+               },
+               {
+                $push:{events:appointevent}
+               }
+            )
+
+            ])
+
+          
+        
+        console.log("savebooking...",savebooking)
+        console.log("mydocappointment..",mydocappointment)
+        if(savebooking.modifiedCount>0 && mydocappointment.modifiedCount>0 ){
+            console.log('worked')
+            res.status(200).json({success:true})
+        }else{
+            res.json({error:"Request not sent , please book again"})
+        }
+    }catch(e){
+        console.log('errror in adding to db..',e)
+    }
+})
+
+//send report to doctor
+router.post('/sendrepo',async(req,res)=>{
+    try{
+        const {repoId,nurseassesment,docId}=req.body
+        let amuser;
+        if (!req.user){
+            amuser=req.user.user
+        }else{
+            amuser=req.user
+        }
+        const userId=amuser._id
+        console.log('docId...',docId)
+        const db=await getdb()
+        const repocollection=await db.collection('reports')
+        const docrepos=await db.collection('docreports')
+        const doctors=await db.collection('doctors')
+        // const myimage=amuser.image?amuser.image:" "
+
+        const doc=await doctors.findOne({
+            _id:docId
+        })
+
+        if(!doc || doc.status!=="active"){
+            res.json({message:'Doctor not available , get another one'})
+        }
+        docdetails={
+            id:doc._id,
+            name:doc.name,
+            speciality:doc.speciality,
+            
+        }
+        console.log(repoId)
+        console.log(docId)
+        console.log(nurseassesment)
+
+       
+     
+        const instruction=`given the following statement ${nurseassesment} return only and only a one sentence summary , your response should be only and only the summary nothing else`
+        const summary=await querymodel(instruction)
+        const docsreport={
+            reportId:repoId,
+            sentdate:new Date(),
+            id:userId,
+            tname:'Brian Michaels',
+            image:"",
+            reportsummary:summary,
+            status:'pending'
+            }
+
+         await repocollection.updateOne(
+                {
+                    _id:userId,
+                    "reports.reportId":new Date(repoId)
+                },{
+                    $unset:{
+                        "reports.$.nurse.assesment":1
+                    }
+                }
+         )
+
+
+        const [userreport,docreport]=await Promise.all([
+
+            repocollection.updateOne(
+                {
+                    _id:userId,
+                    "reports.reportId":new Date(repoId)
+                },{
+                    $set:{
+                        "reports.$.nurse.assesment":nurseassesment,
+                        "repors.$.doctor":docdetails
+                    }
+                }
+            ),
+            docrepos.updateOne(
+                {
+                    _id:docId,
+                    "reports.date":new Date().toISOString().split('T')[0]
+                },
+                {
+                    $push:{ 
+                        "reports.$.patients":docsreport
+                    }
+
+                }
+            )
+
+        ])
+        console.log(userreport)
+        console.log(docreport)
+        if(userreport.modifiedCount>0 &&docreport.modifiedCount>0){
+            res.status(200).json({success:true ,message:'report sent to doctor successfully'})
+        }else{
+            console.log(`error in sending report \n ${userreport }\n ${docreport}`)
+            res.json({success:false,error:'failed to send report to doc'})
+        }
+
+        
+
+    }catch(e){
+        res.status(400).json({message:`error in sending report to doc ${e}`})
+        console.error('error in sending report to doctor',e)
+    }
+
+})
+
+//download a report
+router.post('/generaterepo',async(req,res)=>{
+    try{
+        const {reportId}=req.body
+        let amuser;
+        if (!req.user){
+            amuser=req.user.user
+        }else{
+            amuser=req.user
+        }
+        let userId=amuser._id
+        // const reportId='2025-03-16T11:12:45.735Z'
+        const db=await getdb()
+        const  myreport=await db.collection('reports').findOne(
+            {
+                _id:userId
+            },{
+                _id:1,
+                name:1,
+                birthdate:1,
+                gender:1,
+                reports:{$elemMatch:{reportId:reportId}}
+            }
+        )
+        console.log('my report for download..',myreport)
+        const date=new Date(reportId).toLocaleDateString('en-US',{day:'numeric',month:'long',year:'numeric'})
+        const today=new Date().getTime()
+        const dob=new Date(myreport.birthdate).getTime()
+        const age=new Date(today-dob).getUTCFullYear()-1970
+        console.log(`${age}....${date}`)
+
+        const htmlContent = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Patient Report</title>
+            <style>
+                /* Reset styles */
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+    
+                /* Body and modal styling */
+                body {
+                    font-family: Arial, sans-serif;
+                    padding: 0 20px;
+                    position: relative;
+                }
+    
+                .modal-content {
+                    background: #fff;
+                    width: 60%;
+                    max-height: 93%;
+                    border-radius: 10px;
+                    display: flex;
+                    margin: 5px;
+                    padding: 5px;
+                    flex-direction: column;
+                    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+                    overflow: hidden;
+                }
+    
+                .modal-header {
+                    padding: 15px 20px;
+                    border-bottom: 2px solid #ddd;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    font-weight: bold;
+                    background: white;
+                }
+    
+                .modal-body {
+                    overflow-y: auto;
+                    overflow-x: hidden;
+                    flex-grow: 1;
+                    padding: 20px;
+                    max-height: 80vh;
+                }
+    
+                .section {
+                    margin-top: 15px;
+                    display: flex;
+                    flex-direction: column;
+                }
+    
+                .modal-footer {
+                    padding: 10px;
+                    background: white;
+                    border-top: 1px solid #ddd;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    font-size: 12px;
+                    position: fixed;
+                    bottom: 0;
+                    left: 0;
+                    width: 100%;
+                    border-top: 1px solid #ddd;
+                }
+    
+                /* Footer with page number styling */
+                .footer {
+                    text-align: center;
+                    font-size: 12px;
+                    padding: 10px;
+                    border-top: 1px solid #ddd;
+                }
+    
+                /* Page number styling */
+                .page-number {
+                    content: counter(page);
+                }
+    
+                /* Ensure footer doesn't overlap content */
+                body {
+                    padding-bottom: 60px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="modal-content">
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h2>Afyasphere</h2>
+                    <p><strong>Date:</strong> <span id="reportDate">${date}</span></p>
+                </div>
+                
+                <!-- Modal Body -->
+                <div class="modal-body">
+                    <!-- Patient Info -->
+                    <div class="section">
+                        <h3>Patient Report</h3>
+                        <p><strong>Name:</strong> ${myreport.name}</p>
+                        <p><strong>Age:</strong> ${age}</p>
+                        <p><strong>Gender:</strong> ${myreport.gender}</p>
+                    </div>
+                    
+                    <!-- Metrics -->
+                    <div class="section">
+                        <h3>Most Recent Metrics</h3>
+                        <ul>
+                            <li><strong>Temperature:</strong> ${myreport.reports[0].metrics.temperature}&deg;C</li>
+                            <li><strong>Blood Pressure:</strong> ${myreport.reports[0].metrics.bloodPressure.systolic}/${myreport.reports[0].metrics.bloodPressure.diastolic} mmHg</li>
+                            <li><strong>Respiratory Rate:</strong> ${myreport.reports[0].metrics.respiratoryRate} breaths/min</li>
+                            <li><strong>Pulse Rate:</strong> ${myreport.reports[0].metrics.pulseRate} bpm</li>
+                        </ul>
+                    </div>
+    
+                    <!-- Diagnosis -->
+                    <div class="section">
+                        <h3>Symptoms Diagnosis</h3>
+                        <p><strong>Symptoms:</strong> ${myreport.reports[0].Diagnosis[0].symptoms}</p>
+                        <p><strong>Possible Condition:</strong> ${myreport.reports[0].Diagnosis[0].summary}</p>
+                        <p><strong>Possible Condition:</strong> ${myreport.reports[0].Diagnosis[0].result}</p>
+                    </div>
+                    
+                    <!-- Nurse's Assessment -->
+                    <div class="section">
+                        <h3>Nurse's Assessment</h3>
+                        <p>${myreport.reports[0].nurse.assessment}</p>
+                    </div>
+    
+                    <!-- Doctor's Assessment -->
+                    <div class="section">
+                        <h3>Doctor's Assessment</h3>
+                        <p>${myreport.reports[0].doctor.assessment}</p>
+                    </div>
+    
+                    <!-- Recommendations -->
+                    <div class="section">
+                        <h3>Recommendations</h3>
+                        <p>${myreport.reports[0].doctor.recommendation}</p>
+                    </div>
+                </div>
+    
+                <!-- Modal Footer (No page number here) -->
+                <div class="modal-footer">
+                    <p><strong>Report Sent By:</strong> ${myreport.reports[0].nurse.name}</p>
+                    <p><strong>Report Assessed By:</strong> Dr. ${myreport.reports[0].doctor.name}</p>
+                    <p>Generated by Afyasphere - confidential</p>
+                </div>
+            </div>
+    
+            <!-- Footer with page number -->
+            <div class="footer">
+                Page <span class="page-number"></span>
+            </div>
+        </body>
+        </html>`;
+
+        const browser=await puppeteer.launch()
+        const page=await browser.newPage()
+        await page.setContent(htmlContent)
+        const pdfbuffer=await page.pdf({
+            path:'report.pdf',
+            format:'A4',
+            displayHeaderFooter:true,
+            footerTemplate:`<div style="font-size: 12px; text-align: center; width: 100%;">Page <span class="pageNumber"></span></div>`,
+            margin: { top: "60px", bottom: "60px" }, 
+        })
+        await browser.close()
+        res.set({
+            'Content-Type':'application/pdf',
+            'Content-Disposition': 'attachment; filename="Patient_Report.pdf"'
+
+        })
+        res.send(pdfbuffer)
+        
+
+
+    }catch(e){
+        console.error('errro in generating a report...',e)
+        
+    }
+
+})
+
+
+// 'getting doctors detaills'
+router.post('/getdocdates',async(req,res)=>{
+    try{
+        let allevents=[]
+        let timeevent=[]
+        const today=new Date().toISOString
+        console.log('getting doctors appoinment dates')
+        console.log('my date',new Date().toISOString().split("T")[0])
+        const docId=req.body.docId
+        console.log(`the id ${docId} is ${typeof docId}`)
+        const db=await getdb()
+        const docappcollection=await db.collection('docappointments')
+        const docdates=await docappcollection.aggregate([
+            {$match:{_id:docId}},
+            {$unwind:"$appointmentdates"},
+            {
+                $match:{"appointmentdates.date":{$gt:new Date().toISOString().split("T")[0] }}
+            },
+            {
+                $project:{
+                    _id:0,
+                    date:"$appointmentdates.date",
+                    mysessions:"$appointmentdates.mysessions",
+                    time:"$appointmentdates.appointmenttime",
+                    numvisits:"$appointmentdates.numvisits",
+                    patients:"$appointmentdates.patients"
+                }
+            }
+        ]).toArray()
+        console.log("the dates are..",docdates)
+        console.log(`the document is ${typeof docdates} \n ${docdates}  `)
+        if(docdates && docdates.length>0){
+            docdates.forEach((date)=>{
+                const numvisits=parseInt(date.numvisits,10)
+                timeevent.push(
+                    {
+                        date:new Date(date.date).toISOString().split("T")[0] ,
+                        numvisits:date.numvisits,
+                        apptime:date.time
+                    }
+                )
+                console.log(typeof numvisits)
+                if(date.patients){
+                        if(date.patients.length==numvisits){
+                            const events={
+                                title:'Fully Booked',
+                                start:new Date(date.date).toISOString().split("T")[0] ,
+                                color:"808080"
+                            }
+    
+                            allevents.push(events)
+                        } else{
+                            const events={
+                                title:date.mysessions,
+                                start:new Date(date.date).toISOString().split("T")[0] ,
+                                color:"4DA8DA"
+                            }
+                            allevents.push(events)
+                        }
+                   
+                } else{
+                   
+                        allevents.push({
+                            title:date.mysessions,
+                            start:new Date(date.date).toISOString().split("T")[0] ,
+                            color:"4DA8DA"
+                        })
+                    } 
+  
+
+            })
+            console.log(`all events :\n ${allevents}`)
+            console.log(`all events :\n ${timeevent}`)
+            
+            res.status(200).json({allevents,timeevent})
+           
+        } else{
+            res.json({error:'Error in getting the doctor dates'})
+        }
+
+    }catch(e){
+        console.error('error in finding the dates ',e)
+    }
+
+})
+
 // route to enter history
 router.get('/historyentry',async(req, res)=>{
     const db=await getdb()
@@ -478,6 +1101,8 @@ router.get('/checkhistory', async(req, res)=>{
 
 
 
+
+
 router.put('/newchat',
     async(req,res)=>{
         try{
@@ -505,6 +1130,63 @@ router.put('/newchat',
         }
     }
 )
+
+router.post('/askgroq',async(req,res)=>{
+    console.log('asking groq.....')
+    const {message,reportId}=req.body
+    const db=await getdb()
+    let amuser
+    const nurse=req.user.nurse
+    if(!nurse){
+         amuser=req.user
+    }else{
+        amuser=req.user.user
+    }
+    const userId=amuser._id
+        
+    const reportcollection=await db.collection('reports')
+    console.log('question asked...',message)
+    console.log('reportId found', reportId)
+    console.log('user id',typeof userId)
+    const instruction=`You are a health support system designed to analyze symptoms and suggest possible  condition or illnesses    . Given the following usermetrics :${req.session.metrics} and symptoms: ${message}, provide a direct list of potential conditions with a brief explanation of why you chose a certain condition, you response can  start with ,'The patient...' and for the reason start with, 'The condition was choose because...' dont start with "I" and return only and only the conditions and reason for condition do not offer any advice /anything`
+    const results=await  querymodel(instruction)
+    if (results){
+        const suminstruction=`You are a summary system , given the prompt :${results} return only and only all the diseases/conditions listed /indicated , do not add anything or any statemnt , your only response should be the diseases/conditions  ,,`
+        const summary=await querymodel(suminstruction)
+        console.log('results from groq...',results)
+        if(reportId){
+            const diagnosisrepo={
+                symptoms:message,
+                result:results,
+                summary:summary
+            }
+            const date=new Date(reportId)
+            console.log('date...',date)
+            const reportupdate=await reportcollection.updateOne(
+                {
+                    _id:userId,
+                    "reports.reportId":new Date(reportId)
+                },{
+                    $push:{
+                        
+                        "reports.$.Diagnosis":diagnosisrepo,
+        
+                    }
+                }
+            )
+            console.log('reportupdate..',reportupdate)
+            if(reportupdate.modifiedCount>0){
+                console.log('report modified...')
+                res.status(200).json(results)
+            }
+            
+        } else{
+            res.json({Error:"Please update the vital signs measurements first"})
+        }
+
+    }
+    // res.status(200).json(results)
+})
 
 router.get('/gethistory', async(req, res)=>{
     try{
@@ -1106,14 +1788,27 @@ router.get('/events',async(req,res)=>{
 //getevents from the database
 router.get('/allevents',async(req,res)=>{
     try{
+        let myevents
         const db=await getdb()
+        let userId
+        if(req.user){
+            userId=req.user._id
+
+        }else{
+            userId=req.user.user._id
+        }
         const eventscollection=await db.collection('events')
-        const userId=req.user.googleId
+        // const userId=req.user.googleId
         const events=await eventscollection.findOne({
             _id:userId,
         })
+        if(!events){
+            myevents=[]
+        }else{
+            myevents=events
+        }
         // console.log("events", events) .....,{Headers: {'Access-Control-Allow-Origin' : '*'}}
-        res.status(200).json(events)
+        res.status(200).json(myevents)
     }catch(e){
         console.error(`failed to get the events from the database ${e}`)
     }
@@ -1460,6 +2155,20 @@ router.post('/storeevent', async(req,res)=>{
     }    
 
 })
+
+    router.get('/doctors', async(req, res)=>{
+        try{
+            const db=await getdb()
+            const docscollection=await db.collection('doctors')
+            const docs= await docscollection.find().toArray()
+            console.log('doctors ...',docs)
+            res.status(200).json(docs)
+        }catch(e){
+            console.error('not getting the doctors')
+        }
+
+
+    })
 
 
 

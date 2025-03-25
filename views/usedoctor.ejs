@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>mydoc</title>
+        <style>
+            *{
+                margin:0;
+                padding:0
+            
+            }
+          
+
+            body{
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                
+                /* height: 100vh; */
+                margin: 0;
+
+
+                
+            }
+
+            header{
+                display: flex;
+                background-color: rgb(235, 234, 234);
+                top:0;
+                height:70px;
+                padding: 5px;
+                margin:5px;
+                align-items: center;
+                position: sticky;
+                z-index: 100;
+                gap:80%
+            }
+            .main{  
+                display: flex;
+                padding:5px;
+                height: 100%; 
+                flex-direction: row;
+                background-color: rgb(250, 248, 250);
+             
+             
+                 
+            }
+
+            .side-menu{
+            background-color: aliceblue;
+            /* left :0px; */
+            /* align-self: center ; */
+            z-index: 5;
+            display:flex;
+            position:fixed;
+            flex-direction:column;
+            margin-left:10px ;
+            width:18%; 
+            height:400px; 
+            margin-top: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
+            .side-icon{
+            margin: 10px; 
+            display: flex;
+            flex-direction: row; 
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease
+
+           }
+           .side-icon:hover {
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+
+
+
+     
+        .doc-card {
+    margin: 0;
+    padding: 0;
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background-color:  #ffffff;;
+    overflow-y: auto;
+    overflow-x: hidden;
+    margin-top: 19px;
+    margin-left: 15px;
+    max-height:83vh ;
+    box-sizing: border-box;
+    position: sticky;
+}
+
+.card-head {
+    margin: 0;
+    padding: 10px;
+    width: 100%;
+    /* background-color: #f4f4f9; */
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    /* height: 30px; */
+    z-index: 100;
+    box-sizing: border-box;
+}
+
+.availability {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: 5px;
+    color: #333;
+    font-weight: bold;
+}
+
+.doc-history {
+    margin: 10px;
+    
+    width: 35%;
+    display: flex;
+    flex-direction: column;
+    background-color:  #ffffff;;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    max-height: 83vh;
+    overflow-y: auto;
+    margin-left: 20%;
+    margin-top: 20px;
+    box-sizing: border-box;
+}
+
+.report-header {
+    display: flex;
+    flex-direction: row;
+    /* justify-content: space-between; */
+    gap:200px;
+    padding: 5px 10px;
+    border-bottom: 2px solid rgb(194, 190, 190);
+    margin-bottom: 10px;
+    color: #333;
+    font-weight: bold;
+    /* background-color: #fff; */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.headertitles {
+    color: #130101;
+    /* border-bottom: 2px solid #c97474; */
+    cursor: pointer;
+    padding-bottom: 3px;
+    margin-bottom: -2px;
+    transition: color 0.3s, border-color 0.3s;
+}
+
+
+
+        .doc-details {
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+    padding: 5px;
+    box-sizing: border-box;
+    position: fixed;
+    width: 100vw; /* Use viewport width to ensure full coverage */
+    height: 100vh; /* Use viewport height for full coverage */
+    display: none;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-direction: row;
+    background-color: rgba(29, 27, 27, 0.9);
+    margin: 0; /* Remove any default margin */
+}
+
+        .doc-detail-image{
+            padding: 10px;
+            margin: 10px; 
+            margin-left: 20px ;
+            height:400px;
+            width: 300px; 
+            display: flex;  
+            background-size: cover; 
+            background-position: top center; 
+            border-radius: 15px; 
+            align-self: center;
+        }
+
+        .name-type{
+            color: white; 
+            margin-bottom:20px ;
+            background-color: #010c1a; 
+            margin: 10px;
+            padding: 10px;
+            border-radius: 30px; 
+            align-items: center;
+            display: flex;
+            justify-content: center; 
+            flex-direction: column;
+        }
+        .sendtodoc{
+            display: flex;
+            flex-direction: column;
+            
+            background-color: #f0f0f0; 
+            height: 400px; 
+            width: 500px;
+            border-radius: 12px;
+            padding: 10px;
+            margin: 5px;
+            margin-right: 5px;
+            
+
+        }
+        textarea {
+           
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            background-color: #b7c3c7;
+            border-radius: 8px;
+            outline: none;
+            color: #333;
+            resize: none;
+            margin-top: 10px;
+            height: 100px;
+        }
+
+        .session-button{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 15px;
+            cursor: pointer;
+            border: 1px solid rgb(24, 1, 34,0.7);  
+        }
+
+        .book-button{
+            margin-top: 20px;
+            border-radius: 15px;
+            background-color: rgb(38, 38, 153);
+            color:white;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 10px;
+            width: 200px;
+            align-self: center;
+          
+
+
+        }
+
+
+        .session-button:hover {
+            border: none;
+            color: black;
+            box-shadow: 0 1px 5px rgba(110, 135, 150, 0.7); /* Valid shadow */
+            background-color: rgba(110, 135, 150, 0.1); /* Slight color change on hover */
+        }
+       
+        /* Toolbar Styling */
+.fc-toolbar {
+    background-color: rgb(220, 237, 245);
+    color: rgb(1, 1, 36);
+    font-size: 14px;
+    padding: 8px;
+}
+
+.fc-toolbar-title {
+    font-size: 16px;
+    color: rgb(40, 41, 4);
+    font-weight: bold;
+}
+
+.fc-button {
+    font-size: 14px;
+    background-color: rgb(180, 220, 240) !important;
+    color: rgb(1, 1, 36) !important;
+    border: 1px solid #b0b0a0;
+    border-radius: 4px;
+}
+
+/* Highlight selected date */
+.selected-date {
+    background-color: aquamarine !important;
+    border-radius: 5px;
+}
+
+/* General Day Styling */
+.fc-daygrid-day {
+    background-color: rgb(220, 237, 245) !important;
+    border: none;
+}
+
+/* Highlight Today's Date */
+.fc-day-today {
+    background-color: rgb(162, 159, 163) !important;
+    color: rgb(35, 64, 66) !important;
+    border: 2px solid rgb(4, 46, 100) !important;
+    font-weight: bold !important;
+    border-radius: 5px;
+}
+
+/* Header (Days of the Week) Styling */
+.fc-col-header-cell {
+    background-color: rgb(220, 237, 245) !important;
+    color: black !important;
+    font-weight: bold !important;
+    text-transform: uppercase;
+}
+
+/* Ensure Proper Spacing for Events */
+.fc-daygrid-day-frame {
+    height: auto !important;
+    min-height: 20px !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dates that have events - Change Background */
+.fc-daygrid-day.has-event {
+    background-color: rgba(255, 225, 132, 0.8) !important; /* Light Yellow */
+    border-radius: 5px;
+}
+
+/* Style Event Text */
+/* Event Styling */
+.fc-daygrid-event {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    font-size: 10px;
+    padding: 2px;
+    border-radius: 3px;
+    background-color: rgba(4, 123, 255, 0.8) !important; /* Blue */
+    color: white !important;
+    text-align: center;
+    width: 90%; /* Prevent Overflow */
+}
+.fc-event-title {
+    white-space: normal;
+    text-align: center;
+    font-size: 12px;
+}
+ 
+              
+
+        .calendar{
+            display: flex;
+            margin:5px;
+            padding:5px; 
+            overflow: hidden;
+            border-radius: 10px;
+            background-color: rgb(220, 237, 245); 
+            /* height: 200px  !important; */
+
+        }
+
+        
+
+        .headertittles{
+                cursor: pointer; 
+                width: 40%;
+                align-items: center;
+                justify-content: center;
+                display: flex;
+                color:rgb(156, 154, 154);
+                transition: border-bottom 0.7s ease-in-out;
+            }
+
+            .headertittles.active{
+                color:rgb(2, 34, 61);
+                border-bottom:1.5px solid rgb(45, 45, 102);
+                font-size: 18px;
+
+            }
+            
+            
+            select {
+                width: 200px;
+                padding: 10px;
+                font-size: 15px;
+                border:1px solid rgb(231, 231, 231);
+                border-radius: 5px;
+                background-color: white;
+                appearance: none;
+                cursor: pointer;
+              }
+            select:hover {
+                border-color: #0056b3;
+              }
+              
+            select:focus {
+                outline: none;
+                border-color: #7e615b;
+            }
+
+            select option {
+                background-color: white;
+                font-size: 14px;
+                color: black;
+              }
+                
+
+                
+                
+        .doctor-list{
+            display: flex;
+            flex-direction: column;
+            /* overflow: auto; */
+
+            /* width: 35%; */
+
+        }
+        .main-doc{
+            display: flex;
+            /* height: 100vh; */
+            flex-direction: row;
+            background: linear-gradient(rgb(245, 245, 245), rgb(235, 245, 244));
+            border-radius: 10px;
+            padding: 10px;
+            margin-top:5px ;
+            box-shadow: 0 0px -4px rgb(167, 167, 168)  inset;
+        }
+        /* #doc-name{
+            color:#333;
+            font-size: 19px; 
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        } */
+        .doc-profile{
+            height: 100px;
+            width: 100px;
+            border-radius: 8px;
+            align-items: center;
+            display: flex;  
+            background-size: cover; 
+            background-position: top center;
+        }
+
+        .doc-type{
+            margin-top: 3px;
+            color:rgb(70, 3, 97);
+            font-size: 15px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .doc-description{
+            font-size: 14px;
+            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color:rgb(85, 82, 71);
+            margin-top:3px;
+        }
+        .doc-lower{
+            display: flex;
+            flex-direction: row;
+            margin-top: 10px; 
+            gap:40px;
+            font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            align-items: center;
+            margin-left:50px;
+        }
+
+        .send-book{
+            box-shadow:0 0  1px  rgb(39, 42, 43) inset ;
+            border:1px dotted rgb(39, 42, 43); 
+            border-radius: 10px; 
+            padding: 3px;
+            cursor: pointer; 
+            font-size: 13px;
+            
+        }
+        .send-book:hover{
+            background-color: #007bff; 
+            color:white;
+            
+        }
+
+        .confirmation{
+            display: flex;
+            margin:5px;
+            align-self: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 17px;
+            color:green;
+            display: flex;
+            /* Modal Content */
+        }
+    .modal-content {
+        background: rgb(255, 255, 255);
+        width: 60%;
+        max-height: 93%;
+        border-radius: 10px;
+        display: flex;
+        margin:5px;
+        padding: 5px;
+        flex-direction: column;
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+        overflow: hidden; /* Prevents content from overflowing */
+    }
+
+    .hidden{
+        display:none
+    }
+    
+    /* Sticky Header */
+    .modal-header {
+        position: sticky;
+        top: 0;
+        background: white;
+        padding: 15px 20px;
+        border-bottom: 2px solid #ddd;
+        z-index: 10;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: bold;
+    }
+    
+    /* Scrollable Modal Body */
+    .modal-body {
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex-grow: 1; /* Enables scrolling inside modal */
+        padding: 20px;
+        max-height: 80vh; /* Ensures the body is scrollable */
+        /* background-color: aqua; */
+    }
+    
+    .modal-footer {
+        position: sticky;
+        bottom: 1px;
+        background: white;
+        border-top: 1px solid #ddd;
+        padding: 5px;
+        /* max-height: 30px !important;  */
+        align-items: center;
+        display: flex;
+        /* overflow:hidden; */
+        /* background-color: #0056b3; */
+    }
+
+    .popup-profile{
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            top: 70px;
+            right: 20px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            padding: 10px;
+            /* display: none; */
+            z-index: 110;
+        }
+    
+    
+    /* Close Button */
+    .close {
+        cursor: pointer;
+        font-size: 20px;
+        font-weight: bold;
+    }
+    
+    /* Sections */
+    .section {
+        margin-top: 15px;
+        display:flex;
+       flex-direction: column;
+    }
+    
+    /* Textareas */
+    textarea {
+        width: 90%;
+        height: 80px;
+        margin-top: 5px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        resize: none;
+    }
+    
+    /* Buttons */
+    .send-doc{
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background: #007bff;
+        color: white;
+    }
+    
+    .send-doc:hover {
+        background: #011429;
+    }
+    .clicked-docs {
+    cursor: pointer;
+    font-weight: bold;
+    color: #2b8a3e;            /* Green color for active look */
+    background-color: #e8f5e9; /* Light green background */
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+        
+        
+
+            
+
+        </style>
+            <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
+    </head>
+    <body>
+       
+        <div class="header-container" style="position: sticky;"></div>
+        <div class="main" >
+
+            <div class="side-menu">
+               
+    
+                <div class="side-icon"  onclick="window.location.href='/user/'">
+                
+                    <svg  style="margin-right:10px ; " xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" viewBox="0 0 24 24" fill="none"><path d="M9 20H7C5.89543 20 5 19.1046 5 18V10.9199C5 10.336 5.25513 9.78132 5.69842 9.40136L10.6984 5.11564C11.4474 4.47366 12.5526 4.47366 13.3016 5.11564L18.3016 9.40136C18.7449 9.78132 19 10.336 19 10.9199V18C19 19.1046 18.1046 20 17 20H15M9 20V14C9 13.4477 9.44772 13 10 13H14C14.5523 13 15 13.4477 15 14V20M9 20H15" stroke="#464455" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                
+                <span  style=" margin-right:63px ; font-size: 17px; margin-bottom: 5px; cursor:pointer; align-self: center;"> Home  </span>
+                </div>
+
+                <div class="side-icon" onclick="window.location.href='/user/symptomchecker'">
+                    <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="24" height="24">
+                        <!-- Clipboard -->
+                        <rect x="12" y="4" width="40" height="56" rx="4" ry="4" fill="#f0f0f0" stroke="#000" stroke-width="2"/>
+                        <rect x="12" y="4" width="40" height="10" rx="2" ry="2" fill="#a0a0a0"/>
+                        
+                        <!-- Checkmark -->
+                        <path d="M20 32l8 8 16-16" stroke="#28a745" stroke-width="4" fill="none"/>
+                      </svg>   
+                      
+                      
+                      
+         
+                      <span style="margin-left :10px ;font-size: 17px; margin-bottom: 5px;"> Check Symptom</span>
+                      
+                </div>
+
+                <div class="side-icon" onclick="window.location.href='/user/events'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 64 64" stroke-width="3" stroke="#000000" fill="none"><path d="M36.66,54.45H8.84A2.5,2.5,0,0,1,6.35,52V12.12A2.49,2.49,0,0,1,8.84,9.63H48.68a2.49,2.49,0,0,1,2.49,2.49v22.4"/><line x1="6.35" y1="20.63" x2="51.17" y2="20.63"/><line x1="16.46" y1="9.63" x2="16.46" y2="4.63"/><line x1="40.42" y1="9.63" x2="40.42" y2="4.63"/><circle cx="45.22" cy="45.44" r="12.43"/><polyline points="45.22 36.7 45.22 45.82 49.57 49.16"/><script xmlns=""/></svg>
+                      
+        
+                      <span id="starred" style="margin-left :10px ;font-size: 17px; margin-bottom: 10px;"> Event Scheduler</span>
+                      
+                </div>
+
+                <span class="side-icon" onclick="window.location.href='/user/historyentry'">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="30px" height="30px" version="1.1" id="Layer_1" viewBox="0 0 295.238 295.238" xml:space="preserve"><script xmlns=""/>
+                        <g>
+                            <g>
+                                <g>
+                                    <polygon style="fill:#F9BA48;" points="254.762,28.571 292.857,28.571 292.857,33.333 278.571,47.619 292.857,61.905      292.857,66.667 254.762,66.667    "/>
+                                </g>
+                                <g>
+                                    <rect x="69.048" y="33.333" style="fill:#F9BA48;" width="25px" height="27px"/>
+                                </g>
+                                <g>
+                                    <path style="fill:#333333;" d="M254.762,257.143h4.762V0H64.286c-13.129,0-23.81,10.681-23.81,23.81v133.333h-9.524     c-15.757,0-28.571,12.814-28.571,28.571s12.814,28.571,28.571,28.571h9.524v57.143c0,13.129,10.681,23.81,23.81,23.81h195.238     v-9.524h-4.762c-7.876,0-14.286-6.41-14.286-14.286C240.476,263.552,246.886,257.143,254.762,257.143z M50,204.762h-9.524     v-38.095H50V204.762z M59.524,190.476h138.095v14.286H59.524V190.476z M207.143,171.157l20.376,14.557l-20.376,14.557V171.157z      M197.619,180.952H59.524v-14.286h138.095V180.952z M11.905,185.714c0-10.505,8.543-19.048,19.048-19.048v38.095     C20.448,204.762,11.905,196.219,11.905,185.714z M235.724,285.714H64.286c-7.876,0-14.286-6.41-14.286-14.286     s6.41-14.286,14.286-14.286h171.438c-2.995,3.981-4.771,8.929-4.771,14.286C230.952,276.786,232.729,281.733,235.724,285.714z      M64.286,247.619c-5.381,0-10.295,1.862-14.286,4.886v-38.219h153.905l40-28.571l-40-28.571H50V23.81     c0-7.876,6.41-14.286,14.286-14.286H250v238.095H64.286z"/>
+                                </g>
+                            </g>
+                        </g>
+                        <script xmlns=""/></svg>
+                      
+        
+                      <span style="margin-left :10px ;font-size: 17px; margin-bottom: 10px;cursor:pointer;  align-self: center;margin-right: 10px;" > Journal Entry</span>
+                </span>
+    
+                
+        
+                <div class="side-icon"  onclick="window.location.href='/user/checkhistory'">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- First Line -->
+                        <line x1="4" y1="7" x2="20" y2="7"></line>
+                        <!-- Second Line -->
+                        <line x1="4" y1="12" x2="20" y2="12"></line>
+                        <!-- Third Line -->
+                        <line x1="4" y1="17" x2="20" y2="17"></line>
+                      </svg>
+        
+                      <span style="margin-left :10px ;font-size: 17px; margin-bottom: 5px; "> Journal Records</span>
+                      
+                </div>
+        
+              
+        
+                   
+                
+            </div>
+            
+            
+            <div class="doc-history">
+                <div class="card-head" style="background-color: #fafaf7;">
+                    <span style="font-size: 1.2em; font-weight: bold; color: #333; padding: 10px 0; border-bottom: 2px solid #536163; display: block;text-align: center;">Reports</span>
+
+                    <div class="availability">
+                        <span id="completerepos"  class="clicked-docs" onclick="completereports()" style="cursor: pointer;">Completed</span>
+                        <span id="pendingrepor" onclick="Pendingreports()" style="cursor: pointer;">Pending</span>
+                    </div>
+                </div>
+              
+                <div class="all-reports">
+                    <!-- Report items go here -->
+                </div>
+            </div>
+
+            
+            <div class="doc-card">
+                <div class="card-head" style="background-color: #fafaf7;">
+                    <span style="font-size: 1.2em; font-weight: bold; color: #333; padding: 10px 0; border-bottom: 2px solid #cccccc; display: block;">Doctors</span>
+
+                    <div class="availability">
+                        <span id="activedocs"  class="clicked-docs" onclick="activedocs()" style="cursor: pointer;">Available</span>
+                        <span id="alldocs" onclick="everydoc()" style="cursor: pointer;">All</span>
+                    </div>
+                </div>
+                <div class="doctor-list">
+                    <!-- Doctor list items go here -->
+                </div>
+            </div>
+
+
+
+
+        </div>
+        <div class="doc-details"  >
+            <div class="the-doc" style="display: flex;flex-direction: column;"> 
+ 
+            </div>
+
+            <div class="calendar"  id="docscalendar" style="margin: 5px;padding: 5px;max-height: 500px;max-width: 550px;position: sticky;">
+
+            </div>
+            
+        
+
+            <div class="sendtodoc" id="bookdoc" style="display: none;margin: 10px;" >
+                   <span style="margin: 10px ;font-size: 18px;background-color: aliceblue; align-items: center;justify-content: center; display: flex; font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif ; ">4th June 2025</span>
+                   
+                    <span style="margin: 10px ;font-size: 18px; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;">Pick  check-up type and suitable time</span>
+                    <select id="reason" style="border-radius: 3px;margin:3px ;">
+                        <option value="General Checkup">General Checkup</option>
+                        <option value="Symptoms and Illness">Symptoms and Illness</option>
+                        <option value="Test and Screening">Test and Screening</option>
+                        <option value="Injury and Pain">Injury and Pain</option>
+                        <option value="Mental Checkup"> Mental Checkup</option>
+                        <option value="Child's Health">Child's Health</option>
+                     
+
+                    </select>
+              
+
+                    <button class="session-button book-button" id="booking">
+                        Send appointment
+                    </button>
+                    <div class="confirmation" style="display: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="RGB(9 140 8)" version="1.1" id="Capa_1" width="30px" height="30px" viewBox="0 0 335.765 335.765" xml:space="preserve"><script xmlns=""/>
+                            <g>
+                                <g>
+                                    <polygon points="311.757,41.803 107.573,245.96 23.986,162.364 0,186.393 107.573,293.962 335.765,65.795   "/>
+                                </g>
+                            </g>
+                            <script xmlns=""/></svg>
+                           <div style="align-items: center;display: flex;margin: 10px;padding: 10px;">Request Sent Succesfully</div>
+                    </div>
+            </div>
+            <!-- <div class="sendtodoc" id="sendreport" style="margin-top: 20px; display: flex;"> -->
+                
+                <!-- <span style="margin: 10px; font-size: 18px; font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;">view report</span> -->
+                <div class="modal-content"  id="sendreport" >
+                    <!-- Header Section with Logo Placeholder and Date -->
+                    <div class="modal-header">
+                        <h2>Afyasphere</h2> <!-- Logo Placeholder -->
+                        <p><strong>Date:</strong> <span id="reportDate">4th March 2025</span></p>
+                     
+                    </div>
+            
+                    <!-- Scrollable Modal Body -->
+                    <div class="modal-body">
+                        
+                       
+                    </div>
+            
+                    <!-- Footer -->
+                    <div class="modal-footer" >
+                        <button class="send-doc" >Submit</button>
+                    </div>
+                </div>
+      
+            <!-- </div> -->
+          
+
+          
+
+              
+        </div>
+        <script src="/header.js" ></script>
+        <script src="/usedoctor.js"></script>
+    </body>
+</html>

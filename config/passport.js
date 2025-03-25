@@ -5,7 +5,7 @@ require('dotenv').config()
 const LocalStrategy=require('passport-local').Strategy
 const bcrypt=require('bcrypt')
 const {generatemyid}=require('../config/database')
-
+const axios =require('axios')
 // import {getdb} from './database'
 
 
@@ -13,15 +13,54 @@ passport.use('google',new GoogleStrategy({
     clientID:process.env.GOOGLE_CLIENT_ID,
     clientSecret:process.env.GOOGLE_CLIENT_SECRET,
     callbackURL:"http://localhost:3000/google/callback",
-    scope: ["profile", "email"]
+    scope: ["profile", "email","https://www.googleapis.com/auth/userinfo.profile"]
 }, 
 async  function (accessToken, refreshToken, profile, done){
 
     try{
+        //you can still make use of fetch , but in the headers add "accept":application/json
+        //axios automatically sets the accept
+        //accessToken is automatically provided in the callback
+        // const response=await axios.get(
+        //     "https://www.googleapis.com/auth/user.gender.read",
+        //     {
+        //         headers:{
+        //             "Authorization":`Bearer ${accessToken}`
+        //         }
+        //     }
+
+        // )
+
+        // const response=await fetch("https://people.googleapis.com/v1/people/me?personFields=genders,birthdays",{
+        //     method:'GET',
+        //     headers:{
+        //          "Authorization":`Bearer ${accessToken}`,
+            
+
+        //     }
+        // })
+        // console.log(response)
+        // const myprof=await response.json
+        // console.log('my profile..',myprof)
+        // const gender=myprof.genders?myprof.genders[0].value:'Gender not available'
+        // const birthdate=myprof.birthdays?myprof.birthdays[0].value:'Birthdate not available'
+
+        // function calculateAge(birthYear, birthMonth, birthDay) {
+        //     const today = new Date();
+        //     const birthDate = new Date(birthYear, birthMonth - 1, birthDay);
+        
+        //     return new Intl.DateTimeFormat('en', { year: 'numeric' }).format(today) - 
+        //            new Intl.DateTimeFormat('en', { year: 'numeric' }).format(birthDate);
+        // }
+        //  const age=calculateAge(birthdate.year,birthdate.month,birthdate.day)
+        
+        
+
         const db=await getdb();
         const User =db.collection('users')
         const user= await User.findOne({googleId:profile.id})
         const data=db.collection('data')
+
         
         // console.log(userid)
 
@@ -39,7 +78,11 @@ async  function (accessToken, refreshToken, profile, done){
                     _id:myid,
                     googleId:profile.id,
                     name:profile.displayName,
-                    email:profile.emails[0].value
+                    email:profile.emails[0].value,
+                    role:'PersonOfCare'
+                    // gender:gender,
+                    // age:age
+                    
                 }
     
                 const details=await User.insertOne(google_details)
@@ -77,9 +120,18 @@ passport.use('local',new LocalStrategy(
             const Nurse=await db.collection('nurses')
             const Doctor=await db.collection('doctors')
             const user= await User.findOne({_id:userId}) ||await Nurse.findOne({_id:userId}) || await Doctor.findOne({_id:userId})
+            console.log('user found....',user)
             if(!user){
                 console.log('user not found...',userId)
                 return done(null, false,{message:"user not found"})
+            } 
+            if(user.role=='Doctor' && user.id==password){
+                console.log('doctor authenticated')
+                return done(null,user)
+                
+            }else if(user.role=='admin'&& user._id==password){
+                console.log('doctor authenticated')
+                return done(null,user)
             }
             const verified=await bcrypt.compare(password,user.password)
             if(!verified){

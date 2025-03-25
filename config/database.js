@@ -1,6 +1,6 @@
 
 const{MongoClient, ServerApiVersion}=require('mongodb')
-
+const nodemailer=require('nodemailer')
 require('dotenv').config()
     // get the uri from the .env
 const uri =process.env.MONGO_URI
@@ -97,23 +97,7 @@ async function resetactiveChatIds(){
 } 
 
 
-function generatemyid(myname){
-    let letters;
-    const randomnumber=Math.floor(Math.random()*1e10).toString()
-    const number=randomnumber.slice(0,6)
-    console.log('random number generated...',number)
 
-    const name=myname.trim().split(" ") //split name to an array
-    if (name.length<2){
-        letters=name[0][0].toUpperCase()+name[0][2].toUpperCase()
-    }else{
-        letters=name[0][0].toUpperCase()+name[1][0].toUpperCase()
-    }
-
-    const myid=letters+number
-    console.log('geneeratesd id..',myid)
-    return myid
-}
 
 //function to sendmail
 async function sendmail(to,subject,body){
@@ -145,5 +129,5 @@ async function sendmail(to,subject,body){
 }
 
 
-module.exports={savesession, generatemyid, sendmail,initializecollection, getdb, resetactiveChatIds}
+module.exports={savesession, sendmail,initializecollection, getdb, resetactiveChatIds}
 // module.exports =savesession.collection

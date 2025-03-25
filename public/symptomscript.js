@@ -39,31 +39,32 @@ let chatId;
 
 
 
-
-// function formatTextToHTML(text) {
-//     return text
-//       .replace(/\n/g, '<br>') // Convert newlines to <br>
-//       .replace(/\* (.+?)(\n|$)/g, '<li>$1</li>') // Convert * bullet points to <li>
-//       .replace(/(?:<li>.+?<\/li>)+/g, '<ul>$&</ul>'); // Wrap <li> in <ul>
-//   }
-
 function formatTextToHTML(text) {
-    // Ensure the text is a string
-    text = String(text);
-  
-    // Convert newlines to <br> tags
-    let formattedText = text.replace(/\n/g, '<br>');
-  
-    // Convert bullet points starting with an asterisk (*) into <li> items.
-    // This regex looks for "* " at the beginning of a line (or after a <br>)
-    // followed by text until a <br> or end of string.
-    formattedText = formattedText.replace(/(^|<br>)\*\s+(.*?)(?=<br>|$)/g, '$1<li>$2</li>');
-  
-    // Wrap consecutive <li> elements into a <ul>
-    formattedText = formattedText.replace(/((?:<li>.*?<\/li>)+)/g, '<ul>$1</ul>');
-  
+    if (typeof text !== 'string') {
+        console.error("Expected a string but got:", typeof text, text);
+        return '';
+    }
+
+    // Convert **bold** text to <b>bold</b>
+    let formattedText = text.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); 
+
+    // Convert * or - bullet points to <li> (excluding numbered lists)
+    formattedText = formattedText.replace(/(^|\n)[*-] (.+?)(?=\n|$)/g, '<li>$2</li>');
+
+    // Wrap consecutive <li> elements inside a <ul>
+    formattedText = formattedText.replace(/(<li>.*?<\/li>)+/gs, match => `<ul>${match}</ul>`);
+
+    // Ensure numbered lists (1., 2., etc.) remain intact
+    formattedText = formattedText.replace(/(\d+\.)\s*(.+)/g, '<br>$1 $2');
+
+    // Convert double line breaks (paragraphs) to <p> tags
+    formattedText = formattedText.replace(/\n\s*\n/g, '</p><p>');
+
+    // Wrap the entire content in a <p> tag
+    formattedText = `<p>${formattedText}</p>`;
+
     return formattedText;
-  }
+}
   
   
 
@@ -75,24 +76,8 @@ function formatTextToHTML(text) {
         disclaimer.style.display = 'none';
     }
 }
-//   async function gettips(){
-//     try{
 
-//         const response =await fetch('/tips')
-//         const results = await response.json()
-        
-//         const randomtip=results[Math.floor(Math.random()*results.length)]
-//         console.log('random tips',randomtip)
-//         console.log('math random',Math.random())
-//         console.log("Math.floor(Math.random()*results.length)", Math.floor(Math.random()*results.length))
-//         headertip.textContent=randomtip.tittle
-//         tip.textContent=randomtip.description
-//         image.setAttribute('src',randomtip.image)
 
-//     }catch(e){
-//         console.error(`error in getting tips from api : ${e}`)
-//     }
-// }
 
 
 function thinkinanimation(genanime){
@@ -236,8 +221,7 @@ Array.from(subsuggestion).forEach(subsuggest=>{
 
 document.addEventListener('DOMContentLoaded',async()=>{
    
-    await gettips()
-    setInterval(gettips,10000)
+  
 
 })
 
@@ -255,13 +239,9 @@ continu.addEventListener('click',async()=>{
     //  userinfo.push(age.value)
     
     console.log(userinfo)
-    symptom.style.display='block'
+    symptom.style.display='flex'
     document.querySelector('.information').style.display='none'
-    // await gettips()
-    // setInterval(gettips,10000)
-    
-    document.getElementById('userage').textContent=`Age :${userinfo.age}`
-    document.getElementById('usergender').textContent=`Gender :${userinfo.gender}`
+  
 
 })
 
@@ -341,6 +321,8 @@ checkbtn.addEventListener('click',async()=>{
     console.log ('checkbtn clicked')
     console.log (addedsymptoms) 
     const messages=addedsymptoms.join(', ')
+    const reportId=localStorage.getItem('repid')
+    console.log('reportId..',reportId)
     const results=document.createElement('div')
     results.classList.add('results')
     results.textContent=''
@@ -356,40 +338,52 @@ checkbtn.addEventListener('click',async()=>{
     dots.forEach(dot=>{
         dot.classList.add('fadedot')
     })
-    
-   
-    // const response=await fetch('/askgroq',{
-    //     method:'POST',
-    //     headers:{
-    //         'Content-Type':'application/json'
-    //     },
-    //     body:JSON.stringify({message:messages})
-    // })
-    
+    let response;
+    if(reportId){
+        response=await fetch('/user/askgroq',{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({message:messages, reportId})
+        })
+        
+    }else{
+        response=await fetch('/askgroq',{
+            method:'POST',
+            headers:{
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({message:messages})
+        })
 
-    // const result=await response.json()
+    }
 
-    const result=` I'd be happy to help with that. However, you haven't described the headache yet. Please provide more details about your headache, such as:
 
-* How long you've been experiencing it
-* The severity of the pain
-* Any triggers or factors that make it worse
-* Any other symptoms you're experiencing
+    const result=await response.json()
 
-Once I have more information, I can provide some related treatment options.
+//     const result=` I'd be happy to help with that. However, you haven't described the headache yet. Please provide more details about your headache, such as:
 
-(Please keep in mind that I'm not a medical professional, and my responses should not be considered a substitute for professional medical advice.)
+// * How long you've been experiencing it
+// * The severity of the pain
+// * Any triggers or factors that make it worse
+// * Any other symptoms you're experiencing
 
-Please go ahead and describe your headache, and I'll do my best to provide some helpful information.
+// Once I have more information, I can provide some related treatment options.
 
-And remember, after considering the treatment options I provide, it's essential to consult a doctor for a proper diagnosis and personalized advice.
+// (Please keep in mind that I'm not a medical professional, and my responses should not be considered a substitute for professional medical advice.)
 
-So, please describe your headache, and I'll get started.
+// Please go ahead and describe your headache, and I'll do my best to provide some helpful information.
 
-And always, at the end of our conversation: **Please visit a doctor for proper evaluation and treatment.**`
-    text=' MANAGING YOUR SYMPTOMS <br> <br>'+result 
+// And remember, after considering the treatment options I provide, it's essential to consult a doctor for a proper diagnosis and personalized advice.
 
-    if(results){
+// So, please describe your headache, and I'll get started.
+
+// And always, at the end of our conversation: **Please visit a doctor for proper evaluation and treatment.**`
+     text=' MANAGING YOUR SYMPTOMS <br> <br>'+result 
+
+    if(result){
+        document.getElementById('startthinking').textContent='responding'
         setTimeout(()=>{
             genanime.style.display="none"  
             console.log(result)
@@ -419,6 +413,7 @@ And always, at the end of our conversation: **Please visit a doctor for proper e
 
 
 })
+
 
 
 moreinfo.addEventListener('click',async()=>{

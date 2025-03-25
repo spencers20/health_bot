@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html>
+    <head> 
+        <title>Doctor</title>
+        
+        <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+
+        body{
+            display: flex;
+            flex-direction: column;
+            /* background-color: #0056b3; */
+        }
+
+        header{
+                display: flex;
+                background-color:  rgb(226, 240, 237);
+                top:0;
+                height:50px;
+                padding: 5px;
+                margin:5px;
+                position: sticky;
+                z-index: 100;
+                flex-direction: column ;
+            }
+            .main-header{
+            display: flex;
+            height: 160px;
+            position: sticky;
+            z-index: 100;
+            width: 100%;
+            background-color:rgb(255, 255, 255);
+            top:70px;
+            margin:10px;
+           
+            }
+            .the-container{
+                padding: 5px; 
+                display: flex; 
+                flex-direction: row; 
+                margin-left: 40px; 
+                height:400px ;
+                top:260px;
+                position: sticky;
+
+            }
+            .my-calendar{
+                display: flex;
+                flex-direction: column;
+                width: 30%;
+                background-color: rgb(230,237,254);
+                margin: 10px;
+                height: auto;
+                top:10px;
+                /* position:fixed; */
+            }
+        .legend-card{
+            padding:10px;
+            margin: 5px;
+            display:flex;
+            flex-direction: row; 
+            width:80%;
+            background:linear-gradient(to right,rgb(197, 214, 213),rgb(102, 194, 201)) ;
+            margin-left: 40px;
+            border-radius: 12px;
+           
+        }
+        .main{
+            display: flex;
+            flex-direction: row;
+        }
+        .highlight-date {
+    font-weight: bold;
+    color: #056860;  /* Orange-red color */
+    background-color: #ffe0b2; /* Light orange background */
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+
+        .notification-message {
+    margin: 10px;
+    font-size: 16px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    color: #ffffff;
+    background-color: rgb(41, 75, 77);
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    display: inline-block;
+    text-align: center;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease-in-out;
+    }
+
+     /* Smooth fade-in effect */
+     @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+   }
+
+
+        .appointments{
+            background-color: rgb(241, 243, 245);
+            display:flex;
+            flex-direction:column;
+            /* margin-left:10px ; */
+            /* width:30%;  */
+            /* height:400px;  */
+            /* margin-top: 15px; */
+            /* border-radius: 12px; */
+            /* box-shadow: 0 4px 8px rgba(0,0,0,0.1); */
+        }
+
+            .reports{
+            padding: 5px;
+            box-sizing: border-box;
+            width:33%;
+            background-color: rgb(229, 231, 231);
+            margin-left:20%;
+            margin-top: 20px;
+            border-radius: 10px;
+
+        }
+        /* Default Profile Container (Ensures div always has a size) */
+.profile {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-position: top center;
+    background-size: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* No Image Available - Show Initials */
+.no-image {
+    width: 30px;
+    height: 30px;
+    background: linear-gradient(135deg, #4A90E2, #1E3A8A); /* Gradient Background */
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+
+        .calendar{
+            margin:10px;
+            padding: 10px;
+            width:35%;
+            /* position: fixed; */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-self: center;
+            max-height:350px !important;
+            margin-top: 19px;
+            margin-left:15px ;
+            box-shadow:inset 0px -5px 5px rgba(22, 6, 6, 0.1);
+            border-radius: 10px;
+
+        }
+        .fc-event-title {  
+            white-space: normal;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .fc-daygrid-day.has-event {
+    background-color: rgba(255, 225, 132, 0.8) !important; /* Light Yellow */
+    border-radius: 5px;
+}
+        .fc-daygrid-event {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: flex;
+    font-size: 10px;
+    padding: 2px;
+    border-radius: 3px;
+    color: white !important;
+    text-align: center;
+    width: 90%; /* Prevent Overflow */
+   }
+
+
+        .fc-toolbar{
+           
+            color: rgb(1, 1, 36);
+            font-size: 12px;
+        }
+
+        .fc-toolbar-title{
+            font-size: 14px;
+            color:rgb(40, 41, 4);
+            /* font-weight:600px */
+        }
+        .fc-button{
+       
+            background-color: rgb(252, 253, 253) !important;
+            color: rgb(1, 1, 36) !important;
+            border: 1px solid #b0b0a0;
+            /* border:2px solid #f7f7f7; */
+            border:none;
+
+           
+
+        }
+        .selected-date{
+            background-color: aquamarine !important;
+            border-radius: 5px;
+        }
+        .fc-daygrid-day{
+         
+            border:none
+   
+        }.fc-day-today {
+          background-color: rgb(190, 187, 190)!important; /* Change background color */
+          color: rgb(35, 64, 66) !important; /* Change text color */
+          border: 2px solid rgb(4, 46, 100) !important; /* Add a border */
+          font-weight: bold !important;
+         
+        }
+        .fc-daygrid-day-frame {
+            height: 55px !important;
+            width:auto;
+            /* min-height: 8px !important; Set a flexible minimum height */
+            display: flex;
+            flex-direction: column;
+            /* align-items: center;
+            justify-content: center; */
+        }
+        /* Ensure rows are flexible */
+        .fc-daygrid-day {
+            height: 100% !important;
+        }
+        
+       
+        .fc-col-header-cell {
+
+         color:black!important; /* Change text color */
+         font-weight: 400px !important;
+         /* text-transform: uppercase;*/
+          }
+
+        .svg-class{
+            display: flex;
+            margin:5px; 
+            align-self:center;
+            align-items: center;
+            gap:10px;
+            /* margin-left: 70px; */
+            
+        }
+
+
+        .session-button{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+        
+            margin: 5px;
+            font-size: 15px;
+            cursor: pointer;
+            border: 1px solid rgb(24, 1, 34,0.7);  
+            margin-top: 20px;
+            border-radius: 15px;
+            background-color: rgb(43, 58, 122);
+            color:white;
+            border-radius: 10px;
+            width: 200px;
+            margin-left: 100px;
+        }
+
+        .patient-container{
+            align-items: center;
+            display:flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 5px;
+            border-bottom: 1px solid rgb(151, 150, 150);
+            padding: 5px;
+            margin:3px;
+        }
+        
+        .the-card{
+            display: flex;
+            flex-direction: column;
+            margin: 10px;
+            padding: 10px;
+            border-radius: 14px;
+            box-shadow: 0 2px 4px rgb(49, 40, 40) ;
+            width: auto;
+            height: 80px;
+        }
+     
+   /* Modal Overlay */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+  
+    /* justify-content: center;
+    align-items: center; */
+}
+
+/* Modal Content */
+.modal-content {
+    background: white;
+    width: 50%;
+    height: 94vh;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    overflow: hidden; /* Prevents content from overflowing */
+    margin: 10px;
+    padding:10px;
+}
+
+/* Sticky Header */
+.modal-header {
+    position: sticky;
+    top: 0;
+    background: white;
+    padding: 15px 20px;
+    border-bottom: 2px solid #ddd;
+    z-index: 10;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+
+/* Scrollable Modal Body */
+.modal-body {
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex-grow: 1; /* Enables scrolling inside modal */
+    padding: 10px;
+    max-height: 70vh; /* Ensures the body is scrollable */
+}
+
+.modal-footer {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    border-top: 1px solid #ddd;
+    padding: 10px;
+}
+
+
+/* Close Button */
+.close {
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Sections */
+.section {
+    margin-top: 15px;
+}
+
+/* Textareas */
+textarea {
+    width: 90%;
+    min-height: 80px;
+    margin-top: 5px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: none;
+}
+
+.active{
+    background-color: azure;
+    font-size: 18px;
+
+}
+
+.closed{
+    background-color: rgb(231,231,231);
+    font-size:17px
+
+}
+.view-report{
+    margin-top: 15px;
+    color: rgb(5, 63, 102); 
+    background-color: rgb(221, 219, 217); 
+    width: 100px;
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    padding: 3px; 
+    cursor:pointer;
+    align-self: center;
+    margin: 5px;
+}
+/* Buttons */
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #007bff;
+    color: white;
+}
+
+button:hover {
+    background: #0056b3;
+}
+
+
+    .appointment-tab {
+        padding: 5px 8px;
+        border-radius: 8px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .appointment-tab:hover {
+        background: #e0f7fa;
+        color: #00796b;
+    }
+
+    .appointment-tab.active {
+        background: #e0f7fa;
+        color: #00796b;
+    }
+
+
+
+
+    </style>
+
+                <script src="https://cdn.jsdelivr.net/npm/date-fns@latest"></script>
+                <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
+                
+                <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+                <!-- FullCalendar CSS and JS -->
+                <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+                
+                <!-- Tippy.js for tooltips -->
+                <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+                <script src="https://unpkg.com/@popperjs/core@2"></script>
+                <script src="https://unpkg.com/tippy.js@6"></script>
+                
+    </head>
+    <body>
+
+        <header>
+           <span style="align-self: center;">AFYASPHERE </span>  
+            <div  id="docgreeting" style="font-size: 20px;margin-top: 10px;margin: 5px;font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;font-weight: 600;"> Welcome Back Doctor</div>
+
+        </header>
+        <!-- <div style="display: flex;flex-direction: row;"> -->
+
+        <div class="main-doc" style="display: flex;flex-direction: row;gap:10px;">
+            <div class="appointment-report" style="display: flex;flex-direction: column;width: 70%;">
+                <div class="main-header">
+                    <div class="legend-card">
+                        <div class="card-summary" >
+                         
+                            <div style="display: flex;flex-direction: row;">
+                                <div class='the-card'>
+                                    <span>Today's appointments</span>
+                                    <span id="todayno" style="margin-top:10px">0</span>
+    
+                                </div>
+    
+                                <div class='the-card'>
+                                    <span>Upcoming Appointments</span>
+                                    <span  id="upcomingappoints" style="margin-top:10px"> 0</span>
+    
+                                </div>
+    
+                                <div class='the-card'>
+                                    <span>Pending Reports</span>
+                                    <span id="pendingrepocount" style="margin-top:10px"> 0</span>
+    
+                                </div>
+                                <div style="align-items: center;padding:auto; margin: 5px; display: flex; flex-direction: column;">
+                                    <label style="display: flex;flex-direction: row;margin: 5px;margin-top: 13px; padding:5px;border-radius: 5px;">
+                                        <input class="availability" style="margin: 5px;padding: 3px;" type="radio" name="availability" value="active" id="active"> Active
+                                    </label>
+                                    <label style="display: flex;flex-direction:row;margin: 5px;padding: 5px;font-size: 16px;background-color:rgb(231, 231, 231);border-radius: 5px;">
+                                        <input class="availability" style="margin: 5px;padding: 3px;" type="radio" name="availability" value="away" id="closed" checked>Away
+                                    </label>
+                                    
+                                </div>
+                              
+    
+                            </div>
+                        </div>
+                        <div id="docimages" style="border-radius: 30px;  height:auto ;width: 40%; margin-left: 10px;  background-size: cover;background-position: 50% 20% ; background-image: url('https://img.freepik.com/free-photo/beautiful-young-female-doctor-looking-camera-office_1301-7807.jpg') ">
+                          
+                        </div>
+    
+    
+                    </div>
+
+                </div>
+
+                <div class="the-container">
+    
+                    <!-- Appointments Section -->
+                    <div class="container Appointments" style="width: 45%; padding: 5px; background: #fff; border-radius: 12px;   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); height: 460px;">
+                        <div style="position: sticky; top: 0; background: white; padding: 10px 0; font-size: 17px; font-weight: 600; text-align: center; border-bottom: 2px solid #ddd; z-index: 10;">
+                            Appointments
+                        </div>
+                        
+                        <div id="appointment-tabs" style="display: flex; justify-content: center; gap: 40px; font-weight: 500; margin: 10px 0; cursor: pointer;">
+                            <span class="appointment-tab active" onclick="selectTab(this, 'allappoints')">All</span>
+                            <span class="appointment-tab" onclick="selectTab(this, 'todayappoints')">Today</span>
+                            <span class="appointment-tab" onclick="selectTab(this, 'pendingappoints')">Pending</span>
+                            <span class="appointment-tab" onclick="selectTab(this, 'upcomingappoints')">Upcoming</span>
+                        </div>
+                        
+                
+                        <div style="max-height: 400px; overflow-y: auto; padding: 5px;">
+                            <div class="appointments" style="display: flex; flex-direction: column;"> </div>
+                        </div>
+                    </div>
+                
+                    <!-- Reports Section -->
+                    <div class="container Reports" style="width: 50%; margin-left: 30px; padding: 5px; background: #fff; border-radius: 12px; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); overflow-y: hidden;height: 460px;">
+                        <div style="position: sticky; top: 0; background: white; padding: 10px 0; font-size: 16 px; font-weight: 600; text-align: center; border-bottom: 2px solid #ddd; z-index: 10;">
+                            Reports
+                        </div>
+                
+                        <div style="display: flex; justify-content: center; gap: 40px; font-weight: 500; margin: 10px 0; cursor: pointer;">
+                            <span class="appointment-tab active" onclick="selectTab(this, 'pendingrepos')">Pending</span>
+                            <span class="appointment-tab" onclick="selectTab(this, 'completereports')">Completed</span>
+                        </div>
+                        
+                
+                        <div style=" overflow-y: auto; padding: 5px;">
+                            <div class="reportschedules" style=" display: flex; flex-direction: column; gap: 15px; padding: 5px; ; background-color: rgb(248, 248, 248); overflow-y: auto;"></div>
+                            
+                        </div>
+                    </div>
+                </div>
+                
+                        
+
+                   
+                </div>
+
+            <!-- </div> -->
+
+            <div class="my-calendar" >
+                <div style="font-size: 18px; font-weight: bold;color: #2c3e50; padding: 12px 20px; text-align: center;  border-radius: 8px; box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.1);text-transform: uppercase;letter-spacing: 1px;">
+                Set Appointment Date
+            </div>
+            
+                <div id=calendar style="display:flex;margin: 10px;padding: 10px; background-color: white;border-radius: 12px;height: 100px;"></div>
+
+                <div id="bookdoc" style="display: none; flex-direction: column; background-color: white; padding: 10px; margin: 5px; border-radius: 12px; width: 100%; max-width: 350px;">
+                    <div id="checktitle" style="margin-bottom: 10px;margin-top: 8px;">  Pick which session you would be available</div>
+                  
+                    <!-- Checkboxes -->
+                    <label style="display: flex; align-items: center; margin-bottom: 5px;">
+                        <input type="radio" id="morning" name="session" class="session-checkbox"  value="Half Day" style="margin-right: 8px;" required> 
+                        Half Day
+                    </label>
+
+                    <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                        <input type="radio" id="fullday" name="session" class="session-checkbox"  value="Full Day" style="margin-right: 8px;" required> 
+                        Full Day
+                    </label>
+                
+                    <!-- Input for number of patients -->
+                    <input type="number" id="numPatients" placeholder="Number of patients" style="padding: 8px; border: 1px solid #ccc; border-radius: 6px; width: 100%; box-sizing: border-box; margin-bottom: 10px;" required>
+                    <label for="session-time">Select Time:</label>
+                   <div class="input-container" style=" display: flex;align-items: center; gap: 10px;border: 1px solid #ccc;padding: 5px; width: fit-content;">
+                        <input type="time" id="session-time" style=" border: none;outline: none;font-size: 16px;padding: 5px;" required>
+                         <svg style="cursor: pointer;" class="add-button" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M11 8C11 7.44772 11.4477 7 12 7C12.5523 7 13 7.44772 13 8V11H16C16.5523 11 17 11.4477 17 12C17 12.5523 16.5523 13 16 13H13V16C13 16.5523 12.5523 17 12 17C11.4477 17 11 16.5523 11 16V13H8C7.44771 13 7 12.5523 7 12C7 11.4477 7.44772 11 8 11H11V8Z" fill="#0F0F0F"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12ZM3.00683 12C3.00683 16.9668 7.03321 20.9932 12 20.9932C16.9668 20.9932 20.9932 16.9668 20.9932 12C20.9932 7.03321 16.9668 3.00683 12 3.00683C7.03321 3.00683 3.00683 7.03321 3.00683 12Z" fill="#0F0F0F"/>
+                    </svg>
+                      </div>
+                    <!-- Button -->
+                    <button class="session-button" style="padding: 10px; background-color: #007BFF; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
+                        Set Appointment
+                    </button>
+                </div>
+                
+
+            </div>
+            </div> 
+        
+              
+       <!-- Modal (Report Popup) -->
+<div id="reportModal" class="modal" style="z-index:110; display: none;">
+    <div class="modal-content">
+        <!-- Header Section with Logo Placeholder and Date -->
+        <div class="modal-header">
+            <h2>Afyasphere</h2> <!-- Logo Placeholder -->
+            <p ><strong>Date:</strong> <span id="reportDate">4th March 2025</span></p>
+         
+        </div>
+
+        <!-- Scrollable Modal Body 
+           <p id="docsasses">${report[0].doctor.assessment} </p>
+           -->
+        <div class="modal-body">
+        </div>
+          
+        <div class="modal-footer">
+            <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 5px;">
+                <!-- SVG Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 21 21">
+                    <g fill="none" fill-rule="evenodd" transform="translate(-1 -1)">
+                        <path d="m14.517 3.5 4.983 5v6l-4.983 5h-6.017l-5-5v-6l5-5z" stroke="#721c24" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="m11.5 12.5v-5" stroke="#721c24" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="11.5" cy="15.5" fill="#721c24" r="1"/>
+                    </g>
+                </svg>
+            
+                <!-- Warning Message -->
+                <p style="margin: 0; color: #721c24; font-weight: bold;">
+                    Editing the report will overwrite your initial recommendation or assessment.
+                </p>
+            </div>
+            
+            
+            <button id="report-submit" style="margin-top: 8px;">Send Report</button>
+        </div>
+  
+     </div>
+
+     <div class="modal-content">
+        <div class="modal-header">
+            <h2>Owens History</h2> <!-- Logo Placeholder -->
+         
+        </div>
+        <div class="histories" style="margin: 5px;">
+            
+        </div>
+
+
+     </div>
+
+</div>
+
+        
+        <script src="/docs.js"></script>  
+        
+    </body>
+</html>

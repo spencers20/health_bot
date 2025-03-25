@@ -30,6 +30,9 @@ function formatTextToHTML(text) {
       .replace(/(?:<li>.+?<\/li>)+/g, '<ul>$&</ul>'); // Wrap <li> in <ul>
   }
 
+const myuser=localStorage.getItem('user')
+console.log('my user',myuser)
+
 async function gettips(){
     try{
         const alltips=await fetch('/tips')
@@ -105,28 +108,52 @@ Array.from(backsvg).forEach(svg=>{
     })
 })
 
-async function insertvalue(metric,value){
+async function insertvalue(mymetrics){
     try{
-
-        const metricvalues={
-            "metrics":metric,
-            "values":value
+        localStorage.clear()
+        console.log('mymetrics entered')
+        if (mymetrics<4){
+            alert('please enter all the measurements again')
+            return;
         }
+        const allmetrics=Object.assign({},...mymetrics)
+
         const results=await fetch('/user/insertmetric',{
             method:'POST',
             headers:{
                 "Content-Type":"application/json"
             },
-            body:JSON.stringify({metricvalues})
+            body:JSON.stringify(allmetrics)
         })
         console.log('results...,',results)
-        return results
+        if (results){
+            const response=await results.json()
+            console.log(response)
+            if(response.success===true){
+                const reportid=response.repoid
+                let repoid
+                console.log('type of report id..',typeof reportid)
+                // if(typeof reportid !==String){
+                //      repoid=reportid.toISOString()
+                // }else{
+                //     repoid=reportid
+                // }
+                localStorage.setItem('repid',reportid)
+                console.log(localStorage.getItem('repid'))
+    
+            }else{
+                alert(response.message)
+            }
+
+            }
     }catch(e){
         console.log('error in pushing values to backend...',e)
     }
     
 
 }
+
+let mymetrics=[]
 
 Array.from(valueinputt).forEach(valueinput=>{
     valueinput.addEventListener('keydown',async (e)=>{
@@ -159,7 +186,17 @@ Array.from(valueinputt).forEach(valueinput=>{
 
                 if (cardId==='temperature'){
                     const metric="temperature"
-                    await insertvalue(metric,Number(valueentered))
+                    mymetrics.push({
+                          [metric]:parseInt(valueentered,10)       
+                    }) 
+                    if (mymetrics.length==4){
+                        console.log('my metrics array...',mymetrics)
+                        setTimeout(async()=>{ await insertvalue(mymetrics)},5000)
+                    }else{
+                        console.log('move on..')
+                    }
+
+                    //await insertvalue(metric,Number(valueentered))
 
                     if(valueentered >38 || valueentered<36 ){
                         conditiondegree.innerHTML='alarming',
@@ -193,12 +230,31 @@ Array.from(valueinputt).forEach(valueinput=>{
                         systolic:Number(sysvalue),
                         diastolic:Number(valueentered)
                     }
-                    await insertvalue(metric,pvalues)
+
+                    mymetrics.push({
+                        [metric]:pvalues
+                    })
+                    if (mymetrics.length==4){
+                        console.log('my metrics array...',mymetrics)
+                        setTimeout(async()=>{ await insertvalue(mymetrics)},5000)
+                    }else{
+                        console.log('move on..')
+                    }
+                    // await insertvalue(metric,pvalues)
                 
                  value.innerHTML=`${sysvalue}/${valueentered} mmHg`
                 } else   if (cardId==='pulse'){
                     const metric="pulseRate"
-                    await insertvalue(metric,Number(valueentered))
+                    mymetrics.push({
+                        [metric]:Number(valueentered)
+                    })
+                    if (mymetrics.length==4){
+                        console.log('my metrics array...',mymetrics)
+                        setTimeout(async()=>{ await insertvalue(mymetrics)},5000)
+                    }else{
+                        console.log('move on..')
+                    }
+                    // await insertvalue(metric,Number(valueentered))
 
                     if(valueentered >100 || valueentered<60 ){
                         conditiondegree.innerHTML='alarming',
@@ -213,7 +269,14 @@ Array.from(valueinputt).forEach(valueinput=>{
                 
             } else{
                 const metric="respiratoryRate"
-                await insertvalue(metric,Number(valueentered))
+                mymetrics.push({
+                    [metric]:Number(valueentered)
+                })
+                // await insertvalue(metric,Number(valueentered))
+                if (mymetrics.length==4){
+                    console.log('my metrics array...',mymetrics)
+                    setTimeout(async()=>{ await insertvalue(mymetrics)},5000)
+                }
 
                 if(valueentered >24 || valueentered<10 ){
                     conditiondegree.innerHTML='alarming',
@@ -241,9 +304,15 @@ async function getevents(){
        const response =await fetch('/user/allevents')
        const event=await response.json()
        console.log('events loaded')
+       let events
     //    console.log(`events ${Object.values(events.events)}`)
-       Array.isArray(event.events)?console.log("events is an array"):console.log('events is not an array')
-       const events=event.events.sort((a,b)=>new Date(b.datedue)-new Date(a.datedue))
+    if (event.length>0){
+        Array.isArray(event.events)?console.log("events is an array"):console.log('events is not an array')
+        events=event.events.sort((a,b)=>new Date(b.datedue)-new Date(a.datedue))
+    }else{
+        events=[]
+
+    }
        return events
       
     } catch(e){
@@ -311,7 +380,7 @@ async function displaychart(data,label ,color){
             data:{
                 labels:labels,
                 datasets:[{
-                    label:label,
+                    label:label, 
                     data:values,
                     borderColor:color,
                     tension:0.4
@@ -349,32 +418,52 @@ Array.from(cardmetric).forEach(card=> card.addEventListener('click',async ()=>{
         // const data=window[datakey]
         popup.style.display='flex'
         console.log('metricstrend..',metricstrend)
+        const temperature = {};
+        const bloodPressure={}
+        const pulseRate = {};
+        const respiratoryRate = {};
+        
+        // Populate objects with date-value pairs
+        metricstrend.metrepos.forEach(report => {
+            const date = new Date(report.date).toISOString().split('T')[0];  // Format date to YYYY-MM-DD
+            const { metrics } = report;
+          
+            temperature[date] = metrics.temperature;
+            bloodPressure[date] = metrics.bloodPressure;
+            // bloodPressureDiastolic[date] = metrics.bloodPressure.diastolic;
+            pulseRate[date] = metrics.pulseRate;
+            respiratoryRate[date] = metrics.respiratoryRate;
+          });
+          console.log('temperature...',temperature)
+        //   console.log('bloodPressureSystolic',bloodPressureSystolic)
+          console.log('bloodPressure',bloodPressure)
+        
        
         // const label=datakey
         if (datakey==='temperature'){
-            const temperature=Object.fromEntries(metricstrend.temperature.map(entry=>[entry.date,entry.value]))
+            // const temperature=Object.fromEntries(metricstrend.temperature.map(entry=>[entry.date,entry.value]))
             color='rgba(255, 99, 132, 1)'
             await displaychart(temperature,datakey,color)
             console.log('datakey...',datakey)
         } else if(datakey==='pulse'){
-            const pulseRate=Object.fromEntries(metricstrend.pulseRate.map(entry=>[entry.date,entry.value]))
+            // const pulseRate=Object.fromEntries(metricstrend.pulseRate.map(entry=>[entry.date,entry.value]))
             color='rgb(130, 255, 99)'
             await displaychart(pulseRate,datakey,color)
             console.log('datakey...',datakey)
         } else if(datakey==='respiratory'){
-            const respiratoryRate=Object.fromEntries(metricstrend.respiratoryRate.map(entry=>[entry.date,entry.value]))
+            // const respiratoryRate=Object.fromEntries(metricstrend.respiratoryRate.map(entry=>[entry.date,entry.value]))
             color='rgb(0, 206, 209)'
             await displaychart(respiratoryRate,datakey,color)
             console.log('datakey...',datakey)
         }else{
-            const bloodPressure=Object.fromEntries(metricstrend.bloodPressure.map(entry=>[entry.date,entry.value]))
+            // const bloodPressure=Object.fromEntries(metricstrend.bloodPressure.map(entry=>[entry.date,entry.value]))
             console.log('bloodpressure...',bloodPressure)
             console.log('datakey...',datakey)
             await bpressurechart(bloodPressure)
  
         }
     }catch(e){
-        console.log('error in cardmetric click...',e)
+        console.error('error in cardmetric click...',e)
     }
 
 
@@ -385,24 +474,49 @@ document.addEventListener('DOMContentLoaded',async()=>{
   
     
     const tips=await gettips()
+    const nursenuser=await fetch('/user/nursenme/')  
+    const nursenme=await nursenuser.json()
+    console.log(nursenme.user)
+
+    // if(nursenme.nurse){
+    //     const abbrievs=nursenme.user.name.slice(0,2)
+    //     console.log('abbreives..',abbrievs)
+    //     localStorage.setItem('myinitials',abbrievs)
+    //     document.getElementById('nursename').innerHTML=`Nurse : ${nursenme.nurse.name} `
+    //     document.getElementById('greetname').innerHTML=`Welcome ${nursenme.user.name}`
+    // }else{
+    //     const abbrievs=nursenme.user.name.slice(0,2)
+    //     console.log('abbreives..',abbrievs)
+    //     localStorage.setItem('myinitials',abbrievs)
+    //     document.getElementById('nursename').style.display='none'
+        document.getElementById('greetname').innerHTML=`Welcome ${nursenme.user.name}`
+    // }
+        
+
+    
     setInterval(tips,10000);
     const events=await getevents()
-    const datetoday=new Date()
-    const upcomingevent=events.reverse().find(event=>new Date(event.datedue)>=datetoday)
-    console.log('upcomingevent...',upcomingevent)
-    const upcomingdateformat=new Date(upcomingevent.datedue).toLocaleString('en-US',{
-        year:'numeric',
-        month:'long',
-        day:'numeric',
-        weekday:'long',
-        hour:'numeric',
-        minute:'numeric',
-        hour12:true
-    })
-    console.log('upcoming date format,...',upcomingdateformat)
-    console.log('upcomingevent.datedue...', typeof upcomingevent.datedue)
-    eventathome.textContent=upcomingdateformat
-    eventhomesummary.textContent=upcomingevent.summary
+    if(events.length>0){
+
+        const datetoday=new Date()
+        const upcomingevent=events.reverse().find(event=>new Date(event.datedue)>=datetoday)
+        console.log('upcomingevent...',upcomingevent)
+        const upcomingdateformat=new Date(upcomingevent.datedue).toLocaleString('en-US',{
+            year:'numeric',
+            month:'long',
+            day:'numeric',
+            weekday:'long',
+            hour:'numeric',
+            minute:'numeric',
+            hour12:true
+        })
+        console.log('upcoming date format,...',upcomingdateformat)
+        console.log('upcomingevent.datedue...', typeof upcomingevent.datedue)
+        eventathome.textContent=upcomingdateformat
+        eventhomesummary.textContent=upcomingevent.summary
+    }else{
+        const events=[]
+    }
 
 
 })
