@@ -9,6 +9,7 @@ const google=require('./routes/google') //calling the google. route
 require('./config/passport')
 const user=require('./routes/user')
 const doctors=require('./routes/doctors')
+const admin=require('./routes/admin')
 
 const path=require('path')
 const cron=require('node-cron')
@@ -58,6 +59,7 @@ app.use(passport.session());
 app.use('/google',google)
 app.use('/user',user) 
 app.use('/doctors',doctors)
+app.use('/admin',admin)
 
 app.use(express.json())
 
@@ -75,7 +77,7 @@ try{
 
 app.get('/',(req , res)=>{
     console.log('entered')
-    res.render('admin.ejs')
+    res.render('index.ejs')
 })
 
 app.get('/logins',(req , res)=>{
@@ -102,9 +104,10 @@ app.get('/allparticipants',async(req,res)=>{
         const alldocs=await db.collection('doctors').find().toArray()
         const allnurses=await db.collection('nurses').find().toArray()
         const allusers=await db.collection('users').find().toArray()
+        const alladmins=await db.collection('administrator').find().toArray()
        
 
-        res.status(200).json({alldocs,allnurses,allusers})
+        res.status(200).json({alldocs,allnurses,allusers,alladmins})
         
 
         
@@ -142,611 +145,6 @@ app.post('/remove',async(req,res)=>{
     }
 })
 
-// app.get('/allnurses',async(req,res)=>{
-//     try{
-//         const db=await getdb()
-//         const allnurses=db.collection('nurses').find().toArray()
-//         if(allnurses>0){
-//             res.status(200).json(allnurses)
-//         }else{
-//             res.json({message:'no docs around'})
-//         }
-
-        
-//     }catch(e){
-//         console.error('error in getting all nurses..',e)
-//         res.json({errror:`error in getting all nurses..${e}`})
-//     }
-// })
-
-// app.get('/allusers',async(req,res)=>{
-//     try{
-//         const db=await getdb()
-//         const allusers=db.collection('users').find().toArray()
-//         if(allusers>0){
-//             res.status(200).json(allusers)
-//         }else{
-//             res.json({message:'no users around'})
-//         }
-
-        
-//     }catch(e){
-//         console.error('error in getting all users..',e)
-//         res.json({errror:`error in getting all users..${e}`})
-//     }
-// })
-
-
-
-// app.get('/reportnow', async(req,res)=>{
-//     try{
-//         // const{reportId}=req.body
-//         const db=await getdb()
-//         const repocollection=await db.collection('reports')
-//         const userId="BM382487"
-//         // const reportId="2025-03-15T16:12:38.193Z"
-//         // const myreport=await repocollection.find(
-//         //     {
-//         //        _id:userId
-//         //     }
-            
-//         // ).toArray()
-
-//         const myreport=await repocollection.aggregate([
-//             {$match:{_id:userId}},
-//             {$unwind:"$reports"},
-//             {$sort:{"reports.reportId":-1}},
-//             {$group:{
-//                 _id:"$_id",
-//                 name:{$first:"$name"},
-//                 birthdate:{$first:"$birthdate"},
-//                 gender:{$first:"$gender"},
-//                 reports:{$push:"$reports"}
-//             }}
-
-//         ]).toArray()
-//         if(myreport || myreport.lenght>0){
-//             console.log('reportfound',myreport)
-//             res.status(200).json(myreport)
-//         } else{
-//             console.log('report not found')
-//             res.status(400).json({message:"report not found"})
-//         }
-        
-
-//     }catch(e){
-//         console.error('not getting the current report',e)
-//     }
-// })
-
-// app.post('/finishreport',async(req,res)=>{   //****for doctor
-//     try{
-//         const {reportId,docrecommendation,docassessment,patientId,sentdate}=req.body
-//         const db=await getdb()
-//         const docId="D123478JO"
-//         const repodate=new Date(sentdate).toISOString().split('T')[0]
-//         const [finishrepo,finishdoc]=await Promise.all([
-//             db.collection('docreports').updateOne(
-//                 {    _id: docId,
-//                     "reports.date": repodate, 
-//                    "reports.patients.id": patientId
-//                 },
-//                 { $set: { "reports.$[report].patients.$[patient].status": "complete" } },
-//                 {
-//                   arrayFilters: [
-//                     { "report.date": repodate },
-//                     { "patient.id": patientId }
-//                   ]
-//                 }
-//               )
-//             ,
-//             await db.collection('reports').updateOne(
-//                 {
-//                     _id:patientId,
-//                     "reports.reportId":new Date(reportId)
-//                 },
-//                 {   
-//                     $set:{
-//                        "reports.$.status":'complete',
-//                        "reports.$.doctor.assessment":docassessment,
-//                        "reports.$.doctor.recommendation":docrecommendation
-//                     }
-//                 } && finishdoc.modifiedCount>0
-//             )
-
-            
-//         ])
-//          console.log(finishrepo)
-//         if(finishrepo.modifiedCount>0){
-//             console.log(`in doc details ${finishrepo} and in reports `)
-//             res.status(200).json({success:true ,message:"report finished success"})
-//         }else{
-//             res.json({success:false, error:"report not finished"})
-//         }
-//     }catch(e){
-//           console.log('error in finishing report....',e)
-//           res.json({error:"error in finishing report",e })
-//     }
-
-// })
-
-// app.post('/setavailability',async(req,res)=>{ //****for doctor
-//     try{
-//         const {status}=req.body
-//         console.log('status...',status)
-//         const db=await getdb()
-//         const docscollection=await db.collection('doctors')
-//         const docrepos=await db.collection('docreports')
-//         const docId='D123478JO'
-
-        
-
-//         await docscollection.updateOne(
-//             { _id: docId },
-//             { $unset: { status: "" } } // Removes the field
-//         );
-
-//         const statusresults=await docscollection.updateOne(
-//             {
-//                 _id:docId
-//             },
-//             {
-//                 $set:{
-//                     "status":status
-//                 }
-//             }
-//         )
-
-//         if(statusresults.modifiedCount>0){
-//             const doc=await docscollection.findOne(
-//                 {
-//                     _id:docId
-//                 }
-//             )
-//             // console
-//             if(doc.status=='active'){
-//                 const docfound = await docrepos.findOne(
-//                     {
-//                         _id: docId,
-//                         "reports.date": new Date().toISOString().split('T')[0] // Correct way to filter
-//                     },
-//                     {
-//                         "reports.$": 1 // Only return the matched report
-//                     }
-//                 );
-
-//                 let newdate
-//                 if(!docfound){
-//                     console.log('doc not found')
-//                     newdate=await docrepos.updateOne(
-//                         {
-//                             _id:docId,
-                            
-//                         },
-//                         {
-//                             $push:{
-//                                 "reports":{
-//                                     "date": new Date().toISOString().split('T')[0],
-//                                     "patients":[]
-//                                 } 
-//                             }
-//                         }
-//                     )
-
-//                     console.log(newdate)
-//                 }
-//                 if(docfound || newdate.modifiedCount>0){
-//                     res.status(200).json({message:'status set to active '})
-//                 }else{
-//                     res.json({message:"error in setting active"})
-//                 }
-
-//             }else{
-//                 res.status(200).json({message:'You have successfully closed your session'})
-//             }
-//         }else{
-//             res.json({error:'error in updating doctors status'})
-//         }
-
-
-//     }catch(e){
-//         console.error('error in updating status',e)
-//         res.json({error:'error in updating status'})
-//     }
-// })
-
-// app.get('/reportpatients', async(req,res)=>{  //****for doctor
-//     try{
-//         const db=await getdb()
-//         const docrepos=await db.collection('docreports')
-//         docId='D123478JO'
-//         const reports=await docrepos.findOne({
-//             _id:docId
-//         })
-
-//         if(!reports){
-//                 await docrepos.insertOne(
-//                     {
-//                         _id:docId,
-//                         reports:[]
-//                     }
-//                 )
-
-//                 res.status(200).json({message:"No reports"})
-            
-//         }
-
-//         res.status(200).json(reports)
-
-
-//     }catch(e){
-//         console.log('error in getting the patients with reports' )
-//     }
-// })
-
-
-// app.post('/getreport',async(req,res)=>{   //****for doctor
-//     try{
-//         const db=await getdb()
-//         const repocollection=await db.collection('reports')
-//         const historycollection=await db.collection('history')
-//         const {repoId,userId}=req.body
-
-//        const [thereport,histories]=await Promise.all([
-//            repocollection.findOne(
-//                { _id: userId },
-//                {
-//                    _id: 1, // Include the patient ID
-//                    name: 1, // Include the patient's name
-//                    birthdate: 1, // Include birthdate
-//                    gender: 1, // Include gender
-//                    reports: { $elemMatch: { reportId: repoId } } // Match the specific report
-//                }
-//             ),
-//            historycollection.aggregate([
-//                 {
-//                     $match:{_id:"100984849132378172203"}
-//                 },
-//                 {
-//                      $unwind:"$histories"
-//                 },
-//                 {
-//                     $sort:{"histories.date":-1}
-//                 },
-//                 {
-//                  $group:{
-//                     _id:"$_id",
-//                     histories:{$push:"$histories"}
-//                  }
-//                 }
-//             ]).toArray()
-           
-//         ])
-//         if (!thereport || histories.length==0){
-//             res.status(200).json({message:'no reeport available'})
-//             return
-//         } 
-//         console.log(`report of ${userId} found`)
-//         console.log(histories)
-//         res.status(200).json({thereport,histories})
-
-
-
-//     }catch(e){
-//         console.error('error in getting single user reports...',e)
-//     }
-// })
-
-// app.post('/generaterepo',async(req,res)=>{
-//     try{
-//         // const {reportId,userId}=req.body
-//         const userId='BM382487'
-//         const reportId='2025-03-16T11:12:45.735Z'
-//         const db=await getdb()
-//         const  myreport=await db.collection('reports').findOne(
-//             {
-//                 _id:userId
-//             },{
-//                 _id:1,
-//                 name:1,
-//                 birthdate:1,
-//                 gender:1,
-//                 reports:{$elemMatch:{reportId:reportId}}
-//             }
-//         )
-//         console.log('my report for download..',myreport)
-//         const date=new Date(reportId).toLocaleDateString('en-US',{day:'numeric',month:'long',year:'numeric'})
-//         const today=new Date().getTime()
-//         const dob=new Date(myreport.birthdate).getTime()
-//         const age=new Date(today-dob).getUTCFullYear()-1970
-//         console.log(`${age}....${date}`)
-
-//         const htmlContent = `
-//         <!DOCTYPE html>
-//         <html lang="en">
-//         <head>
-//             <meta charset="UTF-8">
-//             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//             <title>Patient Report</title>
-//             <style>
-//                 /* Reset styles */
-//                 * {
-//                     margin: 0;
-//                     padding: 0;
-//                     box-sizing: border-box;
-//                 }
-    
-//                 /* Body and modal styling */
-//                 body {
-//                     font-family: Arial, sans-serif;
-//                     padding: 0 20px;
-//                     position: relative;
-//                 }
-    
-//                 .modal-content {
-//                     background: #fff;
-//                     width: 60%;
-//                     max-height: 93%;
-//                     border-radius: 10px;
-//                     display: flex;
-//                     margin: 5px;
-//                     padding: 5px;
-//                     flex-direction: column;
-//                     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-//                     overflow: hidden;
-//                 }
-    
-//                 .modal-header {
-//                     padding: 15px 20px;
-//                     border-bottom: 2px solid #ddd;
-//                     display: flex;
-//                     justify-content: space-between;
-//                     align-items: center;
-//                     font-weight: bold;
-//                     background: white;
-//                 }
-    
-//                 .modal-body {
-//                     overflow-y: auto;
-//                     overflow-x: hidden;
-//                     flex-grow: 1;
-//                     padding: 20px;
-//                     max-height: 80vh;
-//                 }
-    
-//                 .section {
-//                     margin-top: 15px;
-//                     display: flex;
-//                     flex-direction: column;
-//                 }
-    
-//                 .modal-footer {
-//                     padding: 10px;
-//                     background: white;
-//                     border-top: 1px solid #ddd;
-//                     display: flex;
-//                     justify-content: space-between;
-//                     align-items: center;
-//                     font-size: 12px;
-//                     position: fixed;
-//                     bottom: 0;
-//                     left: 0;
-//                     width: 100%;
-//                     border-top: 1px solid #ddd;
-//                 }
-    
-//                 /* Footer with page number styling */
-//                 .footer {
-//                     text-align: center;
-//                     font-size: 12px;
-//                     padding: 10px;
-//                     border-top: 1px solid #ddd;
-//                 }
-    
-//                 /* Page number styling */
-//                 .page-number {
-//                     content: counter(page);
-//                 }
-    
-//                 /* Ensure footer doesn't overlap content */
-//                 body {
-//                     padding-bottom: 60px;
-//                 }
-//             </style>
-//         </head>
-//         <body>
-//             <div class="modal-content">
-//                 <!-- Modal Header -->
-//                 <div class="modal-header">
-//                     <h2>Afyasphere</h2>
-//                     <p><strong>Date:</strong> <span id="reportDate">${date}</span></p>
-//                 </div>
-                
-//                 <!-- Modal Body -->
-//                 <div class="modal-body">
-//                     <!-- Patient Info -->
-//                     <div class="section">
-//                         <h3>Patient Report</h3>
-//                         <p><strong>Name:</strong> ${myreport.name}</p>
-//                         <p><strong>Age:</strong> ${age}</p>
-//                         <p><strong>Gender:</strong> ${myreport.gender}</p>
-//                     </div>
-                    
-//                     <!-- Metrics -->
-//                     <div class="section">
-//                         <h3>Most Recent Metrics</h3>
-//                         <ul>
-//                             <li><strong>Temperature:</strong> ${myreport.reports.metrics.temperature}&deg;C</li>
-//                             <li><strong>Blood Pressure:</strong> ${myreport.reports.metrics.bloodPressure.systolic}/${myreport.reports.metrics.bloodPressure.diastolic} mmHg</li>
-//                             <li><strong>Respiratory Rate:</strong> ${myreport.reports.metrics.respiratoryRate} breaths/min</li>
-//                             <li><strong>Pulse Rate:</strong> ${myreport.reports.metrics.pulseRate} bpm</li>
-//                         </ul>
-//                     </div>
-    
-//                     <!-- Diagnosis -->
-//                     <div class="section">
-//                         <h3>Symptoms Diagnosis</h3>
-//                         <p><strong>Symptoms:</strong> ${myreport.reports.Diagnosis[0].symptoms}</p>
-//                         <p><strong>Possible Condition:</strong> ${myreport.reports.Diagnosis[0].summary}</p>
-//                         <p><strong>Possible Condition:</strong> ${myreport.reports.Diagnosis[0].result}</p>
-//                     </div>
-                    
-//                     <!-- Nurse's Assessment -->
-//                     <div class="section">
-//                         <h3>Nurse's Assessment</h3>
-//                         <p>${myreport.reports.nurse.assessment}</p>
-//                     </div>
-    
-//                     <!-- Doctor's Assessment -->
-//                     <div class="section">
-//                         <h3>Doctor's Assessment</h3>
-//                         <p>${myreport.reports.doctor.assessment}</p>
-//                     </div>
-    
-//                     <!-- Recommendations -->
-//                     <div class="section">
-//                         <h3>Recommendations</h3>
-//                         <p>${myreport.reports.doctor.recommendation}</p>
-//                     </div>
-//                 </div>
-    
-//                 <!-- Modal Footer (No page number here) -->
-//                 <div class="modal-footer">
-//                     <p><strong>Report Sent By:</strong> ${myreport.reports.nurse.name}</p>
-//                     <p><strong>Report Assessed By:</strong> Dr. ${myreport.reports.doctors.name}</p>
-//                     <p>Generated by Afyasphere - confidential</p>
-//                 </div>
-//             </div>
-    
-//             <!-- Footer with page number -->
-//             <div class="footer">
-//                 Page <span class="page-number"></span>
-//             </div>
-//         </body>
-//         </html>`;
-
-//         const browser=await puppeteer.launch()
-//         const page=await browser.newPage()
-//         await page.setContent(htmlContent)
-//         const pdfbuffer=await page.pdf({
-//             path:'report.pdf',
-//             format:'A4',
-//             displayHeaderFooter:true,
-//             footerTemplate:`<div style="font-size: 12px; text-align: center; width: 100%;">Page <span class="pageNumber"></span></div>`,
-//             margin: { top: "60px", bottom: "60px" }, 
-//         })
-//         await browser.close()
-//         res.set({
-//             'Content-Type':'application/pdf',
-//             'Content-Disposition': 'attachment; filename="Patient_Report.pdf"'
-
-//         })
-//         res.send(pdfbuffer)
-        
-
-
-//     }catch(e){
-//         console.error('errro in generating a report...',e)
-        
-//     }
-
-// })
-
-// app.post('/sendrepo',async(req,res)=>{
-//     try{
-//         const {repoId,nurseassesment,docId}=req.body
-//         // let amuser=req.user.nurse? req.user.user:req.user
-//         // const userId=amuser._id
-//         console.log('docId...',docId)
-//         const userId="BM382487"
-//         const db=await getdb()
-//         const repocollection=await db.collection('reports')
-//         const docrepos=await db.collection('docreports')
-//         const doctors=await db.collection('doctors')
-//         // const myimage=amuser.image?amuser.image:" "
-
-//         const doc=await doctors.findone({
-//             _id:docId
-//         })
-
-//         if(!doc || doc.status!=="active"){
-//             res.json({message:'Doctor not available , get another one'})
-//         }
-//         docdetails={
-//             id:doc._id,
-//             name:doc.name,
-//             speciality:doc.speciality,
-            
-//         }
-
-       
-     
-//         const instructions=`given the following statement ${nurseassesment} return only and only a one sentence summary , your response should be only and only the summary nothing else`
-//         const summary=await getsummary(instructions)
-//         const docsreport={
-//             reportId:repoId,
-//             sentdate:new Date(),
-//             id:userId,
-//             tname:'Brian Michaels',
-//             image:"",
-//             reportsummary:summary,
-//             status:'pending'
-//             }
-
-//          await repocollection.updateOne(
-//                 {
-//                     _id:userId,
-//                     "reports.reportId":new Date(repoId)
-//                 },{
-//                     $unset:{
-//                         "reports.$.nurse.assesment":1
-//                     }
-//                 }
-//          )
-
-
-//         const [userreport,docreport]=await Promise.all([
-
-//             repocollection.updateOne(
-//                 {
-//                     _id:userId,
-//                     "reports.reportId":new Date(repoId)
-//                 },{
-//                     $set:{
-//                         "reports.$.nurse.assesment":nurseassesment,
-//                         "repors.$.doctor":docdetails
-//                     }
-//                 }
-//             ),
-//             docrepos.updateOne(
-//                 {
-//                     _id:docId,
-//                     "reports.date":new Date().toISOString().split('T')[0]
-//                 },
-//                 {
-//                     $push:{ 
-//                         "reports.$.patients":docsreport
-//                     }
-
-//                 }
-//             )
-
-//         ])
-//         if(userreport.modifiedCount>0 &&docreport.modifiedCount>0){
-//             res.status(200).json({success:true ,message:'report sent to doctor successfully'})
-//         }else{
-//             console.log(`error in sending report \n ${userreport }\n ${docreport}`)
-//             res.json({success:false,error:'failed to send report to doc'})
-//         }
-
-        
-
-//     }catch(e){
-//         res.status(400).json({message:`error in sending report to doc ${e}`})
-//         console.error('error in sending report to doctor',e)
-//     }
-
-// })
 
 
 async function getsummary(instruction){
@@ -826,6 +224,8 @@ app.post('/askgroq',async(req,res)=>{
     console.log('results from groq...',results)
     res.status(200).json(results)
 })
+
+// app.post('/ask')
 
 app.post('/acceptcancel',async(req,res)=>{
     try{ 
@@ -1043,31 +443,38 @@ app.get('/get/:id',
 app.post('/ask',
     async(req , res)=>{
     try{
-        console.log('asked...')
-        const {message}=req.body
+        // console.log('asked...')
+        // const {message}=req.body
 
-        const data={
-            question : message,
+        // const data={
+        //     question : message,
             
-        }
+        // }
         
-        const response = await fetch(
-            "http://20.4.189.12:3000/api/v1/prediction/45f5a627-3b9d-4f90-a7df-597c1729b0f1",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            }
-        );
+        // const response = await fetch(
+        //     "http://20.4.189.12:3000/api/v1/prediction/45f5a627-3b9d-4f90-a7df-597c1729b0f1",
+        //     {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-Type": "application/json"
+        //         },
+        //         body: JSON.stringify(data)
+        //     }
+        // );
 
-        // console.log()
-        // savesession(response)
-        const result = await response.json();
-        // console.log( `response: ${result.text}`)
-        // const saved = await savesession(result)
-        // console.log(saved)
+        // // console.log()
+        // // savesession(response)
+        // const result = await response.json();
+        // // console.log( `response: ${result.text}`)
+        // // const saved = await savesession(result)
+        // // console.log(saved)
+        console.log('asking groq.....')
+        const {message}=req.body
+        console.log('question asked...',message)
+        const instruction=` you are a health assistant who answers health related questions,given the following ${message} , give me related insights and answer the question correctly and alwas finish by asking the user to alwas visit the doctor`
+        const results=await  getsummary(instruction)
+        console.log('results from groq...',results)
+        res.status(200).json(results)
         console.log(result)
     
         res.status(200).json(result)

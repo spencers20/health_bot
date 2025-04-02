@@ -22,7 +22,7 @@ const storage=multer.diskStorage({
 })
 
 const fileFilter=(req,file,cb)=>{
-    const allowedtypes=['image/jpeg', 'image/png', 'application/pdf']
+    const allowedtypes=['image/jpeg', 'image/png', 'image/avif', 'application/pdf']
     allowedtypes.includes(file.mimetype)?cb(null,true):cb(new Error('Invalid file'))
 
 }
@@ -172,6 +172,78 @@ router.post('/createnurse',upload.single('photo'),async(req,res)=>{
     }
 })
 
+router.post('/createadmin',upload.single('photo'),async(req,res)=>{
+    try{
+        const db=await getdb()
+        let adminname=req.body.name
+
+        const admins=await db.collection('administrator')
+        const alladmins=await admins.find().toArray()
+        if(alladmins.length===4){
+            res.status.json({message:'maximum number of admins in system,remove one to add'})
+            return
+        }
+        const existingadmin=await admins.findOne({id:req.body.id})
+        if(existingadmin){
+            res.status(200).json({message:'Doctor already in system,'})
+            return
+        }
+    
+        let adminid
+        let adminindb
+        let attempts=0
+        let maxattempts=10
+        do{
+           const genid=generatemyid(adminname)
+           adminid='AM'+genid.slice(2,9)+genid.slice(0,2)
+           adminindb=await admins.findOne({
+            _id:adminid
+
+           })
+           attempts++
+           if(attempts>maxattempts){
+            throw new Error('Failed to generate docid, try again')
+           }
+            
+        }while(adminindb)
+
+        const  admin={
+            _id:adminid,
+            name:adminname,
+            id:req.body.id,
+            phone:req.body.phonenumber,
+            email:req.body.email,
+            birthdate:req.body.birthdate,
+            image:`http://localhost:3000/${req.file.path}`,
+            imagefileType:req.file.mimetype,
+            type:req.body.role,
+            role:'Admin'
+        }
+        console.log('admin details/..',admin)
+        
+        const insertedadmin=await admins.insertOne(admin)
+        console.log('inserteddoc....',insertedadmin)
+        if(insertedadmin.acknowledged){
+            const email=req.body.email
+            console.log('new Admin created')
+            const subject='Admin Account created successfully'
+            const body=`Here is your Admin Id  ${adminid}, use it as your username to login into your app , use  your national id as your password`
+            const sentmail=await sendmail(email,subject,body)
+            console.log('email sent...',sentmail)
+
+            if(insertedadmin.insertedId==adminid ){
+                console.log('Admin...inserted successfully...',adminid)
+                sentmail.accepted.length>0?res.status(200).json({message:'The Doctor has been added successfully. Please ask them to check their email for further details.'}):res.status(200).json({message:'Doctor created successfully, check db for details'})
+                }
+
+        }
+
+    }catch(e){
+        console.log('error in creating admin..',e)
+        res.json({error:'error in creating admin'})
+    }
+})
+
 router.get('/',
     passport.authenticate('google', { scope: ['profile','email'] })
 );
@@ -275,11 +347,12 @@ router.post('/loginuser', (req, res, next) => {
                 req.session.user=req.user
                    return res.json({redirect:'/user'});
                 // return res.render('chat.ejs',{user})
-            } else if (user.role === 'Doctor') {
+             } else if (user.role === 'Doctor') {
                 console.log('user is a doctor')
                 req.session.doc=req.user
                 return res.json({redirect:'/doctors'});
             } else {
+                req.session.admin=req.user
                 return res.json({redirect:'/admin'});
             }
         });

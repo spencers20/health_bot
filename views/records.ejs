@@ -165,6 +165,8 @@
 </head>
 <body>
     <div>
+          <!-- custom-alert -->
+    <%- include('alert') %>
 
         <div class="header">
             <!-- <div class="header_container">
@@ -235,9 +237,9 @@
     
             </div>
 
-            <div class="filter" style="display: flex; margin-top: 25px; "svgid="history entry">
+          <div class="filter" style="display: flex; margin-top: 25px; "svgid="history entry">
                 
-                <div class="filtercontainer" >
+               <div class="filtercontainer" >
                     <div style="margin-top:0px; margin-left:20px ; font-size: 18px;">entry type</div>
                     <div style="cursor: pointer; border: 1px solid black ; padding:5px; display: flex; justify-content: space-between; width:150px ;  margin-top:10px;  background-color: rgb(235, 235, 235);"> 
                         <div style="display:flex; flex-direction: column;position:relative;width:100% ;">
@@ -258,10 +260,9 @@
                     
                     </div>
     
-                </div>
+                </div> 
                 
-    
-               <div class="filtercontainer" id="duration" >
+           <div class="filtercontainer" id="duration" >
                 <div style="margin-top:0px; margin-left : 20px ;font-size: 18px; ">since</div>
                 <div style="cursor: pointer; border: 1px solid black ; padding:5px; display: flex; justify-content: space-between; width:150px ;  margin-top:10px;  background-color: rgb(235, 235, 235);"> 
                    <div style="display:flex; flex-direction: column;position:relative;width:100% ">
@@ -279,19 +280,19 @@
                     </div>
     
                 </div>
-                </div>
+                </div> 
     
-                <div class="filtercontainer"  >
+                 <div class="filtercontainer"  >
                     <div style="margin-top:0px; margin-left: 20px; font-size: 18px;">entry classification</div>
                     <div style="cursor: pointer; border: 1px solid black ; padding:5px; display: flex; justify-content: space-between; width:150px ;  margin-top:10px; background-color: rgb(235, 235, 235);"> 
                         <div style="flex-direction: column;display: flex; width: 100%;">
                             <span id="currententry" style=" background-color: azure; " onclick="classificationDropdown()" >all entries</span>
                             <div  id="entryclassification" style="  display: none; flex-direction: column;position:relative;width:100% ">
-                               <!-- <span style="display:flex "> -->
+                
                                 <span id="allentry" style=" display: flex; margin:5px ">all entries</span>
                                 <span  id = "starred" style="margin:5px; display:flex ">starred entry</span>
                                 <span  id = "bin" style="margin: 5px; display:flex ">archived entry</span>
-                               <!-- </span> -->
+                             
     
                             </div>
                         </div>
@@ -302,11 +303,11 @@
                         </div>
         
                     </div>
-                    </div>
+                    </div> 
         
                 
     
-            </div>
+            </div> 
           
             
         

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Health Report</title>
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Body and report styling */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            position: relative;
+            background-color: #f4f4f4;
+        }
+
+        /* Page layout and structure */
+        .report-container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            overflow: hidden;
+            height: 150px;
+          
+            /* padding-bottom: 10px; */
+            border-bottom: 2px solid #ddd;
+        }   
+
+   
+
+        #patienthead{
+            font-size: 20px;
+            text-align: center;
+            flex-grow: 1;
+            font-weight: bold;
+            color: #333;
+            /* background-color: aqua; */
+        }
+
+        /* Section styles */
+        .section {
+            margin-top: 20px;
+        }
+
+        .section h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .section p, .section ul {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .section ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .section ul li {
+            margin-bottom: 8px;
+        }
+
+        .footer {
+        
+            font-size: 12px;
+            /* color: #777; */
+            margin-top: 30px;
+            height: 80px;
+            align-items: center;
+            
+            margin: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Page break for printing */
+        @media print {
+            .no-print {
+                display: none;
+            }
+            
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            .report-container {
+                margin: 0;
+                padding: 15px;
+                page-break-before: always;
+            }
+
+           
+
+            .page-number::after {
+                content: counter(page);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        
+        <!-- Report Content -->
+        <div class="section">
+            <h3>Patient Information</h3>
+            <p><strong>Name:</strong> ${myreport[0].name}</p>
+            <p><strong>Age:</strong> ${age}</p>
+            <p><strong>Gender:</strong> ${myreport[0].gender}</p>
+            <p><strong>Report Date:</strong>${date}</p>
+        </div>
+
+        <div class="section">
+            <h3>Health Metrics</h3>
+            <ul>
+                <li><strong>Temperature:</strong>  ${myreport[0].reports[0].metrics.temperature}&deg;C</li>
+                <li><strong>Blood Pressure:</strong>  ${myreport[0].reports[0].metrics.bloodPressure.systolic}/${myreport[0].reports[0].metrics.bloodPressure.diastolic} mmHg</li>
+                <li><strong>Respiratory Rate:</strong> ${myreport[0].reports[0].metrics.respiratoryRate} breaths per minute</li>
+                <li><strong>Pulse Rate:</strong>  ${myreport[0].reports[0].metrics.pulseRate} beats per minute</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>Symptoms Diagnosis</h3>
+            <p><strong>Symptoms:</strong>${myreport[0].reports[0].Diagnosis[0].symptoms}</p>
+            <p><strong>Possible Conditions:</strong></p>
+            ${myreport[0].reports[0].Diagnosis[0].summary}
+        </div>
+
+        <div class="section">
+            <h3>Nurse's Assessment</h3>
+            <p>${myreport[0].reports[0].nurse.assesment}</p>
+        </div>
+
+        <div class="section">
+            <h3>Doctor's Assessment</h3>
+            <p>{myreport[0].reports[0].doctor.assessment}</p>
+        </div>
+
+        <div class="section">
+            <h3>Recommendations</h3>
+            ${myreport[0].reports[0].doctor.recommendation}
+        </div>
+
+      
+        
+        <div class="footer">
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 20px;">
+                
+                <!-- Attending Nurse and Consulting Doctor details -->
+                <div >
+                    <p style="color: black;"><strong>Attending Nurse:</strong> Hellen Marry</p>
+                    <p style="color: black;"><strong>Consulting Doctor:</strong> Dr. Mercy Mokaya</p>
+                </div>
+        
+                <div style="width: 20%;">
+                    <img src="/logo/Pink Green Simple Modern Health Center Logo.png" 
+                         style="width: 100%; height: 90%; object-fit: cover;" 
+                         alt="Afyasphere Logo">
+                </div>
+                
+                <!-- Confidential notice on the right -->
+                <div style="width: 20%; text-align: right;">
+                   <!-- Page number at the bottom -->
+            <p class="page-number" style="text-align: center; font-size: 12px; color: #777;">Page <span class="page-number"></span></p>
+                </div>
+            </div>
+    </div>
+</body>
+</html>
+
+
+
+    
+</div>

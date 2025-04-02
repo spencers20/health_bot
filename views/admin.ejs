@@ -31,7 +31,7 @@
                 align-items: center;
                 position: sticky;
                 flex-direction: row;
-                gap:80%;
+                gap:70%;
                 z-index: 100;
                 box-shadow: 0 4px 8px rgba(0,0,0,0.1);
                 font-family: Arial, sans-serif;
@@ -61,439 +61,39 @@
             border-radius: 12px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             }
-            .side-icon{
-            margin: 5px; 
-            display: flex;
-            flex-direction: row; 
-            align-items: center;
-            justify-content: center;
-            padding: 5px;
-            cursor: pointer;
-
-           }
-           .side-icon:hover {
-            background-color: #f0f0f0;
-            border-radius: 5px;
-        }
-
-
-
-     
-        .doc-card {
-    margin: 0;
-    padding: 0;
-    width: 43%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    background-color: #fff;
-    overflow-y: auto;
-    overflow-x: hidden;
-    margin-top: 19px;
-    margin-left: 15px;
-    max-height: 620px;
-    box-sizing: border-box;
- 
-}
-
-.card-head {
-    margin: 0;
-    padding:10px 20px;
-    width: 100%;
-    background-color: #f4f4f9;
-    border-bottom: 1px solid #ccc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    /* height: 30px; */
-    z-index: 100;
-    box-sizing: border-box;
-}
-
-.availability {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-    margin-top: 5px;
-    color: #333;
-    font-weight: bold;
-}
-
-.docnurse-card {
-    margin: 10px;
-    padding: 1px 15px ;
-    width: 35%;
-    display: flex;
-    flex-direction: column;
-    background-color: #f6f6f7;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    height: 80vh;
-    overflow-y: auto;
-  
-    margin-top: 20px;
-    box-sizing: border-box;
-}
-
-.report-header {
-    display: flex;
-    flex-direction: row;
-    /* justify-content: space-between; */
-    gap:200px;
-    padding: 5px 10px;
-    border-bottom: 2px solid rgb(194, 190, 190);
-    margin-bottom: 10px;
-    color: #333;
-    font-weight: bold;
-    /* background-color: #fff; */
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.headertitles {
-    color: #130101;
-    /* border-bottom: 2px solid #c97474; */
-    cursor: pointer;
-    padding-bottom: 3px;
-    margin-bottom: -2px;
-    transition: color 0.3s, border-color 0.3s;
-}
-
-
-
-        .doc-details {
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    z-index: 100;
-    padding: 5px;
-    box-sizing: border-box;
-    position: fixed;
-    width: 100vw; /* Use viewport width to ensure full coverage */
-    height: 100vh; /* Use viewport height for full coverage */
-    display: none;
-    border-radius: 10px;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    flex-direction: row;
-    background-color: rgba(29, 27, 27, 0.9);
-    margin: 0; /* Remove any default margin */
-}
-
-        .doc-detail-image{
-            padding: 10px;
-            margin: 10px; 
-            margin-left: 20px ;
-            height:400px;
-            width: 300px; 
-            display: flex;  
-            background-size: cover; 
-            background-position: top center; 
-            border-radius: 15px; 
-            align-self: center;
-        }
-
-        .name-type{
-            color: white; 
-            margin-bottom:20px ;
-            background-color: #010c1a; 
-            margin: 10px;
-            padding: 10px;
-            border-radius: 30px; 
-            align-items: center;
-            display: flex;
-            justify-content: center; 
-            flex-direction: column;
-        }
-        .sendtodoc{
-            display: flex;
-            flex-direction: column;
-            
-            background-color: #f0f0f0; 
-            height: 400px; 
-            width: 500px;
-            border-radius: 12px;
-            padding: 10px;
-            margin: 5px;
-            margin-right: 5px;
-            
-
-        }
-        textarea {
-           
-            padding: 12px;
-            font-size: 16px;
-            border: none;
-            background-color: #b7c3c7;
-            border-radius: 8px;
-            outline: none;
-            color: #333;
-            resize: none;
-            margin-top: 10px;
-            height: 100px;
-        }
-
-        .session-button{
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 5px;
-            border-radius: 20px;
-            margin: 5px;
-            font-size: 15px;
-            cursor: pointer;
-            border: 1px solid rgb(24, 1, 34,0.7);  
-        }
-
-        .book-button{
-            margin-top: 20px;
-            border-radius: 15px;
-            background-color: rgb(38, 38, 153);
-            color:white;
-            align-items: center;
-            cursor: pointer;
-            border-radius: 10px;
-            width: 200px;
-            align-self: center;
-          
-
-
-        }
-
-
-        .session-button:hover {
-            border: none;
-            color: black;
-            box-shadow: 0 1px 5px rgba(110, 135, 150, 0.7); /* Valid shadow */
-            background-color: rgba(110, 135, 150, 0.1); /* Slight color change on hover */
-        }
        
-      
-              
-
-        .calendar{
-            display: flex;
-            margin:5px;
-            padding:5px; 
-            overflow: hidden;
-            border-radius: 10px;
-            background-color: rgb(220, 237, 245); 
-            /* height: 200px  !important; */
-
-        }
-
-        
-
-        .headertittles{
-                cursor: pointer; 
-                width: 40%;
+            .card-head {
+                margin: 0;
+                padding:10px 20px;
+                width: 100%;
+                background-color: #f4f4f9;
+                border-bottom: 1px solid #ccc;
+                display: flex;
                 align-items: center;
                 justify-content: center;
+                box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+                position: sticky;
+                top: 0;
+                /* height: 30px; */
+                z-index: 80;
+                box-sizing: border-box;
+            }
+            
+            .docnurse-card {
+                margin: 10px;
+                padding: 1px 15px ;
+                width: 35%;
                 display: flex;
-                color:rgb(156, 154, 154);
-                transition: border-bottom 0.7s ease-in-out;
-            }
-
-            .headertittles.active{
-                color:rgb(2, 34, 61);
-                border-bottom:1.5px solid rgb(45, 45, 102);
-                font-size: 18px;
-
-            }
-            
-            
-            select {
-                width: 200px;
-                padding: 10px;
-                font-size: 15px;
-                border:1px solid rgb(231, 231, 231);
-                border-radius: 5px;
-                background-color: white;
-                appearance: none;
-                cursor: pointer;
-              }
-            select:hover {
-                border-color: #0056b3;
-              }
+                flex-direction: column;
+                background-color: #f6f6f7;
+                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+                border-radius: 10px;
+                height: 80vh;
+                overflow-y: auto;
               
-            select:focus {
-                outline: none;
-                border-color: #7e615b;
+                margin-top: 20px;
+                box-sizing: border-box;
             }
-
-            select option {
-                background-color: white;
-                font-size: 14px;
-                color: black;
-              }
-                
-
-                
-                
-        .doctor-list{
-            display: flex;
-            flex-direction: column;
-            /* overflow: auto; */
-
-            /* width: 35%; */
-
-        }
-        .main-doc{
-            display: flex;
-            /* height: 100vh; */
-            flex-direction: row;
-            background-color: rgb(248, 248, 248);
-            border-radius: 10px;
-            padding: 10px;
-            margin-top:5px ;
-            box-shadow: 0 0px -4px rgb(167, 167, 168)  inset;
-        }
-        /* #doc-name{
-            color:#333;
-            font-size: 19px; 
-            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-        } */
-        .doc-profile{
-            height: 100px;
-            width: 100px;
-            border-radius: 8px;
-            align-items: center;
-            display: flex;  
-            background-size: cover; 
-            background-position: top center;
-        }
-
-        .doc-type{
-            margin-top: 3px;
-            color:rgb(3, 97, 81);
-            font-size: 17px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .doc-description{
-            font-size: 17px;
-            font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color:rgb(110, 109, 105);
-            margin-top:3px;
-        }
-        .doc-lower{
-            display: flex;
-            flex-direction: row;
-            margin-top: 10px; 
-            gap:40px;
-            font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-            align-items: center;
-            margin-left:50px;
-        }
-
-        .send-book{
-            box-shadow:0 0  1px  rgb(39, 42, 43) inset ;
-            border:1px dotted rgb(39, 42, 43); 
-            border-radius: 10px; 
-            padding: 3px;
-            cursor: pointer; 
-            font-size: 15px;
-        }
-
-        .confirmation{
-            display: flex;
-            margin:5px;
-            align-self: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 17px;
-            color:green;
-            display: flex;
-            /* Modal Content */
-        }
-    .modal-content {
-        background: rgb(255, 255, 255);
-        width: 60%;
-        max-height: 93%;
-        border-radius: 10px;
-        display: flex;
-        margin:5px;
-        padding: 5px;
-        flex-direction: column;
-        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-        overflow: hidden; /* Prevents content from overflowing */
-    }
-
-    .hidden{
-        display:none
-    }
-    
-    /* Sticky Header */
-    .modal-header {
-        position: sticky;
-        top: 0;
-        background: white;
-        padding: 15px 20px;
-        border-bottom: 2px solid #ddd;
-        z-index: 10;
-        display: flex;
-        
-        justify-content: space-between;
-        align-items: center;
-        font-weight: bold;
-    }
-    
-    /* Scrollable Modal Body */
-    .modal-body {
-        overflow-y: auto;
-        overflow-x: hidden;
-        flex-grow: 1; /* Enables scrolling inside modal */
-        padding: 20px;
-        max-height: 80vh; /* Ensures the body is scrollable */
-        /* background-color: aqua; */
-    }
-    
-    .modal-footer {
-        position: sticky;
-        bottom: 1px;
-        background: white;
-        border-top: 1px solid #ddd;
-        padding: 5px;
-        /* max-height: 30px !important;  */
-        align-items: center;
-        display: flex;
-        /* overflow:hidden; */
-        /* background-color: #0056b3; */
-    }
-    
-    
-    /* Close Button */
-    .close {
-        cursor: pointer;
-        font-size: 20px;
-        font-weight: bold;
-    }
-    
-    /* Sections */
-    .section {
-        margin-top: 15px;
-        display:flex;
-       flex-direction: column;
-    }
-    
-   
-    
-    .clicked-docs {
-    cursor: pointer;
-    font-weight: bold;
-    color: #2b8a3e;            /* Green color for active look */
-    background-color: #e8f5e9; /* Light green background */
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s, color 0.3s;
-}          
-
-
-
 
          .popup-profile{
             position: absolute;
@@ -507,7 +107,7 @@
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             padding: 10px;
             display: none;
-            z-index: 110;
+            z-index: 140;
         }
 
         .popup-profile div {
@@ -588,6 +188,122 @@
             border-bottom: 2px solid #333;
             padding-bottom: 8px;
         }
+        .popup-overlay {
+            /* display: none; */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        /* Card Container */
+        .popup-card {
+            background: #f4f4f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            position: relative;
+        }
+
+        /* Close button */
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #333;
+        }
+
+        /* Input fields */
+        .popup-card input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        /* Submit Button */
+        .submit {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        /* Open button */
+        .open-popup {
+            margin: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .popup-card { 
+            background-color: white; 
+            width: 600px; 
+            padding: 20px; 
+            box-shadow: 0px 4px 20px rgba(0,0,0,0.1); 
+            border-radius: 15px;
+            max-height: 90vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+         }
+        .popup-card h2 { margin-bottom: 15px; font-size: 20px; }
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 20px; 
+            position: st;
+        }
+        .header div { cursor: pointer; padding: 10px; background-color: #e0e0e0; border-radius: 8px; margin-right: 10px; }
+        .header div:hover { background-color: #c8c8c8; }
+        form { display: flex; flex-direction: column; gap: 10px; }
+        input[type=text], input[type=email], input[type=tel], input[type=date], input[type=file] { padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
+        .admin-list { 
+            margin-top: 15px; 
+            padding: 10px; 
+            background-color: #f4f4f9; 
+            border-radius: 10px; 
+            
+            overflow-y: auto; }
+        .admin-item { 
+            width: auto;
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            background-color: #fff;
+            margin-bottom: 10px; 
+            padding: 8px; 
+            border-radius: 8px; 
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1); }
+        .admin-details { 
+            display: flex; 
+            gap: 10px; 
+            align-items: center; }
+        .initials { 
+            background-color: #4caf50;
+             color: white; 
+             padding: 5px 10px; 
+             border-radius: 50%; 
+             font-weight: bold;
+             }
+        .remove-button { background-color: red; color: white; border: none; padding: 5px 8px; border-radius: 5px; cursor: pointer; }
+        .remove-button:hover { background-color: darkred; }
+        .radio-group { display: flex; gap: 15px; margin-top: 2px; }
             
             
 
@@ -601,24 +317,27 @@
             <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
     </head>
     <body>
+          <!-- custom-alert -->
+    <%- include('alert') %>
         <header>
-            <div style="font-size: 20px; font-weight: bold; color: #2c3e50;">AFYASPHERE</div>
+            <div style="display: flex;width: 100px;height: 100px;align-items: center;justify-content: center;overflow: hidden;">
+                <img src="/logo/Pink Green Simple Modern Health Center Logo.png" 
+                     alt="Afyasphere Logo" 
+                     style="width: 180%;height: 180%;object-fit: cover;margin-top: 20px;">
+            </div>
             <div style="display: flex; align-items: center;">
-                <div id="adminprof" style="margin: 5px; padding: 3px; border-radius: 50%; cursor:pointer; height: 50px; width: 50px; margin-right: 15px; background-color: #b7c3c7; display: flex; justify-content: center; align-items: center;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="90%" height="90%" viewBox="0 0 1024 1024">
-                        <path d="M512 616.2m-10 0a10 10 0 1 0 20 0 10 10 0 1 0-20 0Z" fill="#E73B37"/>
-                        <path d="M511.6 656.9m-10 0a10 10 0 1 0 20 0 10 10 0 1 0-20 0Z" fill="#E73B37"/>
-                        <path d="M512.4 697.7m-10 0a10 10 0 1 0 20 0 10 10 0 1 0-20 0Z" fill="#E73B37"/>
-                        <path d="M512 130.8c42.1 0 81.7 16.4 111.5 46.2s46.2 69.4 46.2 111.5-16.4 81.7-46.2 111.5c-29.8 29.8-69.4 46.2-111.5 46.2s-81.7-16.4-111.5-46.2c-29.8-29.8-46.2-69.4-46.2-111.5s16.4-81.7 46.2-111.5 69.4-46.2 111.5-46.2m0-44c-111.4 0-201.6 90.3-201.6 201.6C310.4 399.8 400.7 490 512 490c111.4 0 201.6-90.3 201.6-201.6S623.3 86.8 512 86.8zM512.3 523.5L84 681.4v255.7h856V681.4L512.3 523.5zM896 893.1H128V712.6l384.3-142.4L896 712.6v180.5z" fill="#39393A"/>
-                        <path d="M555.4 585.3l-1.4-0.5v159.9c0 11.7-4.8 22.3-12.4 30-7.7 7.7-18.3 12.4-30 12.4-23.4 0-42.4-19-42.4-42.4V585.3l-1.4 0.5-14.6 5.2v153.8c0 32.2 26.2 58.4 58.4 58.4S570 777 570 744.8V590.5l-14.6-5.2z" fill="#E73B37"/>
-                    </svg>
+                <div id="adminprof"  style="width: 70px; height: 70px; margin-right: 15px; border-radius: 50%; background-image: url(https://img.freepik.com/premium-photo/confident-ceo-portrait-mature-black-man-corporate-office-setting-kenya_209190-273178.jpg); background-size: cover; background-position: 50% 20%;cursor: pointer;">  
                 </div>
-                <span style="font-size: 16px; color: #2c3e50; font-weight: 500;">Admin</span>
 
+                <span id="adminname" style="font-size: 18px; color: #2c3e50; font-weight: 600; font-family: Arial, sans-serif; letter-spacing: 0.5px;background-color: #b3b3bd;padding: 4px 8px;border-radius: 5px;box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+               
+            </span>
+            
+            </div>
                 <!-- Popup -->
             <div class="popup-profile" id="popupMenu">
-                <div onclick="alert('Add Admin clicked')">Add Admin</div>
-                <div onclick="alert('Log Out clicked')">Log Out</div>
+                <div onclick="openPopup()">Manage Admin</div>
+                <div id="adminout" >Log Out</div>
             </div>
 
 
@@ -634,14 +353,14 @@
                     <div id="admincount" style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
                         0
                     </div>
-                    <div style="margin-left: 10px; font-size: 20px;"> Administrators</div>
+                    <div style="margin-left: 10px; font-size: 18px;"> Administrators</div>
                </div>
                 <div class="legend-card Doctor" >
                    
                     <div id="doctorcount" style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
                         0
                     </div>
-                    <div style="margin-left: 10px; font-size: 20px;"> Doctors</div>
+                    <div style="margin-left: 10px; font-size: 18px;"> Doctors</div>
 
             </div>
             <div class="legend-card Nurses"  >
@@ -649,7 +368,7 @@
                 <div id="nursecount" style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
                     0
                 </div>
-                <div style="margin-left: 10px; font-size: 20px;"> Nurses</div>
+                <div style="margin-left: 10px; font-size: 18px;"> Nurses</div>
 
               </div>
               <div class="legend-card User"  >
@@ -657,7 +376,7 @@
                 <div id="usercount" style="font-size: 38px; align-items: center; justify-content: center;  display: flex; flex-direction: column; height: 70%;">
                     0
                 </div>
-                <div style="margin-left: 10px; font-size: 20px;"> Users</div>
+                <div style="margin-left: 10px; font-size: 18px;"> Users</div>
 
             </div>
             
@@ -707,7 +426,7 @@
                         <label for="photo">Upload Photo:</label>
                         <input type="file" id="photo" name="photo" accept="images/*" required style="padding: 8px; margin-bottom: 10px; border-radius: 5px;">
                     
-                        <button class="submit" type="button" style="background-color: #4CAF50; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">Submit</button>
+                        <button class="submit" type="button" style="background-color: #4CAF50; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">Add</button>
                     </form>
                   
        
@@ -724,15 +443,7 @@
                         ">Add New Nurse</button>
                     </div>
                     <div class="all-nurses" >
-                        <!-- <div style="display: flex; align-items: center; margin-top: 10px; border-bottom: 1px solid #5e5e5e; padding: 10px 5px; height: 60px;">
-                            <div style="width: 70px; height: 70px; margin-right: 15px; border-radius: 50%; background-image: url('https://img.freepik.com/free-photo/close-up-health-worker_23-2149112513.jpg'); background-size: cover; background-position: 50% 20%;"></div>
-                            <div style="flex-grow: 1;">
-                                <span id="docid" style="display: block; font-weight: bold; color: #333;">D123478JO</span>
-                                <span id="name" style="display: block; font-size: 14px; color: #555;">Joseph Owens</span>
-                                <span id="speciality" style="display: block; font-size: 13px; color: #777;">Infectiologist, GP</span>
-                            </div>
-                            <div style="color: red; cursor: pointer; font-weight: bold;">Remove</div>
-                        </div> -->
+                       
     
                         
                     </div>
@@ -761,7 +472,7 @@
                         <label for="photo">Upload Photo:</label>
                         <input type="file" id="photo" name="photo" accept=".jpeg,.jpg,.png,.pdf" style="padding: 8px; margin-bottom: 10px; border-radius: 5px;">
                     
-                        <button class="submit" type="button" style="background-color: #4CAF50; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">Submit</button>
+                        <button class="submit" type="button" style="background-color: #4CAF50; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer;">Add</button>
                     </form>
                     
     
@@ -769,8 +480,63 @@
 
         </div>
 
+
+
+    <!-- Full-page Popup -->
+    <div class="popup-overlay" id="popup" style="display:none">
+        <div class="popup-card">
+            <div class="card-head"  style="margin:0 ;gap:30px" >
+                <button class="add" onclick="document.getElementById('admin-section').style.display='flex',
+                document.getElementById('admin-form').style.display='none'
+                ">Manage Admin</button>
+
+                <button class="add" onclick="document.getElementById('admin-form').style.display='flex',
+                document.querySelector('.admin-list').style.display='none'
+                ">Add Admin</button>
+            </div>
+            
+            <div id="admin-section" class="admin-list" style="display:flex;flex-direction: column;overflow-x: hidden ;">
+               
+            </div>
+    
+            <form id="admin-form" style="display:none; margin-top: 20px;">
+                <label>Full Name:</label>
+                <input type="text" name="name" placeholder="Enter full name" required>
+                <label>National ID:</label>
+                <input type="text" name="id" placeholder="Enter National ID" required>
+                <label>Email:</label>
+                <input type="email" name="email" placeholder="Enter Email" required>
+                <label>Phone Number:</label>
+                <input type="tel" name="phonenumber" placeholder="Enter Phone Number" required>
+                <label>Birthdate:</label>
+                <input type="date" name="birthdate" required>
+                <label>Upload Photo:</label>
+                <input type="file" name="photo" accept="image/*" required>
+                <label>Admin Type</label>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    
+                    <label style="display:flex;gap:10px">
+                        <input type="radio" name="role" value="General"> General
+                    </label>
+                    <label style="display:flex;gap:10px">
+                        <input type="radio" name="role" value="Doctors'"> Doctor
+                    </label>
+                    <label style="display:flex;gap:10px">
+                        <input type="radio" name="role" value="Nurses'"> Nurse
+                    </label>
+                </div>
+    
+                <button class="submit" style="width: 100px;" >Add</button>
+            </form>
+        </div>
+        
+    </div>
+
+   
+
+
        
-    <script src="/admin.js"></script>
+    <script src="/administrator.js"></script>
        
     </body>
 </html>

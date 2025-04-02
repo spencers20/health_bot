@@ -9,7 +9,7 @@
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         margin: 0;
         padding: 0;
-        background-color: #f4f4f7;
+        background-color: rgb(235, 234, 234);
         color: #333;
         overflow: hidden;
     }
@@ -30,6 +30,7 @@
             max-height:100vh;
             overflow: hidden ;
             display:flex;
+            background-color: rgb(250, 248, 250);
            
 
         }
@@ -149,15 +150,8 @@
 
 </head>
 <body>
-    <!-- <div class ="history-upbar">
-
-        <p style=" margin-left:600px; text-align: center ; font-size: 30px; font-weight: bold;"> AFYASPHERE
-            <p>
-        <p style="margin-left:400px; font-size:20px"> </p>
-
-
-
-    </div>   -->
+      <!-- custom-alert -->
+      <%- include('alert') %>
     <div class="header-container" style="position: sticky;"></div>
 
     
@@ -246,7 +240,7 @@
                 </span>
             </div>
            <div class="border-line"></div>
-           <div class="newentry-n-page" style="margin-top: 10px; gap:78%">
+           <div class="newentry-n-page" style="margin-top: 10px; gap:60%;display: flex;flex-direction: row;align-items: center;height: 30px;">
             <div id="newentry" class="entries" style="margin-top:30px ;">
                 <svg  style="margin-bottom:10px;  "xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <!-- Circle -->

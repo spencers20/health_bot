@@ -13,6 +13,13 @@ const selectrole=document.getElementById('loginparty')
 const displayrole=document.getElementById('displayrole')
 const nursepresent=document.getElementById('nursepresent')
 
+
+// Function to display the custom alert message
+// Function to display the custom alert message
+
+
+
+
 let role=''
 selectrole.addEventListener('change',()=>{
     const selectedtext=selectrole.options[selectrole.selectedIndex].text
@@ -69,22 +76,22 @@ document.querySelectorAll('.showhide').forEach((btn) => {
     });
 });
 
-nursepresent.addEventListener('change',()=>{
-    const passinput=document.querySelector('.signinpass')
-    if(nursepresent.checked){
-           document.getElementById('loginwithgoogle').style.display='none'
-           passinput.style.display='none'
-           ncode.style.display='flex'
-           document.querySelector('.middle').style.marginTop='70px'
+// nursepresent.addEventListener('change',()=>{
+//     const passinput=document.querySelector('.signinpass')
+//     if(nursepresent.checked){
+//            document.getElementById('loginwithgoogle').style.display='none'
+//            passinput.style.display='none'
+//            ncode.style.display='flex'
+//            document.querySelector('.middle').style.marginTop='70px'
 
-    }else{
-         document.getElementById('loginwithgoogle').style.display='flex'
-         document.querySelector('.middle').style.marginTop=''
-        ncode.style.display='none'
-        passinput.style.display='flex'
+//     }else{
+//          document.getElementById('loginwithgoogle').style.display='flex'
+//          document.querySelector('.middle').style.marginTop=''
+//         ncode.style.display='none'
+//         passinput.style.display='flex'
 
-    }
-})
+//     }
+// })
 
 
 
@@ -104,15 +111,17 @@ signinbtn.addEventListener('click',async(e)=>{
                 const userId=idinput.value
                 const password=passinput.value
                 if(!userId && !password){
-                    alert('enter all credentials')
+                    showCustomAlert('enter all credentials')
                 }else{
                     if(role=='doctor' && userId.length!==9){
-                        alert('invalid Doctor Id ')
+                        showCustomAlert('invalid Doctor Id ')
                         return
                     } else if(role=='personofcare' || role=='' && userId.length!==8){
-                        alert('invalid Person Of Care Id')
+                        showCustomAlert('invalid Person Of Care Id')
+                        return
                     }else if(role=='admin ' && userId.length!==10){
-                        alert('invalid admin')
+                        showCustomAlert('invalid admin')
+                        return
                     }
                      
                     console.log(`all credentials..${userId}..${password}.`)
@@ -161,7 +170,7 @@ confpassword.addEventListener('focus',(e)=>{
     const inputpassword=signup.querySelector('.passw-input')
     const passvalue=inputpassword.value
     if(passvalue.lenght<8){
-        alert('password should have 8 characters or more')
+        showCustomAlert('password should have 8 characters or more')
         signupbtn.setAttribute('disabled', true);
     } else {
         signupbtn.removeAttribute('disabled'); // Enable signup button
@@ -188,7 +197,7 @@ signupbtn.addEventListener('click',async(e)=>{
 
 
         if(firstpass!== password){
-            alert('first password should be same as the second')
+            showCustomAlert('first password should be same as the second')
             return;
         }
         else{
@@ -226,7 +235,7 @@ signupbtn.addEventListener('click',async(e)=>{
                 // const allcredentials=Object.values(credentials).every(credential=>credential!==undefined && credential!==null && credential!=="")
                 if (!mail || !myname ||  !password || !birthdate || !gender){
                     console.log( `gender ${gender} \n ${mail} \n ${password} \n ${myname} \n ${birthdate}`)
-                    alert('all fields should be filled before signing up')
+                    showCustomAlert('all fields should be filled before signing up')
                 }else{ 
                     // const myage=getage(birthdate)
                     // const descriptio
@@ -250,7 +259,7 @@ signupbtn.addEventListener('click',async(e)=>{
     
                     const createduser=await createuser.json()
                     if (createduser.acknowledged){
-                        alert('check your email for your ID; ')
+                        showCustomAlert('check your email for your ID; ')
                         signin.classList.add('active')
                         signup.classList.remove('active')
                         login.style.display='flex'

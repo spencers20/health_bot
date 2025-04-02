@@ -119,7 +119,8 @@ passport.use('local',new LocalStrategy(
             const User =db.collection('users')
             const Nurse=await db.collection('nurses')
             const Doctor=await db.collection('doctors')
-            const user= await User.findOne({_id:userId}) ||await Nurse.findOne({_id:userId}) || await Doctor.findOne({_id:userId})
+            const Admin=await db.collection('administrator')
+            const user= await User.findOne({_id:userId}) ||await Nurse.findOne({_id:userId}) || await Doctor.findOne({_id:userId})||await Admin.findOne({_id:userId})
             console.log('user found....',user)
             if(!user){
                 console.log('user not found...',userId)
@@ -129,18 +130,19 @@ passport.use('local',new LocalStrategy(
                 console.log('doctor authenticated')
                 return done(null,user)
                 
-            }else if(user.role=='admin'&& user._id==password){
-                console.log('doctor authenticated')
+            }else if(user.role=='Admin'&& user.id==password){
+                console.log('Admin authenticated')
+                return done(null,user)
+            }else{
+                const verified=await bcrypt.compare(password,user.password)
+                if(!verified){
+                    console.log('incorrect password for ..',userId)
+                    return done(null,false,{message:'incorrect password'})
+                }
+        
+                console.log('user authenticated..',user)
                 return done(null,user)
             }
-            const verified=await bcrypt.compare(password,user.password)
-            if(!verified){
-                console.log('incorrect password for ..',userId)
-                return done(null,false,{message:'incorrect password'})
-            }
-    
-            console.log('user authenticated..',user)
-            return done(null,user)
 
         
         }catch(e){

@@ -342,11 +342,8 @@
     </head>
     <body>
     
-        <!-- <div style="height: 10vh; background-color: white; position:sticky;width:100%;top:1px">
-            <div class="heading1" >
-                   <div>AFYASPHERE</div>
-            </div>
-            </div> -->
+          <!-- custom-alert -->
+    <%- include('alert') %>
 
             <div class="header-container" style="position: sticky;"></div>
             
@@ -473,14 +470,14 @@
                     </div>
                
             
-                <div style="width: 100%; display: flex; justify-content: center; gap: 20px; text-align: center; margin: 10px 0;">
-                    <p style="font-size: 14px;">Do you want to save your search?</p>
+                <div style="width: 100%; display: flex; justify-content: center; gap: 20px;align-items: center; margin: 10px 0;">
+                    <p style="font-size: 14px;">Save your search to report?</p>
                     <label>
-                        <input id="yes" type="checkbox">
+                        <input class="confirmtometrix" type="radio" value="yes" name="storetorepo">
                         <span style="margin-left: 5px;margin-top: 20px; ">Yes</span>
                     </label>
                     <label>
-                        <input id="no" type="checkbox">
+                        <input class="confirmtometrix" type="radio" value="no" name="storetorepo">
                         <span style="margin-left: 5px;margin-top: 20px;">No</span>
                     </label>
                     <button  class="symptombuttons" id="continue" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">

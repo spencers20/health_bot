@@ -113,7 +113,7 @@ async function insertvalue(mymetrics){
         localStorage.clear()
         console.log('mymetrics entered')
         if (mymetrics<4){
-            alert('please enter all the measurements again')
+            showCustomAlert('please enter all the measurements again')
             return;
         }
         const allmetrics=Object.assign({},...mymetrics)
@@ -142,7 +142,7 @@ async function insertvalue(mymetrics){
                 console.log(localStorage.getItem('repid'))
     
             }else{
-                alert(response.message)
+                showCustomAlert(response.message)
             }
 
             }
@@ -187,7 +187,7 @@ Array.from(valueinputt).forEach(valueinput=>{
                 if (cardId==='temperature'){
                     const metric="temperature"
                     mymetrics.push({
-                          [metric]:parseInt(valueentered,10)       
+                          [metric]:parseFloat(valueentered)       
                     }) 
                     if (mymetrics.length==4){
                         console.log('my metrics array...',mymetrics)
@@ -211,7 +211,7 @@ Array.from(valueinputt).forEach(valueinput=>{
                 } else if (cardId==='pressure'){
                   const sysvalue=sysinput.value
                   if(sysvalue==''){
-                      alert('enter the systolic value')
+                      showCustomAlert('enter the systolic value')
                       inputvalues.style.display='flex'
                       metricmiddle.style.display='none'
                   }
@@ -227,8 +227,8 @@ Array.from(valueinputt).forEach(valueinput=>{
 
                     const metric="bloodPressure"
                     const pvalues={
-                        systolic:Number(sysvalue),
-                        diastolic:Number(valueentered)
+                        systolic:parseFloat(sysvalue),
+                        diastolic:parseFloat(valueentered)
                     }
 
                     mymetrics.push({
@@ -236,7 +236,9 @@ Array.from(valueinputt).forEach(valueinput=>{
                     })
                     if (mymetrics.length==4){
                         console.log('my metrics array...',mymetrics)
-                        setTimeout(async()=>{ await insertvalue(mymetrics)},5000)
+                        setTimeout(async()=>{ await insertvalue(mymetrics)
+                            showCustomAlert('Metrics inserted, Generating a report...')
+                        },50)
                     }else{
                         console.log('move on..')
                     }
@@ -246,11 +248,11 @@ Array.from(valueinputt).forEach(valueinput=>{
                 } else   if (cardId==='pulse'){
                     const metric="pulseRate"
                     mymetrics.push({
-                        [metric]:Number(valueentered)
+                        [metric]:parseFloat(valueentered)
                     })
                     if (mymetrics.length==4){
                         console.log('my metrics array...',mymetrics)
-                        setTimeout(async()=>{ await insertvalue(mymetrics)},5000)
+                        setTimeout(async()=>{ await insertvalue(mymetrics)},50)
                     }else{
                         console.log('move on..')
                     }
@@ -270,12 +272,14 @@ Array.from(valueinputt).forEach(valueinput=>{
             } else{
                 const metric="respiratoryRate"
                 mymetrics.push({
-                    [metric]:Number(valueentered)
+                    [metric]:parseFloat(valueentered)
                 })
                 // await insertvalue(metric,Number(valueentered))
                 if (mymetrics.length==4){
                     console.log('my metrics array...',mymetrics)
-                    setTimeout(async()=>{ await insertvalue(mymetrics)},5000)
+                    setTimeout(async()=>{ await insertvalue(mymetrics)
+                        showCustomAlert('Metrics inserted, Generating a report...')
+                    },50)
                 }
 
                 if(valueentered >24 || valueentered<10 ){
@@ -412,8 +416,10 @@ window.addEventListener('click',(e)=>{
 Array.from(cardmetric).forEach(card=> card.addEventListener('click',async ()=>{
     try{
         const results=await fetch('/user/getmetrics')
-        const metricstrend=await results.json()
-        console.log('clicked card...')
+        const metricsresults=await results.json()
+        const metricstrend=metricsresults.metrepos.sort((a, b) => new Date(a.date) - new Date(b.date))
+        console.log(metricstrend)
+        console.log('clicked card...',metricstrend)
         const datakey=card.getAttribute('card-id')
         // const data=window[datakey]
         popup.style.display='flex'
@@ -423,8 +429,9 @@ Array.from(cardmetric).forEach(card=> card.addEventListener('click',async ()=>{
         const pulseRate = {};
         const respiratoryRate = {};
         
+        
         // Populate objects with date-value pairs
-        metricstrend.metrepos.forEach(report => {
+        metricstrend.forEach(report => {
             const date = new Date(report.date).toISOString().split('T')[0];  // Format date to YYYY-MM-DD
             const { metrics } = report;
           

@@ -78,31 +78,35 @@ async function eventschart(events){
 
 
 let duesetdate
-const calendar=new FullCalendar.Calendar(calendarEl,{
-      
-    initialView:'dayGridMonth',
-    selectable:true,
-    dateClick:(info)=>{
-         duesetdate=info.dateStr
-        try{
-            setremwithai.style.display='none'
-            setremwithdate.style.display='flex'
-            setdate.innerHTML=info.dateStr
-            alert("selected date :" +info.dateStr   )
-        } catch(e){
-            console.error('errror in date ',e)
-        }
-    },
-    height:'auto',
-    headerToolbar: {
-        left: 'prev,next',
-        center: 'title',  // This controls the title placement
-        right: ''
-      },
-  
-})
+function mycalendar(events){
+    const calendar=new FullCalendar.Calendar(calendarEl,{
+          
+        initialView:'dayGridMonth',
+        selectable:true,
+        dateClick:(info)=>{
+             duesetdate=info.dateStr
+            try{
+                setremwithai.style.display='none'
+                setremwithdate.style.display='flex'
+                setdate.innerHTML=info.dateStr
+                showCustomAlert("selected date :" +info.dateStr   )
+            } catch(e){
+                console.error('errror in date ',e)
+            }
+        },
+        height:'auto',
+        headerToolbar: {
+            left: 'prev,next',
+            center: 'title',  // This controls the title placement
+            right: ''
+          },
+          
+        
+    })
+    
+        calendar.render()
 
-    calendar.render()
+}
 
 saveevent.addEventListener('click',async()=>{
     try{
@@ -132,7 +136,7 @@ saveevent.addEventListener('click',async()=>{
             body:JSON.stringify({reminder})
         }).then(response=>{
             console.log('response ', response)
-            response.ok? alert('reminder stored'):console.error('not stored in db')
+            response.ok? showCustomAlert('reminder stored'):console.error('not stored in db')
         })
     } catch(e){
         console.log('error in saving event ',e)
@@ -234,7 +238,7 @@ function eventlist(events){
                 togglemenulist()
                 
             })
-             
+        
             //menulist functions
             async function menulistlistener(task){
                 try{
@@ -277,7 +281,7 @@ function eventlist(events){
                     task='complete'
                     const results=await menulistlistener(task) 
                     if (results.modifiedCount>0){
-                        alert('event completed successfully')
+                        showCustomAlert('event completed successfully')
                     }
                 }catch(e){
                     console.error('error in completing an event ',e)
@@ -294,7 +298,7 @@ function eventlist(events){
                     task='delete'
                     const results=await menulistlistener(task) 
                     if (results.modifiedCount>0){
-                        alert('event deleted successfully')
+                        showCustomAlert('event deleted successfully')
                     }
                 }catch(e){
                     console.error('error in deleting an event ',e)
@@ -310,7 +314,7 @@ function eventlist(events){
                     task='cancel'
                     const results=await menulistlistener(task) 
                     if (results.modifiedCount>0){
-                        alert('event canceled successfully')
+                        showCustomAlert('event canceled successfully')
                     }
                 }catch(e){
                     console.error('error in canceling an event ',e)
@@ -326,7 +330,7 @@ function eventlist(events){
                     task='activate'
                     const results=await menulistlistener(task) 
                     if (results.modifiedCount>0){
-                        alert('event activated successfully')
+                        showCustomAlert('event activated successfully')
                     }
                 }catch(e){
                     console.error('error in canceling an event ',e)
@@ -404,33 +408,62 @@ function todayevents(events){
     }
 }
 
+function formatTextToHTML(text) {
+    if (typeof text !== 'string') {
+        console.error("Expected a string but got:", typeof text, text);
+        return '';
+    }
+
+    // Convert **bold** text to <b>bold</b>
+    let formattedText = text.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); 
+
+    // Convert * or - bullet points to <li> (excluding numbered lists)
+    formattedText = formattedText.replace(/(^|\n)[*-] (.+?)(?=\n|$)/g, '<li>$2</li>');
+
+    // Wrap consecutive <li> elements inside a <ul>
+    formattedText = formattedText.replace(/(<li>.*?<\/li>)+/gs, match => `<ul>${match}</ul>`);
+
+    // Ensure numbered lists (1., 2., etc.) remain intact
+    formattedText = formattedText.replace(/(\d+\.)\s*(.+)/g, '<br>$1 $2');
+
+    // Convert double line breaks (paragraphs) to <p> tags
+    formattedText = formattedText.replace(/\n\s*\n/g, '</p><p>');
+
+    // Wrap the entire content in a <p> tag
+    formattedText = `<p>${formattedText}</p>`;
+
+    return formattedText;
+}
+
 //function to generate result from the AI model
 genreminder.addEventListener('click',async()=>{
     try{
+        showCustomAlert("Generating reminder...")
         const rem=reminder.value
         console.log('reminder',rem)
-        const response = await fetch('/ask', {
+        const response = await fetch('/user/greminder', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ rem })
+            body: JSON.stringify({rem})
         });
 
         console.log('response', response)
         reminderresult= await response.json()
         console.log('reminderresult', reminderresult)
+        
         genreminder.style.display='none'
         responsecontainer.style.display='flex'
 
         document.getElementById('e_tittle').innerHTML=reminderresult[0].summary
         document.getElementById('e_type').innerHTML=reminderresult[0].type
         document.getElementById('e_description').innerHTML=reminderresult[0].description
-        document.getElementById('event_datedue').innerHTML=reminderresult[0].datedue
-        document.getElementById('event_dateset').innerHTML=reminderresult[0].dateset 
+        document.getElementById('event_datedue').innerHTML=new Date(reminderresult[0].datedue).toLocaleDateString('en-US',{weekday:'short',day:'numeric',month:'numeric',year:'numeric'})
+        document.getElementById('event_dateset').innerHTML=new Date(reminderresult[0].dateset ).toLocaleDateString('en-US',{weekday:'short',day:'numeric',month:'numeric',year:'numeric'})
         // return reminderresult
     }catch(e){
-        console.error('error in generating reminder')
+        console.error('error in generating reminder',e)
     }
     console.log('generate reminder clicked')
 
@@ -449,7 +482,7 @@ setreminder.addEventListener('click',async()=>{
             },  
             body:JSON.stringify({reminder})
         }).then(response=>{
-            response.ok? alert('reminder created successfully'):console.log('reminder not set')
+            response.ok? showCustomAlert('reminder created successfully'):console.log('reminder not set')
         })
     }catch(e){
         console.error('error in setting reminder...',e)
@@ -571,4 +604,36 @@ async function allfunctions(){
      return eventsdist
 }
 
-document.addEventListener('DOMContentLoaded',allfunctions)
+document.addEventListener('DOMContentLoaded',async()=>{
+    
+    await allfunctions()
+    let events
+    const myevents= await getevents()
+    console.log("events",myevents)
+    mycalendar()
+    // myevents.forEach(event=>{
+    //     const eventdate=new Date(event.datedue).toISOString().split("T")[0]
+    //     const datetoday=new Date().toISOString().split('T')[0]
+    //     if (eventdate>=datetoday){
+    //         let eventcolor
+    //         if (event.status=="upcoming"){
+    //             eventcolor="#28A745"
+    //         }else{
+    //             eventcolor="#FF4500"
+    //         }
+    //         events.push({
+    //             title:event.type,
+    //             start:eventdate,
+    //             color:eventcolor,
+    //             status:event.status,
+    //             description:event.description
+     
+    //         })
+    //     }
+
+       
+
+
+    // })
+}
+    )

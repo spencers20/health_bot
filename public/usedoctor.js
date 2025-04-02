@@ -11,6 +11,7 @@ let myreports;
 let mydocId=''
 let alldoctors
 
+let loading=false
 
 // let allreports
 document.addEventListener('DOMContentLoaded',async()=>{
@@ -100,12 +101,14 @@ function getreports(reportId){
 
 function showreport(myreports,reports,docname){
     try{
+        const existingrepo=localStorage.getItem('reportidtosend')
+        console.log('existing reportid',existingrepo)
         const modalbody=document.querySelector('.modal-body')
         modalbody.innerHTML=''
         if(Object.keys(reports).length>0){
            
             const age = myreports?.[0]?.birthdate ? getage(myreports[0].birthdate) : "";
-            const diseases = reports?.Diagnosis?.length > 0 ? formatTextToHTML(reports.Diagnosis[0].summary) : "";
+            const diseases = reports?.Diagnosis?.length > 0 ? formatTextToHTML(reports.Diagnosis[0].summary) : "No diseases searched";
            
 
             const fulldiagnosis= reports?.Diagnosis?.length>0?formatTextToHTML(reports.Diagnosis[0].result):'No full report'
@@ -117,14 +120,24 @@ function showreport(myreports,reports,docname){
             if(reports.status=='pending'){
                 doctorasses=''
                 doctorrecomend=''
-                nurseases=reports?.nurse?reports.nurse.assesment:''
+                nurseases=reports?.nurse?reports.nurse.assesment:reports.myassesment
             }else{
                 doctorasses=reports.doctor.assessment
                 doctorrecomend=reports.doctor.recommendation
-                nurseases=reports.nurse.assesment
+                nurseases=reports?.nurse?reports.nurse.assesment:reports.myassesment
+            }
+            const existingReportDate = document.querySelector('.modal-header div');
+            const reportdate=document.createElement('div')
+            if (existingReportDate) {
+                existingReportDate.remove();
             }
 
-           
+            const date=new Date(reports.reportId).toLocaleDateString('en-Us',{day:'numeric',month:'long',year:'numeric'})
+            reportdate.innerHTML= 'Report for '+date
+            document.querySelector('.modal-header').appendChild(reportdate)
+
+            const mysymptoms=reports.Diagnosis[0].symptoms?reports.Diagnosis[0].symptoms:"No symptoms recorded"
+
             modalbody.innerHTML=`
                   <!-- Patient Info -->
                     <div class="section">
@@ -148,7 +161,7 @@ function showreport(myreports,reports,docname){
                     <!-- First Diagnosis -->
                     <div class="section">
                         <h3>Symptoms Diagnosis</h3>
-                        <p><strong>Symptoms:</strong> ${reports.Diagnosis[0].symptoms}</p>
+                        <p><strong>Symptoms:</strong> ${mysymptoms}</p>
                         <p style="margin-top:6px"><strong>Possible Condition:</strong> ${diseases}</p>
                         <p style="margin-top:6px ; cursor:pointer" id='togglereason'><strong>Reason for chosen condition:</strong> </p>
                         <span style="margin-top:6px; display:none;flex-direction:column" id="fullreason"> ${fulldiagnosis}</span>
@@ -156,9 +169,9 @@ function showreport(myreports,reports,docname){
         
                     <!-- Nurse's Assessment -->
                     <div class="section">
-                        <h3>Nurse Assesment</h3>
+                        <h3>Your Assesment</h3>
                          <p id="nurseAssesment">${nurseases} </p>
-                        <textarea  id="nurseNotes" placeholder="Enter any vital signs, initial observations, and any immediate concerns...."></textarea>
+                        <textarea  id="nurseNotes" placeholder="Briefly tell how you are feeling...."></textarea>
                     </div>
                     <div class="docs-part" style="flex-direction:column">
                     <div class="section">
@@ -176,68 +189,123 @@ function showreport(myreports,reports,docname){
 
                     <!-- Report Sent By -->
                     <div class="section" id="docnurse">
-                        <p><strong>Report Sent By:</strong>${Nursename}</p>
                         <p id="reposent"><strong>Report Sent To:</strong> Dr. ${docname}</p>
                         <p id="repoasses"><strong>Report Assesed :</strong> Dr. ${docname}</p>
                     </div>
             `
+            
             if (reports.status=='complete'){
+                localStorage.removeItem('reportidtosend')
+                document.querySelector('.modal-footer').innerHTML=''
                 document.getElementById('nurseNotes').style.display='none'
                 document.getElementById('reposent').style.display='none'
                 document.getElementById('nurseAssesment').style.display='flex'
                 document.querySelector('.docs-part').style.display='flex'
-                senddocbtn.style.display='none'
+                // senddocbtn.style.display='none'
                 document.querySelector('.modal-footer').innerHTML = `
                 <span style="font-weight: bold; color: green;">Report completed and assessed</span>
-                <button id="downloadrepo" style="margin-left: 50px;align-self:center; padding: 5px 10px; background-color: blue; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                  Download Report
+                
+                <button class="downloadrepo" style="margin-left: 50px;align-self:center; padding: 5px 10px; background-color: blue; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                  Generate Report
                 </button>
               `;
 
-              document.getElementById('downloadrepo').addEventListener('click',async()=>{
-                console.log('downloading report...')
-                const reportId=reports.reportId
-                console.log('report id to be downloaded...',reportId)
-                await fetch('/user/generaterepo',{
-                    method:'POST',
-                    headers:{
-                        'Content-Type':'application/json'
-                    },
-                    body:JSON.stringify({reportId})
-
-                })
-
-              })
-              
-            
-
-
             }else{
-                document.getElementById('nurseNotes').style.display='flex'
-                document.getElementById('nurseAssesment').style.display='none'
-                document.getElementById('repoasses').style.display='none'
-                document.querySelector('.docs-part').style.display='none'
-                document.querySelector('.modal-footer').innerHTML ='<button class="send-doc" >Submit</button>'
+                const docId=localStorage.getItem('mydocId')
+                const existingrepo=localStorage.getItem('reportidtosend')
+              
+                console.log('existingrepo:', existingrepo, 'docId:', docId); // Debugging
 
-                const senddocbtn=document.querySelector('.send-doc')
-                senddocbtn.addEventListener('click',async()=>{
-                    const docId=localStorage.getItem('mydocId')
-                    console.log('docId..',docId)
-                    if(!docId){
-                        alert('no doctor receiving report, Pick one')
-                        return
-                    }
-                    await sendreport(docId)
-                })
+                if(existingrepo && !docId){
+                    document.querySelector('.modal-footer').innerHTML=''
+                    document.querySelector('.modal-footer').innerHTML=`<span style="font-weight: bold; color: #007BFF;">This report has been selected and is ready to be sent to the doctor.</span>
+            
+                        <button class="notreport" style="margin-left: 50px;align-self:center; padding: 5px 10px; background-color: blue; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                          Not This Report
+                        </button>`
+                    document.querySelector('.notreport').addEventListener('click',()=>{
+                                const existingrepo=localStorage.getItem('reportidtosend')
+                                if(existingrepo){
+                                    console.log('report Id to cancel',existingrepo)
+                                    localStorage.removeItem('reportidtosend')
+                                    document.querySelector('.modal-footer').innerHTML=''
+                                   
+                                }
+                            })
+                        
 
+                    
+                }else{
+
+                    document.querySelector('.modal-footer').innerHTML=''
+                    document.getElementById('nurseNotes').style.display='flex'
+                    document.getElementById('nurseAssesment').style.display='none'
+                    document.getElementById('repoasses').style.display='none'
+                    document.querySelector('.docs-part').style.display='none'
+                    document.querySelector('.modal-footer').innerHTML ='<button class="send-doc" >Submit</button>'
+    
+                    const senddocbtn=document.querySelector('.send-doc')
+                    senddocbtn.addEventListener('click',async()=>{
+                        const docId=localStorage.getItem('mydocId')
+                        console.log('docId..',docId)
+                        if(!docId){
+                            showCustomAlert('no doctor receiving report, Pick one')
+                            return
+                        }
+                        await sendreport(docId)
+                    })
+    
+                }
+    
             }
             const nursenotes=modalbody.querySelector('#nurseNotes')
-            nursenotes.placeholder = reports?.nurse?.assesment || nursenotes.placeholder;
+            nursenotes.placeholder = reports?.myassesment ?? nursenotes.placeholder;
+
+
             
         }else{
             console.log('no report ', typeof reports)
             document.querySelector('.modal-content').style.display='none'
         }
+
+        document.querySelectorAll('.downloadrepo').forEach((downloadrepo,index)=>{
+            downloadrepo.addEventListener('click',async()=>{
+                showCustomAlert('generating report, please wait ')    
+                console.log('downloading report...')
+                console.log(reports)
+                const reportId=reports.reportId
+                console.log('report id to be downloaded...',reportId)
+               
+
+                const response=await fetch('/user/generaterepo',{
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json'
+                    },
+                    body:JSON.stringify({reportId})
+    
+                })
+                if(response.ok){
+                    //convert the response to a binary large object(blob)
+                    const blob=await response.blob()
+
+                    //create a url for the  the blob
+                    const url=URL.createObjectURL(blob)
+                    window.open(url,'_blank')
+                   
+
+
+                     console.log('✅ Report downloaded successfully!');
+
+                }else{
+                    console.log('failed to download report')
+                }
+    
+              })
+
+        })
+
+       
 
     }catch(e){
         console.error('errror in showing the reports..',e)
@@ -392,16 +460,14 @@ function displayreports(repos){
      <!-- Report Details -->
      <div style="display: flex; flex-direction: column; flex-grow: 1; ">
  
-         <div style="font-size: 14px;">
-             Nurse: <span style="  font-weight: bold;color: black;">${report.nurse.name}</span>
-         </div>
+       
  
          
          <!-- Show Doctor's Name only if the report is complete -->
          <div style="font-size: 14px;  display:flex;">
              Doctor: <span style="font-weight: bold;color: rgb(3, 88, 81);">${docname}</span>
          </div>
-         <div id="repostatus" style=" font-size: 12px; color: rgb(255, 51, 0);">
+         <div class="repostatus" style=" font-size: 12px; color: rgb(255, 51, 0);">
              ${report.status}
          </div>
          
@@ -416,18 +482,36 @@ function displayreports(repos){
         </div>
  
       </div>`
-    if(report.status=='complete'){
-    document.getElementById('repostatus').style.color='green'
-      }else{
-    document.getElementById('repostatus').style.color='red'
+    if(report.status=='pending'){
+        document.querySelectorAll('.repostatus').forEach(repostatus=>{
+            repostatus.style.color='red'
+        })
+    }else {
+        document.querySelectorAll('.repostatus').forEach(repostatus=>{
+            repostatus.style.color='green'
+        })
      }
      
     })
     
     document.querySelectorAll('.viewrepo').forEach((view)=>{
         view.addEventListener('click',()=>{
-
+            const existingrepo=localStorage.getItem('reportidtosend')
+            if(existingrepo){
+                localStorage.removeItem('reportidtosend')
+               
+            }
+            document.querySelector('.modal-footer').innerHTML=''
+            document.querySelector('.modal-footer').innerHTML = `
+            <span style="font-weight: bold; color: green;">"This report has been selected and is ready to be sent to the doctor."</span>
+            
+            <button class="notreport" style="margin-left: 50px;align-self:center; padding: 5px 10px; background-color: blue; color: white; border: none; border-radius: 4px; cursor: pointer;">
+              Not This Report
+            </button>
+          `;
            const reportid=view.getAttribute('repo-id')
+           localStorage.setItem('reportidtosend',reportid)
+           
            const docname=view.getAttribute('doc-name')
            console.log('report id...',reportid)
            const reports=getreports(reportid)
@@ -444,9 +528,9 @@ function displayreports(repos){
         })
     })
 
-
    
 }
+
 
 
 function getage(birthdate){
@@ -654,7 +738,7 @@ function dochistory(doctors){
                     }
                     localStorage.setItem('mydocId',doc._id)
                     console.log('doctor id chosen...',mydocId)
-                    const reportid= "2025-03-24T09:09:46.508Z"
+                    const reportid=localStorage.getItem('reportidtosend')
                     const reports = getreports(reportid);
                     console.log('reports..',reports)
     
@@ -704,7 +788,7 @@ function dochistory(doctors){
                         const clickeddate=new Date(info.dateStr).toISOString().split('T')[0]
                         const datetoday=new Date().toISOString().split('T')[0]
                         if(clickeddate<datetoday){  
-                            alert('Please pick a future date')
+                            showCustomAlert('Please pick a future date')
                             return
                         }
                         console.log('date clicked...',clickeddate)
@@ -712,7 +796,7 @@ function dochistory(doctors){
                         const eventOnDate=events.allevents.find(event=>event.start.split("T")[0]===clickeddate)
                         console.log("eventOnDate...",eventOnDate)
                             if(!eventOnDate){
-                                alert('The doctor is not available on this date, please check the calendar again')
+                                showCustomAlert('The doctor is not available on this date, please check the calendar again')
                               
                                 return
                             }
@@ -755,7 +839,7 @@ function dochistory(doctors){
                                     const selectedTime = selecttime.value;
                                     localStorage.setItem('selectedTime', selectedTime);
                                     console.log('Selected Time:', selectedTime);
-                                    alert('You selected: ' + selectedTime);
+                                    showCustomAlert('You selected: ' + selectedTime);
                                 });
                             
                                 bookdoc.insertBefore(selecttime, book);
@@ -797,18 +881,19 @@ function dochistory(doctors){
     
 async function sendreport(docId){
     try{
-      
+        loading=true
         const reports=getreports()
         const nurseassesment=reports?.nurse?.assesment?.trim()? reports.nurse.assesment:document.getElementById('nurseNotes').value
         console.log(nurseassesment)
         const repoId=localStorage.getItem('repid')
+        // const repoId= "2025-03-24T09:09:46.508Z"
 
         if(docId==""){
-            alert('choose doctor first')
+            showCustomAlert('choose doctor first')
             return
         }
         if(!nurseassesment.trim()&& !reports.nurse.assesment){
-            alert('The nurse must asses first before sending report')
+            showCustomAlert('The nurse must asses first before sending report')
             return
         }
 
@@ -821,7 +906,7 @@ async function sendreport(docId){
                 body:JSON.stringify({repoId,nurseassesment,docId})
             })
             const sentconfirm=await sentresults.json()
-            sentconfirm.message?alert(sentconfirm.message):alert(sentconfirm.error)
+            sentconfirm.message?showCustomAlert(sentconfirm.message):showCustomAlert(sentconfirm.error)
 
 
     
@@ -835,6 +920,12 @@ async function sendreport(docId){
 
 book.addEventListener('click',async()=>{
     try{
+        document.getElementById('wait').style.display='flex'
+        if(loading){
+            book.disabled=true
+        }else{
+            book.disabled=false
+        }
         // document.querySelector('.confirmation').style.display='none'
         const appoinmentreason=document.getElementById('reason').value
         const dateclicked=localStorage.getItem("clickeddate")
@@ -845,43 +936,40 @@ book.addEventListener('click',async()=>{
         console.log(typeof setsession)
         console.log(typeof appoinmentreason)
         const patient={
-            name:'Daniel Richards',
             session:time,
             type:appoinmentreason,
-            status:'pending'
         }
         const seldoctor={
             doctor:doctor._id,
             name:doctor.name,
             date:dateclicked
         }
-        // const event={
-        //     type: "appointment",
-        //     description: ` A ${appoinmentreason} Appointment with Dr.${doctor} on ${dateclicked}   `,
-        //     summary: `${appoinmentreason} appointment`,
-        //     datedue: dateclicked,
-        //     dateset: new Date(),
-        //     status: "pending"
-
-        // }
-        const savetodoc=await fetch('/user/savetodoc',{
-            method:'POST',
-            headers:{
-                'Content-Type':'application/json'
-            },
-            body:JSON.stringify({seldoctor,patient})
-        })
-        if(savetodoc){
-            const saved=await savetodoc.json()
-            console.log('saved...',saved)
-            if(saved.success){
-                console.log('saved successfully')
-                document.querySelector('.confirmation').style.display='flex'
-                // alert('appointment request sent successfullly')
-            }else{
-                console.log('error in making request')
-                alert(saved.error)
+        try{
+            loading=true
+            const savetodoc=await fetch('/user/savetodoc',{
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify({seldoctor,patient})
+            })
+            if(savetodoc){
+                const saved=await savetodoc.json()
+                console.log('saved...',saved)
+                if(saved.success){
+                    console.log('saved successfully')
+                    document.getElementById('wait').style.display='none'
+                    document.querySelector('.confirmation').style.display='flex'
+                    loading=false
+                    // showCustomAlert('appointment request sent successfullly')
+                }else{
+                    console.log('error in making request')
+                    showCustomAlert(saved.error)
+                }
             }
+
+        }catch(e){
+            console.error('error in sending to doc')
         }
 
     }catch(e){
@@ -895,6 +983,7 @@ window.addEventListener('click',(e)=>{
     const bookReport=document.querySelector('.doc-details')
     if(e.target===bookReport){
         localStorage.removeItem("clickeddate")
+        localStorage.removeItem('mydocId')
         docscalendar.innerHTML=''
         bookReport.style.display='none'
         document.body.style.overflow='auto'

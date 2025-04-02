@@ -17,7 +17,7 @@
             .middle{
                 width:30%;
                 display: flex;
-                margin: 20px;
+                margin: 10px;
                 padding: 10px;
                 box-shadow: 0 2px 4px rgb(16, 57, 59);
                 background-color: white;
@@ -117,6 +117,7 @@
         border-radius: 5px;
         resize: none;
     }
+    
 
 
 
@@ -125,16 +126,26 @@
     </head>
 
     <body>
-        <div style="margin-top: 10px; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 10px; width: 100%;">
+        <!-- Include the Custom Alert -->
+       <%- include('alert') %>
+         
+        
+        <div style="margin-top: 10px; display: flex; align-items: center; justify-content: flex-start; gap: 35%; width: 100%;">
             <select name="loginparty" id="loginparty" style="padding: 8px; font-size: 16px; border-radius: 5px; border: 1px solid #187bb9;">
                 <option value="personofcare">Person Of Care</option>
                 <option value="doctor">Doctor</option>
                 <option value="admin">Admin</option>
             </select>
-            <span style="color: rgb(2, 58, 68); font-size: 22px; font-weight: bold; text-align: center; flex-grow: 1;">
-                AFYASPHERE
-            </span>
+            <div style="display: flex;width: 150px;height: 150px;align-items: center;justify-content: center;overflow: hidden;">
+    <img src="/logo/Pink Green Simple Modern Health Center Logo.png" 
+         alt="Afyasphere Logo" 
+         style="width: 210%;height: 210%;object-fit: cover;margin-top: 20px;">
+</div>
+
         </div>
+
+
+        
         
         
         <div class="middle" >
@@ -149,11 +160,12 @@
                     <span class="headertittles"  id="signup" >Sign up</span>
                    
                 </div>
+                <!-- //commented nurrse -->
                 <form class="login sign-in"  >
-                    <div id="withnurse"  style="margin-top: 10px; gap:5px; display: flex; flex-direction: row; margin: 10px;" >
+                    <!-- <div id="withnurse"  style="margin-top: 10px; gap:5px; display: flex; flex-direction: row; margin: 10px;" >
                         <input id="nursepresent" style="cursor: pointer;" type="checkbox">
                         <span style="color: rgb(72, 73, 75);">I am a Nurse  </span>
-                    </div>
+                    </div> -->
                     <input class="in-put user-name" type="text" placeholder="username">
                     <div class="passw signinpass" style="display: flex; flex-direction: row;">
                         <input class="in-put passw-input"  type="password" placeholder="password">

@@ -15,7 +15,10 @@ const { userInfo } = require('os')
 const {isAuthenticated}=require('../middleware/auth')
 const cache=new Nodecache({stdTTL:60})
 const puppeteer=require('puppeteer')
+const chromium = require('@sparticuz/chromium');
 const {querymodel}=require('../config/reuse')
+const { chat } = require('googleapis/build/src/apis/chat')
+
 
 
 
@@ -150,8 +153,8 @@ router.post('/insertmetric',async(req,res)=>{
         const date=new Intl.DateTimeFormat('en-CA').format(new Date())
         // const report
         console.log('date.....',date)
-        const amuser=req.user.user
-        const nurse=req.user.nurse
+        const amuser=req.session.user
+        // const nurse=req.user.nurse
         const db=await getdb()
         const metricscollection=db.collection('allmetrics')
         const reportscollection=db.collection('reports')
@@ -160,14 +163,14 @@ router.post('/insertmetric',async(req,res)=>{
         console.log('metricvalues...', allmetrics)
         // const metrictype=metricvalues.metrics
         // const mvalue=metricvalues.values
-        if (!nurse){
+        // if (!nurse){
           
-         res.json({success:false,message:'Fill in with the approval of a nurse'}) 
-        } 
-        nursedetails={
-            id:nurse._id,
-            name:nurse.name
-        }
+        //  res.json({success:false,message:'Fill in with the approval of a nurse'}) 
+        // } 
+        // nursedetails={
+        //     id:nurse._id,
+        //     name:nurse.name
+        // }
         
         console.log('am user ...', amuser)
         const userId=amuser._id
@@ -214,7 +217,7 @@ router.post('/insertmetric',async(req,res)=>{
                         reportId:repoid,
                         status:'pending',
                         metrics:allmetrics,
-                        nurse:nursedetails,
+                        
 
     
                     } 
@@ -564,12 +567,7 @@ router.post('/savetodoc',async(req,res)=>{
         const db=await getdb()
         const docappcollection=await db.collection('docappointments')
         const {seldoctor,patient}=req.body
-        let amuser;
-        if (!req.user){
-            amuser=req.user.user
-        }else{
-            amuser=req.user
-        }
+        let amuser=req.session.user
         let userId=amuser._id
         const settime=patient.session
         patientbook={
@@ -577,7 +575,7 @@ router.post('/savetodoc',async(req,res)=>{
             id:userId,
             session:settime,
             type:patient.type,
-            status:"pending"
+            status:"accepted"
 
         }
         const userevents=await db.collection('events')
@@ -637,6 +635,11 @@ router.post('/savetodoc',async(req,res)=>{
         console.log("savebooking...",savebooking)
         console.log("mydocappointment..",mydocappointment)
         if(savebooking.modifiedCount>0 && mydocappointment.modifiedCount>0 ){
+            const mail=amuser.email
+            const subject='Appointment Request  '
+            const body=`An appointment with ${seldoctor.name} has been sent `
+            const sentmail=await sendmail(mail,subject,body)
+            console.log('email sent...',sentmail)
             console.log('worked')
             res.status(200).json({success:true})
         }else{
@@ -651,12 +654,12 @@ router.post('/savetodoc',async(req,res)=>{
 router.post('/sendrepo',async(req,res)=>{
     try{
         const {repoId,nurseassesment,docId}=req.body
-        let amuser;
-        if (!req.user){
-            amuser=req.user.user
-        }else{
-            amuser=req.user
-        }
+        let amuser=req.session.user
+        // if (!req.user){
+        //     amuser=req.user.user
+        // }else{
+        //     amuser=req.user
+        // }
         const userId=amuser._id
         console.log('docId...',docId)
         const db=await getdb()
@@ -668,6 +671,11 @@ router.post('/sendrepo',async(req,res)=>{
         const doc=await doctors.findOne({
             _id:docId
         })
+        console.log(userId)
+        const me=await repocollection.findOne({_id:userId})
+        if(!me){
+            res.json({message:"user not available"})
+        }
 
         if(!doc || doc.status!=="active"){
             res.json({message:'Doctor not available , get another one'})
@@ -690,7 +698,7 @@ router.post('/sendrepo',async(req,res)=>{
             reportId:repoId,
             sentdate:new Date(),
             id:userId,
-            tname:'Brian Michaels',
+            tname:amuser.name,
             image:"",
             reportsummary:summary,
             status:'pending'
@@ -702,7 +710,7 @@ router.post('/sendrepo',async(req,res)=>{
                     "reports.reportId":new Date(repoId)
                 },{
                     $unset:{
-                        "reports.$.nurse.assesment":1
+                        "reports.$.myassesment":1
                     }
                 }
          )
@@ -716,8 +724,8 @@ router.post('/sendrepo',async(req,res)=>{
                     "reports.reportId":new Date(repoId)
                 },{
                     $set:{
-                        "reports.$.nurse.assesment":nurseassesment,
-                        "repors.$.doctor":docdetails
+                        "reports.$.myassesment":nurseassesment,
+                        "reports.$.doctor":docdetails
                     }
                 }
             ),
@@ -753,223 +761,280 @@ router.post('/sendrepo',async(req,res)=>{
 
 })
 
+function formatTextToHTML(text) {
+    if (typeof text !== 'string') {
+        console.error("Expected a string but got:", typeof text, text);
+        return '';
+    }
+
+    // Convert **bold** text to <b>bold</b>
+    let formattedText = text.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); 
+
+    // Convert * or - bullet points to <li> (excluding numbered lists)
+    formattedText = formattedText.replace(/(^|\n)[*-] (.+?)(?=\n|$)/g, '<li>$2</li>');
+
+    // Wrap consecutive <li> elements inside a <ul>
+    formattedText = formattedText.replace(/(<li>.*?<\/li>)+/gs, match => `<ul>${match}</ul>`);
+
+    // Ensure numbered lists (1., 2., etc.) remain intact
+    formattedText = formattedText.replace(/(\d+\.)\s*(.+)/g, '<br>$1 $2');
+
+    // Convert double line breaks (paragraphs) to <p> tags
+    formattedText = formattedText.replace(/\n\s*\n/g, '</p><p>');
+
+    // Wrap the entire content in a <p> tag
+    formattedText = `<p>${formattedText}</p>`;
+
+    return formattedText;
+}
+
 //download a report
 router.post('/generaterepo',async(req,res)=>{
     try{
         const {reportId}=req.body
-        let amuser;
-        if (!req.user){
-            amuser=req.user.user
-        }else{
-            amuser=req.user
-        }
+        let amuser=req.session.user
+     
         let userId=amuser._id
         // const reportId='2025-03-16T11:12:45.735Z'
+        const browser = await puppeteer.launch({
+            executablePath: await chromium.executablePath(),
+            args: chromium.args,
+            headless: chromium.headless,
+            defaultViewport: chromium.defaultViewport,
+        });
+        const page=await browser.newPage()
+
         const db=await getdb()
-        const  myreport=await db.collection('reports').findOne(
+        const  myreport=await db.collection('reports').aggregate([
+            { $match: { _id: userId } },
             {
-                _id:userId
-            },{
-                _id:1,
-                name:1,
-                birthdate:1,
-                gender:1,
-                reports:{$elemMatch:{reportId:reportId}}
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    birthdate: 1,
+                    gender: 1,
+                    reports: {
+                        $filter: {
+                            input: "$reports",
+                            as: "report",
+                            cond: { $eq: ["$$report.reportId",new Date(reportId)] }
+                        }
+                    }
+                }
             }
-        )
+        ]).toArray()
+       
         console.log('my report for download..',myreport)
         const date=new Date(reportId).toLocaleDateString('en-US',{day:'numeric',month:'long',year:'numeric'})
         const today=new Date().getTime()
-        const dob=new Date(myreport.birthdate).getTime()
+        const dob=new Date(myreport[0].birthdate).getTime()
         const age=new Date(today-dob).getUTCFullYear()-1970
         console.log(`${age}....${date}`)
+        const mysymptoms=myreport[0].reports[0].Diagnosis?.[0].symptoms?myreport[0].reports[0].Diagnosis[0].symptoms:"No symptoms recorded"
+        const diseases=myreport[0].reports[0].Diagnosis?.[0].summary?formatTextToHTML(myreport[0].reports[0].Diagnosis[0].summary):"No diseases searched"
+        const patientasses=myreport[0].reports[0].nurse?.assesment?myreport[0].reports[0].nurse.assesment:myreport[0].reports[0].myassesment
 
         const htmlContent = `
         <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Patient Report</title>
-            <style>
-                /* Reset styles */
-                * {
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
-                }
-    
-                /* Body and modal styling */
-                body {
-                    font-family: Arial, sans-serif;
-                    padding: 0 20px;
-                    position: relative;
-                }
-    
-                .modal-content {
-                    background: #fff;
-                    width: 60%;
-                    max-height: 93%;
-                    border-radius: 10px;
-                    display: flex;
-                    margin: 5px;
-                    padding: 5px;
-                    flex-direction: column;
-                    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
-                    overflow: hidden;
-                }
-    
-                .modal-header {
-                    padding: 15px 20px;
-                    border-bottom: 2px solid #ddd;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    font-weight: bold;
-                    background: white;
-                }
-    
-                .modal-body {
-                    overflow-y: auto;
-                    overflow-x: hidden;
-                    flex-grow: 1;
-                    padding: 20px;
-                    max-height: 80vh;
-                }
-    
-                .section {
-                    margin-top: 15px;
-                    display: flex;
-                    flex-direction: column;
-                }
-    
-                .modal-footer {
-                    padding: 10px;
-                    background: white;
-                    border-top: 1px solid #ddd;
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    font-size: 12px;
-                    position: fixed;
-                    bottom: 0;
-                    left: 0;
-                    width: 100%;
-                    border-top: 1px solid #ddd;
-                }
-    
-                /* Footer with page number styling */
-                .footer {
-                    text-align: center;
-                    font-size: 12px;
-                    padding: 10px;
-                    border-top: 1px solid #ddd;
-                }
-    
-                /* Page number styling */
-                .page-number {
-                    content: counter(page);
-                }
-    
-                /* Ensure footer doesn't overlap content */
-                body {
-                    padding-bottom: 60px;
-                }
-            </style>
-        </head>
-        <body>
-            <div class="modal-content">
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <h2>Afyasphere</h2>
-                    <p><strong>Date:</strong> <span id="reportDate">${date}</span></p>
-                </div>
-                
-                <!-- Modal Body -->
-                <div class="modal-body">
-                    <!-- Patient Info -->
-                    <div class="section">
-                        <h3>Patient Report</h3>
-                        <p><strong>Name:</strong> ${myreport.name}</p>
-                        <p><strong>Age:</strong> ${age}</p>
-                        <p><strong>Gender:</strong> ${myreport.gender}</p>
-                    </div>
-                    
-                    <!-- Metrics -->
-                    <div class="section">
-                        <h3>Most Recent Metrics</h3>
-                        <ul>
-                            <li><strong>Temperature:</strong> ${myreport.reports[0].metrics.temperature}&deg;C</li>
-                            <li><strong>Blood Pressure:</strong> ${myreport.reports[0].metrics.bloodPressure.systolic}/${myreport.reports[0].metrics.bloodPressure.diastolic} mmHg</li>
-                            <li><strong>Respiratory Rate:</strong> ${myreport.reports[0].metrics.respiratoryRate} breaths/min</li>
-                            <li><strong>Pulse Rate:</strong> ${myreport.reports[0].metrics.pulseRate} bpm</li>
-                        </ul>
-                    </div>
-    
-                    <!-- Diagnosis -->
-                    <div class="section">
-                        <h3>Symptoms Diagnosis</h3>
-                        <p><strong>Symptoms:</strong> ${myreport.reports[0].Diagnosis[0].symptoms}</p>
-                        <p><strong>Possible Condition:</strong> ${myreport.reports[0].Diagnosis[0].summary}</p>
-                        <p><strong>Possible Condition:</strong> ${myreport.reports[0].Diagnosis[0].result}</p>
-                    </div>
-                    
-                    <!-- Nurse's Assessment -->
-                    <div class="section">
-                        <h3>Nurse's Assessment</h3>
-                        <p>${myreport.reports[0].nurse.assessment}</p>
-                    </div>
-    
-                    <!-- Doctor's Assessment -->
-                    <div class="section">
-                        <h3>Doctor's Assessment</h3>
-                        <p>${myreport.reports[0].doctor.assessment}</p>
-                    </div>
-    
-                    <!-- Recommendations -->
-                    <div class="section">
-                        <h3>Recommendations</h3>
-                        <p>${myreport.reports[0].doctor.recommendation}</p>
-                    </div>
-                </div>
-    
-                <!-- Modal Footer (No page number here) -->
-                <div class="modal-footer">
-                    <p><strong>Report Sent By:</strong> ${myreport.reports[0].nurse.name}</p>
-                    <p><strong>Report Assessed By:</strong> Dr. ${myreport.reports[0].doctor.name}</p>
-                    <p>Generated by Afyasphere - confidential</p>
-                </div>
-            </div>
-    
-            <!-- Footer with page number -->
-            <div class="footer">
-                Page <span class="page-number"></span>
-            </div>
-        </body>
-        </html>`;
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Health Report</title>
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        const browser=await puppeteer.launch()
-        const page=await browser.newPage()
-        await page.setContent(htmlContent)
-        const pdfbuffer=await page.pdf({
-            path:'report.pdf',
-            format:'A4',
+        /* Body and report styling */
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            position: relative;
+            background-color: #fff;
+        }
+
+        /* Page layout and structure */
+        .report-container {
+            background: #fff;
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+ 
+        /* Section styles */
+        .section {
+            margin-top: 20px;
+        }
+
+        .section h3 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .section p, .section ul {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .section ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .section ul li {
+            margin-bottom: 8px;
+        }
+
+        .footer {
+        
+            font-size: 12px;
+            /* color: #777; */
+            margin-top: 30px;
+            height: 80px;
+            align-items: center;
+            
+            margin: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        /* Page break for printing */
+        @media print {
+            .no-print {
+                display: none;
+            }
+            
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            .report-container {
+                margin: 0;
+                padding: 15px;
+                page-break-before: always;
+            }
+
+           
+
+            .page-number::after {
+                content: counter(page);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        
+        <!-- Report Content -->
+        <div class="section">
+            <h3>Patient Information</h3>
+            <p><strong>Name:</strong> ${myreport[0].name}</p>
+            <p><strong>Age:</strong> ${age}</p>
+            <p><strong>Gender:</strong> ${myreport[0].gender}</p>
+            <p><strong>Report Date:</strong>${date}</p>
+        </div>
+
+        <div class="section">
+            <h3>Health Metrics</h3>
+            <ul>
+                <li><strong>Temperature:</strong>  ${myreport[0].reports[0].metrics.temperature}&deg;C</li>
+                <li><strong>Blood Pressure:</strong>  ${myreport[0].reports[0].metrics.bloodPressure.systolic}/${myreport[0].reports[0].metrics.bloodPressure.diastolic} mmHg</li>
+                <li><strong>Respiratory Rate:</strong> ${myreport[0].reports[0].metrics.respiratoryRate} breaths per minute</li>
+                <li><strong>Pulse Rate:</strong>  ${myreport[0].reports[0].metrics.pulseRate} beats per minute</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>Symptoms Diagnosis</h3>
+            <p><strong>Symptoms:</strong>${mysymptoms}</p>
+            <p><strong>Possible Conditions:</strong> ${diseases}</p>
+            
+        </div>
+
+        <div class="section">
+            <h3> Patient Self-Assessment</h3>
+            <p>${patientasses}</p>
+        </div>
+
+        <div class="section">
+            <h3>Doctor's Assessment</h3>
+            <p>${myreport[0].reports[0].doctor.assessment}</p>
+        </div>
+
+        <div class="section">
+            <h3>Recommendations</h3>
+            <p>${myreport[0].reports[0].doctor.recommendation}</p>
+        </div>
+
+      
+        
+    </div>
+</body>
+</html>`
+
+        
+        await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+        const fs = require('fs');
+        const imagePath = 'public/logo/Pink Green Simple Modern Health Center Logo.png';
+        const image = fs.readFileSync(imagePath);
+        const base64Image = image.toString('base64');
+        const imageSrc = `data:image/png;base64,${base64Image}`;
+        
+        console.log(imageSrc);
+
+
+        const pdfbuffer = await page.pdf({
+            format: 'A4',
+            printBackground: true, 
             displayHeaderFooter:true,
-            footerTemplate:`<div style="font-size: 12px; text-align: center; width: 100%;">Page <span class="pageNumber"></span></div>`,
-            margin: { top: "60px", bottom: "60px" }, 
-        })
-        await browser.close()
-        res.set({
-            'Content-Type':'application/pdf',
-            'Content-Disposition': 'attachment; filename="Patient_Report.pdf"'
+            headerTemplate: `
+            <div style="width: 100%; display: flex; justify-content: center; align-items: center; height: 100px; border-bottom: 2px solid #ddd;max-width:800px">
+                <div style="width: 40%;">
+                    <img src="data:image/png;base64,${base64Image}" style="width: 90%; height: 90%; object-fit: cover; margin-top:10px" alt="Afyasphere Logo">
+                </div>
+                <div style="font-size: 20px; font-weight: bold; text-align: center; flex-grow: 1; color: #333;">Patient Health Assessment Report</div>
+            </div>
+        `,
+        footerTemplate: `
+           <div style=" margin: 10px;border-top: 1px solid #ddd; margin-top: 30px;height: 80px;align-items: center; font-size:12px ;max-width:800px">
+            <div style="display: flex; align-items: center; justify-content: space-between;  margin-bottom: 20px;">
+                <div>
+                    <p style="color: black;"><strong>Consulting Doctor:</strong> Dr. ${myreport[0].reports[0].doctor.name}</p>
+                </div>
+                <div style="width: 20%;">
+                    <img src="data:image/png;base64,${base64Image}" style="width: 100%; height: 90%; object-fit: cover;" alt="Afyasphere Logo">
+                </div>
+               
+            </div>
+             </div>
+        `,
+        margin: { top: '100px', bottom: '100px' },
+            
+        });
+        
+       
+        //Close the browser
+        await browser.close();
 
-        })
-        res.send(pdfbuffer)
+        // Set headers and send response
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `inline; filename=report_${reportId}.pdf`);
+      
+        console.log('pdfbuffer...',pdfbuffer)
+        res.end(pdfbuffer);
+
+        console.log("✅ PDF Report has been successfully generated!");
         
 
 
     }catch(e){
-        console.error('errro in generating a report...',e)
+        console.error('errror in generating a report...',e)
         
     }
 
@@ -1066,15 +1131,16 @@ router.post('/getdocdates',async(req,res)=>{
 router.get('/historyentry',async(req, res)=>{
     const db=await getdb()
     const users=db.collection('users')
-    const userId=req.user.googleId
-    const details=await users.findOne({googleId:userId})
+    const user=req.session.user
+    const userId=user._id
+    const details=await users.findOne({_id:userId})
 
     if(!details){  
         throw new Error("no user found")
     }
     console.log(JSON.stringify(details, null, 2)) 
 
-    res.render('entries.ejs',{user : req.user}) 
+    res.render('entries.ejs',{user}) 
 })
 
 // route to check the history of your entries ..entries.ejs
@@ -1083,14 +1149,15 @@ router.get('/checkhistory', async(req, res)=>{
         
         const db = await getdb()
         const users=db.collection('users')
-        const userId=req.user.googleId
-        const details=await users.findOne({googleId:userId})
+        const user=req.session.user
+        const userId=user._id
+        const details=await users.findOne({_id:userId})
 
         if(!details){
             throw new Error("no user found")
         }
 
-        res.render('records.ejs',{user : req.user})
+        res.render('records.ejs',{user})
 
     }catch(e){
         error(`error in getting history ${e}`)
@@ -1109,7 +1176,7 @@ router.put('/newchat',
             console.log('reseting activeChatId...')
             const db=await getdb()
             const data=db.collection('data')
-            const userId=req.user.googleId
+            const userId=req.session.user._id
             const activechatId=await data.countDocuments({
                 _id:userId,
                 activechatId:{$exists:true}
@@ -1135,13 +1202,13 @@ router.post('/askgroq',async(req,res)=>{
     console.log('asking groq.....')
     const {message,reportId}=req.body
     const db=await getdb()
-    let amuser
+    let amuser=req.session.user
     const nurse=req.user.nurse
-    if(!nurse){
-         amuser=req.user
-    }else{
-        amuser=req.user.user
-    }
+    // if(!nurse){
+    //      amuser=req.user
+    // }else{
+    //     amuser=req.user.user
+    // }
     const userId=amuser._id
         
     const reportcollection=await db.collection('reports')
@@ -1194,7 +1261,7 @@ router.get('/gethistory', async(req, res)=>{
         const db=await getdb()
         const data=db.collection('data')
         const userchats=await data.findOne(
-            {_id:req.user.googleId}
+            {_id:req.session.user}
         ).sort({createAt:-1}).toArray()
         console.log(JSON.stringify(userchats, null, 2))
         res.status(200).json(userchats)
@@ -1218,7 +1285,7 @@ router.post('/storehistory', async(req, res)=>{
                 just give a summary of the text. Start with phrases like "you are experiencing...", "you were feeling...", "you have been feeling...", or other related phrases.`
          const summary=await querymodel(instruction)
 
-        const userId=req.user.googleId
+        const userId=req.session.user._id
 
         const objectId=await history.findOne({
             _id:userId
@@ -1237,6 +1304,8 @@ router.post('/storehistory', async(req, res)=>{
         
         if (containsnull(histories)){
             console.log(`Null values found in  ${histories}`)
+            res.json({message:'error in saving to diary'})
+            return
         }else{
             
                     const result=await history.bulkWrite ([
@@ -1349,7 +1418,7 @@ const generatepdf=(data,res)=>{
         console.log('error downloading function',e);
         res.status(500).json({ error: 'Error generating PDF' });
     }
-}
+}   
 
 
 async function combineddata (req) {
@@ -1358,9 +1427,11 @@ async function combineddata (req) {
         const db=await getdb()
         const entries=db.collection('history')
         const chats=db.collection('data')
-        const userId=req.user.googleId
+        const userId=req.session.user._id
+        let chatdata
+        let history
         
-        const[chatdata,history]=await Promise.all([
+        const [datanchats,histories]=await Promise.all([
         
              await chats.aggregate([
                 // Match the document with the specified userId
@@ -1438,10 +1509,17 @@ async function combineddata (req) {
             ]).toArray()
         ])
         
-        console.log(chatdata.chatId)
+        // console.log(chatdata.chatId)
         let combinedData
         
-        containsnull(chatdata) || containsnull(history)?console.log(`null values in ${history} or ${chatdata}`):combinedData=[...chatdata, ...history]
+        chatdata=containsnull(datanchats)?[]:datanchats
+        history=containsnull(histories)?[]:histories
+        combinedData=[...chatdata, ...history]
+        console.log('history',history)
+        console.log('chatdate',chatdata )
+
+           
+        // containsnull(chatdata) || containsnull(history)?console.log(`null values in ${history} or ${chatdata}`):combinedData=[...chatdata, ...history]
         
         console.log("combineddata..... ",combinedData)
         return combinedData
@@ -1487,64 +1565,71 @@ router.get('/myhistory',async(req,res)=>{
         const userId=req.user.googleId
 
         const message="from the above conversations generate me a brief summary "
-        const response =await chats.find({
+        const response =await chats.findOne({
             _id:userId
-        }).toArray()
-
-        //generate summaries if the summaries do not exist or is not updated to the current time 
-        for (const chat of response[0].chats) {
-            if(!chat.summaryTime || chat.updatedAt.getTime()>chat.summaryTime.getTime()){
-                const flowisedata={
-                    question:message,
-                    chatId:chat.chatId
-                }
-                const  summaryresponse=await  sendToFLowise(flowisedata)
-                console.log("summary response ", summaryresponse.text)
-
-                const updatedsummary=await chats.updateOne(
-                    {_id:userId,
-                        "chats.chatId":chat.chatId
-                    },
-                    {$set:{"chats.$.summary":summaryresponse.text,
-                        "chats.$.summaryTime":new Date()}
+        })
+        if(response){
+            //generate summaries if the summaries do not exist or is not updated to the current time 
+            for (const chat of response[0].chats) {
+                if(!chat.summaryTime || chat.updatedAt.getTime()>chat.summaryTime.getTime()){
+                    const flowisedata={
+                        question:message,
+                        chatId:chat.chatId
                     }
-                )
-
-                if (updatedsummary.modifiedCount > 0){
-                    console.log("summary generated and updated ")
-                    const combinedData=await combineddata(req)
-                    
-                    const combined_data=Array.isArray(combinedData)? combinedData: Array.from(combinedData)
-                
-                    const unsortmergeddata=await mergeddata(combined_data)
-                    const datamerged=unsortmergeddata[0].histories.sort((a,b)=> new Date(b.date)-new Date(a.date))
-                    console.log('datamerged ', datamerged)
-                    res.status(200).json(datamerged)
+                    const  summaryresponse=await  sendToFLowise(flowisedata)
+                    console.log("summary response ", summaryresponse.text)
+    
+                    const updatedsummary=await chats.updateOne(
+                        {_id:userId,
+                            "chats.chatId":chat.chatId
+                        },
+                        {$set:{"chats.$.summary":summaryresponse.text,
+                            "chats.$.summaryTime":new Date()}
+                        }
+                    )
+    
+                    if (updatedsummary.modifiedCount > 0){
+                        console.log("summary generated and updated ")
+                        const combinedData=await combineddata(req)
                         
+                        const combined_data=Array.isArray(combinedData)? combinedData: Array.from(combinedData)
                     
+                        const unsortmergeddata=await mergeddata(combined_data)
+                        const datamerged=unsortmergeddata[0].histories.sort((a,b)=> new Date(b.date)-new Date(a.date))
+                        console.log('datamerged ', datamerged)
+                        res.status(200).json(datamerged)
+                            
+                        
+                    }
+    
                 }
-
-            }
-                
-            const combinedData=await combineddata(req)
+                const combinedData=await combineddata(req)
             
+                const combined_data=Array.isArray(combinedData)? combinedData: Array.from(combinedData)
+                    
+                const unsortmergeddata=await mergeddata(combined_data)
+                const datamerged=unsortmergeddata[0].histories.sort((a,b)=> new Date(b.date)-new Date(a.date))
+                console.log('datamerged ', datamerged)
+                res.status(200).json(datamerged)
+                                    
+            }
+        }else{
+
+            const combinedData=await combineddata(req)
+                
             const combined_data=Array.isArray(combinedData)? combinedData: Array.from(combinedData)
                 
             const unsortmergeddata=await mergeddata(combined_data)
-            const datamerged=unsortmergeddata[0].histories.sort((a,b)=> new Date(b.date)-new Date(a.date))
+            const datamerged=unsortmergeddata.length>0?unsortmergeddata[0].histories.sort((a,b)=> new Date(b.date)-new Date(a.date)):0
             console.log('datamerged ', datamerged)
             res.status(200).json(datamerged)
-                        
-           
-
-            
         }
     
         // console.log('combined data  ',combinedData)
  
 
     }catch(e){
-        console.log(`error in getting entries : ${e}`)
+        console.log(`error in getting entries :`,e)
     
 
     }
@@ -1790,13 +1875,8 @@ router.get('/allevents',async(req,res)=>{
     try{
         let myevents
         const db=await getdb()
-        let userId
-        if(req.user){
-            userId=req.user._id
-
-        }else{
-            userId=req.user.user._id
-        }
+        let userId=req.session.user._id
+    
         const eventscollection=await db.collection('events')
         // const userId=req.user.googleId
         const events=await eventscollection.findOne({
@@ -1821,7 +1901,7 @@ async function uncompletevent() {
     try{
         const db=await getdb()
         const eventcollection=db.collection('events')
-        const userId=req.user.googleId
+        const userId=req.session.user._id
         const date=new Date().toISOString()
         console.log('date today..',date)
 
@@ -1865,7 +1945,8 @@ async function sendnotification(){
         const db=await getdb()
         const eventcollection=db.collection('events')
         const date =new Date()
-        const userId=req.user.googleId
+        const amuser=req.session.user
+        const userId=amuser._id
         console.log(date)
 
         const datatosend= await eventcollection.findOne({
@@ -1889,12 +1970,12 @@ async function sendnotification(){
             console.log("results....",results)
             console.log("results2....",results[0].summary)
             
-            const to="nyaenyaspencer21@gmail.com"
+            const to=amuser.email
             const subject=results[0].summary 
             const instruction=` You are an intelligent reminder assistant who writes emails given a text .
                                 given : text =${results[0].description}  generate  a brief  email body, to inform about the text:${results.description} 
                                 include greetings , and always be polite
-                                always start with Dear sir, and finish with thank you, do not add anything or be verbous `
+                                always start with Dear sir/madam, and finish with thank you, do not add anything or be verbous `
         
             const bodyinfo=await querymodel(instruction)
             console.log('body information ...',bodyinfo)
@@ -1940,20 +2021,23 @@ router.post('/manageevent',async(req,res)=>{
 
         const db=await getdb()
         const eventcollection=db.collection('events')
-        const userId=req.user.googleId
+        const userId=req.session.user._id
         const {description,date,task}=req.body
         console.log('descriptions..',description  )
         // const dates=new Date(date)
         // !isNaN(datestr.getTime())?console.log('date entered is true date',datestr):console.error('dates entered not a real date')
-        console.log('date completed...',date)
+        const datetoedit=new Date(date)
+        console.log('userId...',userId)
+        console.log('date completed...',datetoedit)
+
         if(task=='complete'){
             console.log('completed task entered...')
             const completeresults=await eventcollection.updateOne(
                 {
                     _id:userId,
-                    'events.datedue':date,
-                    'events.description':description,
-                     "events":{$elemMatch:{description:description,datedue:date}}
+                    'events.datedue':datetoedit,
+                    'events.description':description
+                   
                 },
                 {
                     $set:{
@@ -1974,17 +2058,18 @@ router.post('/manageevent',async(req,res)=>{
             const cancelledresults=await eventcollection.updateOne(
                 {
                     _id:userId,
-                    'events.datedue':date,
-                    "events":{$elemMatch:{description:description,datedue:date}}                    
+                    'events.datedue':datetoedit,
+                    'events.description':description                  
                 },
                 {
                     $set:{
                         'events.$.status':'cancelled'
                     }
-    
+                    
                 }
 
             )
+            console.log(cancelledresults)
             if(cancelledresults.modifiedCount>0){
                 console.log('event cancelled successfully')
                 res.status(200).json(cancelledresults)
@@ -1997,16 +2082,16 @@ router.post('/manageevent',async(req,res)=>{
             const deletedresults=await eventcollection.updateOne(
                 {
                     _id:userId,
-                    'events.datedue':date,
-                    'events.description':description,
-                    "events":{$elemMatch:{description:description,datedue:date}}
+                    'events.datedue':datetoedit,
+                    'events.description':description
+                    
                 },
                 {
-                    $pull:{'events':{datedue:date}}
+                    $pull:{'events':{datedue:datetoedit}}
     
                 }
 
-            )
+          )
             if(deletedresults.modifiedCount>0){
                 res.status(200).json(deletedresults)
             } else{
@@ -2019,9 +2104,8 @@ router.post('/manageevent',async(req,res)=>{
             const activateresults=await eventcollection.updateOne(
                 {
                     _id:userId,
-                    'events.datedue':date,
-                    "events.description":description,
-                    "events":{$elemMatch:{description:description,datedue:date}}
+                    'events.datedue':datetoedit,
+                    'events.description':description 
                 },{
                     $set:{
                         'events.$.status':'upcoming'
@@ -2051,7 +2135,8 @@ router.post('/manageevent',async(req,res)=>{
 //get the reminder from flowise
 router.post('/greminder',async(req,res)=>{
     try{
-        const reminder=req.body.rem
+        const {rem}=req.body
+        const reminder=rem
         const date=new Date()
         console.log('instructions', reminder)
         const instruction = `
@@ -2111,7 +2196,7 @@ router.post('/storeevent', async(req,res)=>{
         const db=await getdb()
         const eventcollection=await db.collection('events')
         const {reminder}= req.body
-        const userId=req.user.googleId
+        const userId=req.session.user._id
         console.log('reminder',reminder)
 
         const objectId=await eventcollection.findOne({
@@ -2126,8 +2211,8 @@ router.post('/storeevent', async(req,res)=>{
             type:reminder.type,
             description:reminder.description,
             summary:reminder.summary,
-            datedue:reminder.datedue,
-            dateset:reminder.dateset,
+            datedue:new Date(reminder.datedue),
+            dateset:new Date(reminder.dateset),
             status:"upcoming"   
         }
 

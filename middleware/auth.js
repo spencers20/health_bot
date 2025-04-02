@@ -1,6 +1,6 @@
 // Common authentication middleware
 function isAuthenticated(req, res, next) {
-    if ( req.session.user || req.session.doc) {
+    if ( req.session.user || req.session.doc || req.session.admin) {
         
         return next();
     } else {

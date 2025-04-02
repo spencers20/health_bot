@@ -83,8 +83,15 @@
 </style>
 
 <body>
-   <div class="head" style="top:0;height: 80px; background-color: rgb(226, 240, 237); display: flex;position: sticky;width: 100%;align-items: center; justify-content: space-between;">
-    <div style="margin: 10px;" >AFYASPHERE</div>
+     <!-- custom-alert -->
+     <%- include('alert') %>
+   <div class="head" style="top:0;height: 80px; background-color: rgb(226, 240, 237); display: flex;position: sticky;width: 100%;align-items: center; justify-content: space-between;overflow: hidden;">
+      <div style="display: flex;width: 100px;height: 100px;align-items: center;justify-content: center;overflow: hidden;">
+         <img src="/logo/Pink Green Simple Modern Health Center Logo.png" 
+              alt="Afyasphere Logo" 
+              style="width: 180%;height: 180%;object-fit: cover;margin-top: 20px;">
+     </div>
+     
     <div style="margin: 10px; cursor: pointer; border-radius: 5px; background-color: rgb(127, 116, 151); align-items: center;margin: 10px;padding: 10px;" onclick="window.location.href='/logins'">login</div>
    </div>
 

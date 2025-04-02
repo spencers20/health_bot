@@ -1,0 +1,63 @@
+<div id="customAlert" class="custom-alert">
+    <p id="alertMessage"></p>
+</div>
+
+<style>
+    /* Custom Alert Style */
+    .custom-alert {
+        display: none;
+        position: fixed;
+        top: -80px;  /* Start from above the screen */
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(rgb(120, 201, 180),rgb(31, 99, 119) );
+        color: white;
+        padding: 15px;
+        font-size: 16px;
+        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        border-radius: 5px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 0.5s ease, top 0.5s ease; /* Transition for both opacity and position */
+    }
+    
+    /* Animation for appearing */
+    .custom-alert.show {
+        top: 20px; /* Position after it slides down */
+        opacity: 1; /* Make it fully visible */
+    }
+    
+    /* Animation for fading out */
+    .custom-alert.fadeOut {
+        top: -80px;  /* Move above the screen */
+        opacity: 0;  /* Fade out */
+    }
+
+</style>
+
+<script>
+    function showCustomAlert(message) {
+    const alertBox = document.getElementById('customAlert');
+    const alertMessage = document.getElementById('alertMessage');
+    
+    alertMessage.textContent = message; // Set the message content
+    
+    alertBox.style.display = 'block';  // Show the alert box
+    
+    // Add sliding animation (using 'show' class)
+    alertBox.classList.add('show');
+    
+    // Automatically hide the alert after 10 seconds
+    setTimeout(() => {
+        // Add fade-out animation (using 'fadeOut' class)
+        alertBox.classList.add('fadeOut');
+        
+        // Wait for the animation to complete, then hide the alert box completely
+        setTimeout(() => {
+            alertBox.style.display = 'none'; // Hide the alert after fading out
+            alertBox.classList.remove('fadeOut'); // Remove the fade-out class for future use
+        }, 500); // Wait for the fade-out effect duration
+    }, 2500); // 10 seconds
+}
+</script>

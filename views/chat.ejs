@@ -249,6 +249,7 @@
     footer a:hover {
         text-decoration: underline;
     }
+   
 
     
     </style>
@@ -260,17 +261,10 @@
 
 </head>
 <body>
+      <!-- custom-alert -->
+    <%- include('alert') %>
 
-    <!-- <div class="head" style=" position: sticky; display :flex; width:100%; height: 40%;  top:0;background-color: rgb(235, 234, 234);   border-bottom: 1px solid rgb(235, 234, 234);">
-        <div id="nursename" style="font-size: 18px; font-weight: bold; color: black; display: inline-flex; align-items: center; padding: 8px 12px; background-color: #fff; border-radius: 8px; border: 1px solid #ccc; box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);">
-            
-        </div>
-
-        <div style=" display :flex;  width: 100%; font-size: 25px; justify-content: center; align-items: center; height:90px;font-weight: 600;">
-            AFYASPHERE
-        </div>
-    </div> -->
-     <div class="header-container" style="position: sticky;"></div>
+     <div class="header-container" style="position: sticky;top:0;height:70px;z-index: 100;"></div>
 
   
     <div class="main-body" >
@@ -314,7 +308,7 @@
             <div  style="margin-left: 40px; margin-top: 20px; width:100%;  display: flex; flex-direction: row;">
 
                 <div class="card-metric" card-id="temperature"  >
-                    <div  class="edit-value" style="display: flex; flex-direction: row;  cursor: pointer;width: 90%;" >
+                    <div class="edit-value" style="display: flex; flex-direction: row;  cursor: pointer;width: 90%;" >
                         <div class="back-svg" style="opacity: 0;" >
                             <svg xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" viewBox="0 0 1024 1024"><script xmlns=""/>
                                 <path fill="#000000" d="M224 480h640a32 32 0 1 1 0 64H224a32 32 0 0 1 0-64z"/><path fill="#000000" d="m237.248 512 265.408 265.344a32 32 0 0 1-45.312 45.312l-288-288a32 32 0 0 1 0-45.312l288-288a32 32 0 1 1 45.312 45.312L237.248 512z"/><script xmlns=""/></svg>
@@ -333,7 +327,7 @@
 
                     <div class="inputvalues"  style="display: none;  flex-direction: column; ">
                         <span style="align-self: center; margin-top: 10px;">Temperature</span>
-                        <input class="value-input" input-id="" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; "  type="text" placeholder="37">
+                        <input class="value-input" input-id="" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; "  type="number" step="0.01" placeholder="37">
                     </div>
                 </div>
                 <div class="card-metric" card-tip="view B.Pressure trend"   >
@@ -356,9 +350,9 @@
                     </div>
                     <div class="inputvalues"  style="display: none;  flex-direction: column;">
                         <span style="align-self: center; margin-top: 5px;">Systolic</span>
-                        <input class="sysvalueinput" input-id="syst" style="font-size:20px;align-self: center; border:none; height:30px;width:100px; margin-top:10px; text-align: center; "  type="text" placeholder="120">
+                        <input class="sysvalueinput" input-id="syst" style="font-size:20px;align-self: center; border:none; height:30px;width:100px; margin-top:10px; text-align: center; "  type="number" step="0.01" placeholder="120">
                         <span style="align-self: center; margin-top: 5px;">Diastolic</span>
-                        <input class="value-input" input-id="dias" style="font-size:10px;align-self: center; border:none; height:30px;width:100px; margin-top:10px; text-align: center; "  type="text" placeholder="88">
+                        <input class="value-input" input-id="dias" style="font-size:10px;align-self: center; border:none; height:30px;width:100px; margin-top:10px; text-align: center; "  type="number" step="0.01" placeholder="88">
 
                     </div>
 
@@ -386,7 +380,7 @@
                 </div>
                 <div class="inputvalues"  style="display: none;  flex-direction: column; ">
                     <span style="align-self: center; margin-top: 10px;">Pulse Rate</span>
-                    <input class="value-input" input-id="" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; "  type="text" placeholder="70">
+                    <input class="value-input" input-id="" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; "  type="number" step="0.01" placeholder="70">
                 </div>
             </div>
                 <div class="card-metric" card-tip="view Respiratory trend" >
@@ -409,14 +403,14 @@
                     </div>
                     <div class="inputvalues"  style="display: none;  flex-direction: column; ">
                         <span style="align-self: center; margin-top: 10px;">Respiratory Rate</span>
-                        <input class="value-input" input-id="" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; "  type="text" placeholder="37">
+                        <input class="value-input" input-id="" style="font-size:20px;align-self: center; border:none; height:40px;width:100px; margin-top:10px; text-align: center; "  type="number" step="0.01" placeholder="37">
                     </div>
                 
 
                 </div>
             </div>
 
-            <div class="card-pages symptom-check" >
+            <div class="card-pages symptom-check"  >
                 <div style="align-items: center; justify-content: center;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="90px" height="90px" viewBox="0 0 48 48" fill="none">
                         <path fill-rule="evenodd" clip-rule="evenodd" d="M10.9517 12.1026C13.0377 9.60753 15.826 7.71984 19.0127 6.74341C19.3803 5.76034 20.0137 4.90717 20.8223 4.26465C15.6985 5.12736 11.271 8.04097 8.41314 12.1321C8.57095 12.1126 8.73138 12.1026 8.89375 12.1026H10.9517ZM7.35899 19.5082C6.6598 19.2093 6.06122 18.7124 5.64197 18.0846C5.22323 19.6525 5 21.3002 5 23.0001C5 28.8499 7.64365 34.0822 11.8014 37.5676L12.4223 35.4483C9.08653 32.3445 7 27.9159 7 23.0001C7 21.8032 7.12369 20.6352 7.35899 19.5082ZM19.4132 39.3741L18.8904 40.6132C18.8628 40.8377 18.8158 41.0557 18.7513 41.2658C20.4183 41.744 22.1793 42.0001 24 42.0001C25.8207 42.0001 27.5817 41.744 29.2487 41.2658C29.1842 41.0557 29.1372 40.8377 29.1096 40.6132L28.5868 39.3741C27.1277 39.782 25.5893 40.0001 24 40.0001C22.4107 40.0001 20.8723 39.782 19.4132 39.3741ZM35.5777 35.4483L36.1986 37.5676C40.3563 34.0822 43 28.8499 43 23.0001C43 21.3002 42.7768 19.6525 42.358 18.0846C41.9388 18.7124 41.3402 19.2093 40.641 19.5082C40.8763 20.6352 41 21.8032 41 23.0001C41 27.9159 38.9135 32.3445 35.5777 35.4483ZM37.0483 12.1026H39.1062C39.2686 12.1026 39.429 12.1126 39.5869 12.1321C36.948 8.35445 32.9708 5.58079 28.3429 4.4987C29.1073 5.18768 29.6869 6.07685 29.9917 7.08608C32.76 8.12888 35.1845 9.8733 37.0483 12.1026Z" fill="#1cb4cf"/>
@@ -428,9 +422,9 @@
                   
                 </div>
 
-                <div id="info-card" style="display: flex;flex-direction: row;margin-left:20px ;cursor: pointer;" onclick="window.location.href='/user/symptomchecker' ">
+                <div id="info-card" style="display: flex;flex-direction: row; ;cursor: pointer; justify-content: space-between;" onclick="window.location.href='/user/symptomchecker' ">
 
-                    <div class="description" style="display: flex; flex-direction: column; margin-left:20px ;padding: 5px;">
+                    <div class="description" style="display: flex; flex-direction: column; ;padding: 5px;">
                         <span style="font-size:20px">
                             Symptom Checker
                         </span>
@@ -453,8 +447,8 @@
 
             </div>
 
-            <div class="card-pages User-Doctors">
-                <div style="align-items: center; justify-content: center;">
+            <div class="card-pages User-Doctors" style="gap:30px">
+                <div style="align-items: center; justify-content: center; ">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="90px" width="89px" version="1.1" id="Layer_1" viewBox="0 0 512 512" xml:space="preserve"><script xmlns=""/>
                         <circle style="fill:#0F7986;" cx="256" cy="256" r="256"/>
                         <path style="fill:#B3B3B3;" d="M220.316,249.432c23.787,0,47.569,0,71.356,0l0.388,4.877l-34.872,52.862l-37.458-53.389l0.582-4.35  H220.316z"/>
@@ -495,29 +489,29 @@
                    
                   
                 </div>
-
-                <div id="info-card" style="display: flex;flex-direction: row;margin-left:20px ;cursor: pointer;" onclick="window.location.href='/user/doctorspage'">
+                <div id="info-card" style="display: flex;flex-direction: row;cursor: pointer; justify-content: space-between;" onclick="window.location.href='/user/doctorspage'">
+    
+                    <div class="descript" style="display: flex; flex-direction: column;  ;padding: 5px; ">
+                        <span style="font-size:20px">
+                            Doctor Access
+                        </span>
+                        <span style="margin-top: 10px;font-size: 16px; color: #023157;">
+                            Schedule appointments and send reports, diagnosis to doctors
+                        </span>
+    
+                    </div>
                     
-                                    <div class="descript" style="display: flex; flex-direction: column; margin-left:20px ;padding: 5px;">
-                                        <span style="font-size:20px">
-                                            Doctor Access
-                                        </span>
-                                        <span style="margin-top: 10px;font-size: 16px; color: #023157;">
-                                            Schedule appointments and send reports, diagnosis to doctors
-                                        </span>
-                    
-                                    </div>
-                                    
-                                    <div style="align-self: center; margin-left: 100px;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="30px" width="30px" version="1.1" id="Layer_1" viewBox="0 0 512 512" xml:space="preserve">
-                                            <path style="fill:#23d3ff;" d="M256,512C114.839,512,0,397.156,0,256S114.839,0,256,0s256,114.844,256,256S397.161,512,256,512z"/>
-                                            <path style="fill:#23d3ff;" d="M512,256C512,114.844,397.161,0,256,0v512C397.161,512,512,397.156,512,256z"/>
-                                            <path style="fill:#FFFFFF;" d="M204.752,394.612c-5.408,0-10.72-2.621-13.933-7.469c-5.099-7.686-3-18.047,4.686-23.146  l164.568-109.165L195.505,145.666c-7.686-5.099-9.785-15.46-4.686-23.146c5.099-7.697,15.455-9.785,23.146-4.686l185.546,123.082  c4.664,3.098,7.469,8.317,7.469,13.916s-2.805,10.818-7.469,13.916L213.966,391.829  C211.128,393.709,207.921,394.612,204.752,394.612z"/>
-                                            <path style="fill:#FFE6B3;" d="M399.511,240.915l-142.824-94.744v40.079l103.386,68.581l-103.386,68.581v40.079l142.825-94.744  c4.664-3.098,7.469-8.317,7.469-13.916S404.175,244.013,399.511,240.915z"/>
-                                            <script xmlns=""/></svg>
-                                    </div>
+                    <div style="align-self: center; margin-left: 100px;">
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="30px" width="30px" version="1.1" id="Layer_1" viewBox="0 0 512 512" xml:space="preserve">
+                            <path style="fill:#23d3ff;" d="M256,512C114.839,512,0,397.156,0,256S114.839,0,256,0s256,114.844,256,256S397.161,512,256,512z"/>
+                            <path style="fill:#23d3ff;" d="M512,256C512,114.844,397.161,0,256,0v512C397.161,512,512,397.156,512,256z"/>
+                            <path style="fill:#FFFFFF;" d="M204.752,394.612c-5.408,0-10.72-2.621-13.933-7.469c-5.099-7.686-3-18.047,4.686-23.146  l164.568-109.165L195.505,145.666c-7.686-5.099-9.785-15.46-4.686-23.146c5.099-7.697,15.455-9.785,23.146-4.686l185.546,123.082  c4.664,3.098,7.469,8.317,7.469,13.916s-2.805,10.818-7.469,13.916L213.966,391.829  C211.128,393.709,207.921,394.612,204.752,394.612z"/>
+                            <path style="fill:#FFE6B3;" d="M399.511,240.915l-142.824-94.744v40.079l103.386,68.581l-103.386,68.581v40.079l142.825-94.744  c4.664-3.098,7.469-8.317,7.469-13.916S404.175,244.013,399.511,240.915z"/>
+                            <script xmlns=""/></svg>
+                    </div>
 
-                </div>
+                  </div>
+
 
             </div>
 

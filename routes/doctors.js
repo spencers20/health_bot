@@ -31,9 +31,14 @@ router.get('/',async(req,res)=>{
     }                                                                                                                                                                                           
 })
 
-router.get('/logout',(req,res)=>{
+router.get('/logout',async(req,res)=>{
     try{
-        delete req.session.doc
+        const docId=req.session.doc._id
+        const docstatus=req.session.doc.status
+       
+
+            delete req.session.doc
+            res.render('index.ejs')
         
 
     }catch(e){
@@ -63,21 +68,30 @@ router.post('/getreport',async(req,res)=>{   //****for doctor
         const repocollection=await db.collection('reports')
         const historycollection=await db.collection('history')
         const {repoId,userId}=req.body
+        console.log('report id',repoId)
 
        const [thereport,histories]=await Promise.all([
-           repocollection.findOne(
-               { _id: userId },
-               {
-                   _id: 1, // Include the patient ID
-                   name: 1, // Include the patient's name
-                   birthdate: 1, // Include birthdate
-                   gender: 1, // Include gender
-                   reports: { $elemMatch: { reportId: repoId } } // Match the specific report
-               }
-            ),
+        repocollection.aggregate([
+            { $match: { _id: userId } },
+            {
+                $project: {
+                    _id: 1,
+                    name: 1,
+                    birthdate: 1,
+                    gender: 1,
+                    reports: {
+                        $filter: {
+                            input: "$reports",
+                            as: "report",
+                            cond: { $eq: ["$$report.reportId",new Date(repoId)] }
+                        }
+                    }
+                }
+            }
+        ]).toArray(),
            historycollection.aggregate([
                 {
-                    $match:{_id:"100984849132378172203"}
+                    $match:{_id:userId}
                 },
                 {
                      $unwind:"$histories"
@@ -94,7 +108,9 @@ router.post('/getreport',async(req,res)=>{   //****for doctor
             ]).toArray()
            
         ])
+        console.log('thereports...',thereport)
         if (!thereport || histories.length==0){
+            console.log('one missing')
             res.status(200).json({message:'no reeport available'})
             return
         } 
@@ -191,6 +207,8 @@ router.post('/finishreport',async(req,res)=>{   //****for doctor
         const db=await getdb()
         const docId=req.session.doc._id
         const repodate=new Date(sentdate).toISOString().split('T')[0]
+        console.log(reportId +'...'+ docId +'...' + patientId +'...'+ sentdate)
+
         const [finishrepo,finishdoc]=await Promise.all([
             db.collection('docreports').updateOne(
                 {    _id: docId,
@@ -217,14 +235,15 @@ router.post('/finishreport',async(req,res)=>{   //****for doctor
                        "reports.$.doctor.assessment":docassessment,
                        "reports.$.doctor.recommendation":docrecommendation
                     }
-                } && finishdoc.modifiedCount>0
+                } 
             )
 
             
         ])
          console.log(finishrepo)
-        if(finishrepo.modifiedCount>0){
-            console.log(`in doc details ${finishrepo} and in reports `)
+         console.log(finishdoc)
+        if(finishrepo.modifiedCount>0 && finishdoc.modifiedCount>0){
+            console.log('n doc details',finishrepo+' and in reports ', finishdoc)
             res.status(200).json({success:true ,message:"report finished success"})
         }else{
             res.json({success:false, error:"report not finished"})
@@ -234,6 +253,95 @@ router.post('/finishreport',async(req,res)=>{   //****for doctor
           res.json({error:"error in finishing report",e })
     }
 
+})
+
+router.post('/acceptcancel',async(req,res)=>{
+    try{ 
+        // let savebooking
+        console.log("saving bookng....")
+        const db=await getdb()
+        const docappcollection=await db.collection('docappointments')
+        const userevents=await db.collection('events')
+        const {reqdecision,patient,date}=req.body
+        
+        const pid=patient.id
+       
+        const docId=req.session.doc._id
+        console.log('patient',patient,+'reqdecision',reqdecision)
+
+        // if(reqdecision=='accepted'){
+        //     const accepted=await docappcollection.updateOne(
+        //         { 
+        //             _id: docId, 
+        //             "appointmentdates.date": reqdecision.date, 
+        //             "appointmentdates.patients.name": patient.name 
+        //         },
+        //         { 
+        //             $set: { "appointmentdates.$[].patients.$[patient].status": reqdecision.status } 
+        //         },
+        //         { 
+        //             arrayFilters: [{ "patient.name": patient.name }]
+        //         }
+        //    )
+        //    if(accepted.modifiedCount>0){
+        //     res.status(200).json({success:true,message:'appointment accepted successfully'})
+          
+        //    }else{
+        //     console.log('error in accepting request')
+        //    }
+
+
+        // }
+     
+        // const [savebooking, mydocappointment]=await Promise.all([
+        //        ,
+        //        userevents.updateOne({
+        //         _id:patient.id,
+        //         "events.datedue":new Date(reqdecision.date),
+        //         "events.type":"appointment"
+
+        //        },
+        //        {
+        //         $set:{"events.$.status":reqdecision.status}
+        //        }
+        //     )
+
+        //     ])
+          const mydate=new Date(reqdecision.date).toISOString().split('T')[0]
+          console.log(patient.name)
+          console.log(docId)
+        console.log('date',mydate)
+        
+            const mydocappointment=await  docappcollection.updateOne(
+                { 
+                    _id: docId, 
+                    "appointmentdates.date":mydate, 
+                    "appointmentdates.patients.name": patient.name 
+                },
+                { 
+                    $set: { "appointmentdates.$[].patients.$[patient].status": reqdecision.status } 
+                },
+                { 
+                    arrayFilters: [{ "patient.name": patient.name }]
+                }
+           )
+
+          
+        
+      
+        console.log("mydocappointment..",mydocappointment)
+        if(mydocappointment.modifiedCount>0 ){
+            console.log('worked')
+            res.status(200).json({success:true,message:'appointment marked complete successfully, remind patient to mark complete'})
+        }else{
+            res.json({error:"Request not sent , please book again"})
+        }
+    }catch(e){
+        console.log('errror in adding to db..',e)
+    }
+
+
+    
 })
 
 router.post('/setavailability',async(req,res)=>{ //****for doctor

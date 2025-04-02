@@ -38,6 +38,8 @@ currentdate.textContent=formattedDate
 
 
 
+
+
 function typeDropdown(){
     try{  
         console.log('currenttype clicked')
@@ -62,46 +64,46 @@ function typeDropdown(){
     }
 }
 
-duration.addEventListener('click',()=>{
-    try{
-        if(weektime.style.display=='none' || monthtime.style.display=='none' || yeartime.style.display=='none' || customtime.style.display=='none'){
-            weektime.style.display='block'
-            monthtime.style.display='block'
-            yeartime.style.display='block'
-            customtime.style.display='block'
-        } else {
-            weektime.style.display='none'
-            monthtime.style.display='none'
-            yeartime.style.display='none'
-            customtime.style.display='none'
-        }
-    }
-    catch(e){
-        console.log(e)
-    }
+// duration.addEventListener('click',()=>{
+//     try{
+//         if(weektime.style.display=='none' || monthtime.style.display=='none' || yeartime.style.display=='none' || customtime.style.display=='none'){
+//             weektime.style.display='block'
+//             monthtime.style.display='block'
+//             yeartime.style.display='block'
+//             customtime.style.display='block'
+//         } else {
+//             weektime.style.display='none'
+//             monthtime.style.display='none'
+//             yeartime.style.display='none'
+//             customtime.style.display='none'
+//         }
+//     }
+//     catch(e){
+//         console.log(e)
+//     }
 
-})
+// })
 
 
-function classificationDropdown(){
-    try{
-        console.log('currententry', currententry.innerHTML)
-        const currenttentry=currententry.innerHTML.trim();
-        const computedstyle=window.getComputedStyle(entryclassification).display
-        console.log("computedstyle",computedstyle)
-        if(computedstyle=='none'){
-            currenttentry.includes('all entries')?allentry.style.display='none':allentry.style.display='flex'
-            currenttentry.includes('starred entry')?starred.style.display='none':starred.style.display='flex'
+// function classificationDropdown(){
+//     try{
+//         console.log('currententry', currententry.innerHTML)
+//         const currenttentry=currententry.innerHTML.trim();
+//         const computedstyle=window.getComputedStyle(entryclassification).display
+//         console.log("computedstyle",computedstyle)
+//         if(computedstyle=='none'){
+//             currenttentry.includes('all entries')?allentry.style.display='none':allentry.style.display='flex'
+//             currenttentry.includes('starred entry')?starred.style.display='none':starred.style.display='flex'
   
-            entryclassification.style.setProperty('display','flex','important')
-        }else{
-            entryclassification.style.setProperty('display','none','important')
-        }
+//             entryclassification.style.setProperty('display','flex','important')
+//         }else{
+//             entryclassification.style.setProperty('display','none','important')
+//         }
          
-    } catch(e){
-        console.log("error in entryclassification",e)
-    }
-}
+//     } catch(e){
+//         console.log("error in entryclassification",e)
+//     }
+// }
 
 
 let keydate=[];
@@ -292,7 +294,7 @@ function historyelements(results, entries) {
             const entry_date = document.createElement('span')
             entry_date.style.marginLeft = '150px'
             entry_date.style.marginBottom = '5px'
-            entry_date.innerHTML = entry.date
+            entry_date.innerHTML =new Date(entry.date).toLocaleDateString('en-US',options)
             detailscontainer.appendChild(entry_date)
 
             entryDiv.appendChild(detailscontainer)
@@ -348,119 +350,119 @@ async function getstarred() {
     
 }
 // starred classification listener
-starred.addEventListener('click',async()=>{
-    console.log('starred opened')
-    await getstarred()
-    currententry.innerHTML='starred entry'
-    entryclassification.style.display='none'
-    const starpath=document.getElementById('starpath')
-    // if(starpath.getAttribute('fill'==='grey')){
-    //     starpath.setAttribute('fill','blue')
-    // } else{
-    //     starpath.setAttribute('fill','grey')
-    // }
-    // allentry.style.display='flex'
-    // starred.style.display='none'
+// starred.addEventListener('click',async()=>{
+//     console.log('starred opened')
+//     await getstarred()
+//     currententry.innerHTML='starred entry'
+//     entryclassification.style.display='none'
+//     const starpath=document.getElementById('starpath')
+//     // if(starpath.getAttribute('fill'==='grey')){
+//     //     starpath.setAttribute('fill','blue')
+//     // } else{
+//     //     starpath.setAttribute('fill','grey')
+//     // }
+//     // allentry.style.display='flex'
+//     // starred.style.display='none'
      
     
     
 
-}
-    )
+// }
+//     )
 
     // all entry classification listener
-allentry.addEventListener('click',async()=>{
-    await gethistory()
-    console.log('allentry opened')
-    currententry.innerHTML='all entries'
-    entryclassification.style.display='none'
+// allentry.addEventListener('click',async()=>{
+//     await gethistory()
+//     console.log('allentry opened')
+//     currententry.innerHTML='all entries'
+//     entryclassification.style.display='none'
    
    
-})
+// })
 // symptom entry type event listener to display symptom checker histories
-symptoms.addEventListener('click',async()=>{
-    try{
-        //updating the dropdown menu
-        currenttype.innerHTML='symptoms diary'
-        entriestype.style.display='none'
+// symptoms.addEventListener('click',async()=>{
+//     try{
+//         //updating the dropdown menu
+//         currenttype.innerHTML='symptoms diary'
+//         entriestype.style.display='none'
         
-         //getting the symptoms from the backend
-        const historydetails=await fetch('/user/myhistory')
-        const result =await historydetails.json()
-        const entries=document.querySelector('.entries')
-        const results=[]
-        result.forEach((entry)=>{
-            if(entry.chatId){
-                results.push(entry)
-            }
-        })
+//          //getting the symptoms from the backend
+//         const historydetails=await fetch('/user/myhistory')
+//         const result =await historydetails.json()
+//         const entries=document.querySelector('.entries')
+//         const results=[]
+//         result.forEach((entry)=>{
+//             if(entry.chatId){
+//                 results.push(entry)
+//             }
+//         })
 
 
         
 
-        historyelements(results,entries)    
-        updateallcheckboxes()
+//         historyelements(results,entries)    
+//         updateallcheckboxes()
 
 
-    }catch(e){
-        console.log('error in getting symptoms histories',e)
-    }
-})
+//     }catch(e){
+//         console.log('error in getting symptoms histories',e)
+//     }
+// })
 
 // all entries to display all both chats and checkupd history
-allentries.addEventListener('click', async()=>{
+// allentries.addEventListener('click', async()=>{
 
-    await gethistory()
-    currenttype.innerHTML='all entries'   
+//     await gethistory()
+//     currenttype.innerHTML='all entries'   
     
-    entriestype.style.display='none'
-    updateallcheckboxes()
-})
+//     entriestype.style.display='none'
+//     updateallcheckboxes()
+// })
 
 // view checkup histories   
 
-checkups.addEventListener('click',async()=>{
-    try{
-        //updating the dropdown menu
-        entriestype.style.display='none'
-        currenttype.innerHTML='daily diary'
-        // checkups.style.display='none'
+// checkups.addEventListener('click',async()=>{
+//     try{
+//         //updating the dropdown menu
+//         entriestype.style.display='none'
+//         currenttype.innerHTML='daily diary'
+//         // checkups.style.display='none'
         
-        const historydetails=await fetch('/user/myhistory')
-        const result=await historydetails.json()
-        const entries=document.querySelector('.entries')
+//         const historydetails=await fetch('/user/myhistory')
+//         const result=await historydetails.json()
+//         const entries=document.querySelector('.entries')
 
-        const currenttentry=currententry.innerHTML.trim()
+//         const currenttentry=currententry.innerHTML.trim()
 
-        if (currenttentry.includes('starred entry')){
-            const results=[]
+//         if (currenttentry.includes('starred entry')){
+//             const results=[]
 
-            result.forEach((entry)=>{
-                if(!entry.chatId && entry.status=='starred'){
-                    results.push(entry)
-                }
-                !entry.chatId
-            })
-            historyelements(results,entries)
-            updateallcheckboxes()      
-        } else{
-            const results=[]
-            result.forEach((entry)=>{
-                if(!entry.chatId){
-                    results.push(entry)
-                }
+//             result.forEach((entry)=>{
+//                 if(!entry.chatId && entry.status=='starred'){
+//                     results.push(entry)
+//                 }
+//                 !entry.chatId
+//             })
+//             historyelements(results,entries)
+//             updateallcheckboxes()      
+//         } else{
+//             const results=[]
+//             result.forEach((entry)=>{
+//                 if(!entry.chatId){
+//                     results.push(entry)
+//                 }
                 
-            })
+//             })
         
     
-           historyelements(results,entries)
-           updateallcheckboxes()
-        }
+//            historyelements(results,entries)
+//            updateallcheckboxes()
+//         }
 
-    }catch(e){
-        console.log('error in getting daily checkups histories',e)
-    }
-})
+//     }catch(e){
+//         console.log('error in getting daily checkups histories',e)
+//     }
+// })
 
 document.addEventListener('DOMContentLoaded',async()=>{
     await gethistory()  
@@ -626,8 +628,8 @@ async function handleDownload() {
 }
 
 // Add click event listeners to both download SVGs
-downloadsvgHeader.addEventListener('click', handleDownload)
-downloadsvgSelection.addEventListener('click', handleDownload)
+// downloadsvgHeader.addEventListener('click', handleDownload)
+// downloadsvgSelection.addEventListener('click', handleDownload)
 
 
 
@@ -660,7 +662,7 @@ starsvg.addEventListener('click',async()=>{
 
         if(results.ok==true){
             // console.log('results of starsvg',results)
-            alert('Entry starred successfully')
+            showCustomAlert('Entry starred successfully')
             allcheckboxes.forEach(checkbox=>{
                 if(checkbox.checked===true){
                     const index=keydate.indexOf(keyydate)
@@ -702,7 +704,7 @@ deletesvg.addEventListener('click',async()=>{
 
     console.log('delete results',results)
     if(results.ok==true){
-        alert('deleted succesfully')
+        showCustomAlert('deleted succesfully')
         selection.style.display='none'
         if (allentry.innerHTML.trim()==='starred entry '){
             await getstarred()

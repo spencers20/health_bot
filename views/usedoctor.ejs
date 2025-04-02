@@ -369,7 +369,7 @@
             display: flex;
             margin:5px;
             padding:5px; 
-            overflow: hidden;
+            /* overflow: hidden; */
             border-radius: 10px;
             background-color: rgb(220, 237, 245); 
             /* height: 200px  !important; */
@@ -498,6 +498,8 @@
             display: flex;
             margin:5px;
             align-self: center;
+            align-items: center;
+            justify-content: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: 17px;
             color:green;
@@ -621,6 +623,27 @@
     border-radius: 5px;
     transition: background-color 0.3s, color 0.3s;
 }
+.generating-report {
+        font-family: Arial, sans-serif;
+        font-size: 18px;
+        color: #333;
+        background-color: #f0f8ff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        width: 300px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin: auto;
+        position: relative;
+        top: 20%;
+        animation: fadeIn 1.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
 
         
         
@@ -631,6 +654,8 @@
             <script src='https://cdn.jsdelivr.net/npm/fullcalendar/index.global.min.js'></script>
     </head>
     <body>
+          <!-- custom-alert -->
+    <%- include('alert') %>
        
         <div class="header-container" style="position: sticky;"></div>
         <div class="main" >
@@ -754,7 +779,7 @@
  
             </div>
 
-            <div class="calendar"  id="docscalendar" style="margin: 5px;padding: 5px;max-height: 500px;max-width: 550px;position: sticky;">
+            <div class="calendar"  id="docscalendar" style="margin: 5px;padding: 5px;max-width: 550px;position: sticky;">
 
             </div>
             
@@ -779,15 +804,18 @@
                     <button class="session-button book-button" id="booking">
                         Send appointment
                     </button>
+                    <div id="wait" style="display: none; background-color: #f0f0f0;color: #555;padding: 10px 15px;border-radius: 8px;text-align: center;font-size: 16px;font-style: italic;box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);margin: 20px auto;width: fit-content;">
+                        Booking Appointment... Please wait
+                      </div>
                     <div class="confirmation" style="display: none;">
-                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="RGB(9 140 8)" version="1.1" id="Capa_1" width="30px" height="30px" viewBox="0 0 335.765 335.765" xml:space="preserve"><script xmlns=""/>
+                        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="RGB(9 140 8)" version="1.1" id="Capa_1" width="25px" height="25px" viewBox="0 0 335.765 335.765" xml:space="preserve"><script xmlns=""/>
                             <g>
                                 <g>
                                     <polygon points="311.757,41.803 107.573,245.96 23.986,162.364 0,186.393 107.573,293.962 335.765,65.795   "/>
                                 </g>
                             </g>
                             <script xmlns=""/></svg>
-                           <div style="align-items: center;display: flex;margin: 10px;padding: 10px;">Request Sent Succesfully</div>
+                           <div style="align-items: center;display: flex;margin: 10px;padding: 10px;">appointment Set Succesfully</div>
                     </div>
             </div>
             <!-- <div class="sendtodoc" id="sendreport" style="margin-top: 20px; display: flex;"> -->
@@ -797,7 +825,7 @@
                     <!-- Header Section with Logo Placeholder and Date -->
                     <div class="modal-header">
                         <h2>Afyasphere</h2> <!-- Logo Placeholder -->
-                        <p><strong>Date:</strong> <span id="reportDate">4th March 2025</span></p>
+                        <!-- <p><span id="reportDate">4th March 2025</span></p> -->
                      
                     </div>
             
@@ -809,6 +837,8 @@
             
                     <!-- Footer -->
                     <div class="modal-footer" >
+
+                        
                         <button class="send-doc" >Submit</button>
                     </div>
                 </div>

@@ -12,19 +12,26 @@ let clickeddate;
 let events=[]
 let patientappointment
 let allreports
+let appointmentcount=0
 
 
 
 document.addEventListener('DOMContentLoaded',async()=>{
     try{
         // await allreports()
-        // await mypatients()
+        
         const doctordetails=await fetch('/doctors/docsname')
         // console.log('doctordetails',doctor)
         const amdoc=await doctordetails.json()
         console.log(amdoc)
         document.getElementById('docgreeting').innerHTML='Welcome Dr.' +amdoc.name.split(' ')[1]
         document.getElementById('docimages').style.backgroundImage=`url(${amdoc.image})`
+        if(amdoc.status === "away") {
+            document.getElementById('away').checked = true;
+        } else if(amdoc.status === "active") {
+            document.getElementById('active').checked = true;
+        }
+        
     
     
         const response=await fetch('/doctors/getmypatients')
@@ -40,36 +47,43 @@ document.addEventListener('DOMContentLoaded',async()=>{
             patientappointment=allpatients.appointmentdates
             console.log(Array.isArray(patientappointment))
             
-         
+          console.log("patientappointment...",patientappointment)
             patientappointment.forEach(appointmentdate=>{
                 let eventcolor;
                 let description
                 let status
+                let tittle
                 const numvisits=parseInt(appointmentdate.numvisits,10)
                 const booked=appointmentdate.bookedtime.length
                 const notbooked=appointmentdate.appointmenttime.length
-        
-                if(booked<numvisits){
-                    eventcolor='#ffc107'
-                    description=`${booked} slots booked out of ${numvisits} set slots`
-                    status=`${notbooked} Pending`
-                }else{
-                    eventcolor='#a9e8c2'
-                    description=`${booked} slots booked out of ${numvisits} set slots`
-                    status=`Fully Booked`
+                if(appointmentdate.date>=datetoday){
+
+                    if(booked<numvisits){
+                        tittle='Scheduled'
+                        eventcolor='#ffc107'
+                        description=`${booked} slots booked out of ${numvisits} set slots`
+                        status=`${notbooked} Pending`
+                    }else{
+                        tittle='Full'
+                        eventcolor='#a9e8c2'
+                        description=`${booked} slots booked out of ${numvisits} set slots`
+                        status=`Fully Booked`
+                    }
+                    events.push({
+                         title:tittle,
+                         start:appointmentdate.date,
+                         color:eventcolor,
+                         description:description,
+                         status:status
+                    })
                 }
-                events.push({
-                     title:'Schedules',
-                     start:appointmentdate.date,
-                     color:eventcolor,
-                     description:description,
-                     status:status
-                })
                 const today=new Date().toISOString().split('T')[0]
-                const mydate=new Date(appointmentdate.date)
-                if(mydate!==new Date(today)){
+                const mydate=new Date(appointmentdate.date).toISOString().split('T')[0]
+                if(appointmentdate.date!==datetoday){
+                    console.log(mydate,"  ", +today )
                     document.getElementById('todayno').textContent='0'
                 }else{
+                    appointmentcount+=1
                     const todayappointments=appointmentdate.patients.length
                     document.getElementById('todayno').textContent=todayappointments
         
@@ -80,7 +94,8 @@ document.addEventListener('DOMContentLoaded',async()=>{
                 doccalendar(events)
             }
         }
-
+        
+        upcomingappoints()
         allappoints() //funcction for all appointment details
     
         const results=await fetch('/doctors/reportpatients')
@@ -89,6 +104,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
     
         console.log("allpatients",allpatients)
         console.log("patientappointment",patientappointment)
+        console.log('appointment count.....',appointmentcount)
 
     }catch(e){
         console.error('error in loading the docs page..',e)
@@ -97,6 +113,17 @@ document.addEventListener('DOMContentLoaded',async()=>{
     
 })
 
+
+
+document.querySelector('.logout').addEventListener('click',async()=>{
+    try{
+        console.log('clicked logout')
+        window.location.href = '/doctors/logout';
+
+    }catch(e){
+        console.error('errror in logging out',e)
+    }
+})
 function doccalendar(events){
     const calendar=new FullCalendar.Calendar(calendarEl,{
     
@@ -112,7 +139,7 @@ function doccalendar(events){
                   
     
                 }else{
-                    alert('appointment dates are only set for future dates')
+                    showCustomAlert('appointment dates are only set for future dates')
     
                    
                 }
@@ -165,9 +192,9 @@ availability.forEach((button)=>{
         if (results){
             const availabilityresult=await results.json()
             if(availabilityresult.message){
-                alert(availabilityresult.message)
+                showCustomAlert(availabilityresult.message)
             }else{
-                alert(availabilityresult.error)
+                showCustomAlert(availabilityresult.error)
             }
         }
 
@@ -185,6 +212,7 @@ async function thereports(userId,repoId){
         })
          
         const patientreport=await reports.json()
+        console.log('my patient report...',patientreport)
         return patientreport
 
     }catch(e){
@@ -233,7 +261,7 @@ function  pendingrepos(){
 
         if(!allreports){
             allreports=[]
-            alert('no reports')
+            showCustomAlert('no reports')
 
         }
     
@@ -342,11 +370,29 @@ function displayreports(docreports){
         let pendingcount=0
         const reports=document.querySelector('.reportschedules')
         reports.innerHTML=''
+
         docreports.forEach(docrepo=>{
             if (docrepo.patients){
                 docrepo.patients.forEach((incomingrepo=>{
+                    // const repoheader=document.querySelector('.report-header')
+                    // const repdate=repoheader.contains(repoheader)
+                    // if(repdate){
+                    //     d
+                    // }
                     console.log('incoming report', incomingrepo.tname)
                     const name=incomingrepo.tname
+                    document.querySelector('.report-header').innerHTML=''
+                    //add name to the history part / entries part 
+                    document.querySelector('.modal-histo').innerHTML=''
+                    const histoname=document.createElement('div')
+                    histoname.innerHTML=name.split(" ")[0] +' Health Diary'
+                    document.querySelector('.modal-histo').appendChild(histoname)
+
+                    //add date of report
+                    const repodate=document.createElement('div')
+                    repodate.innerHTML='Report Date '+ new Date(incomingrepo.reportId).toLocaleDateString('en-US',{day:'numeric',month:'long',year:'numeric'})
+                    document.querySelector('.report-header').appendChild(repodate)
+                    
                     let reporttime
                     if(incomingrepo.status=="pending"){
                         pendingcount+=1
@@ -406,25 +452,30 @@ function displayreports(docreports){
                         viewreport.classList.add('view-report')
                         viewreport.innerHTML='view report'
                         viewreport.addEventListener('click',async()=>{
-                            document.getElementById('reportDate').textContent=''
+                            // document.getElementById('reportDate').textContent=''
                             document.getElementById('reportModal').style.display='flex'
                             let report
+                            console.log('incomingrepo.id',incomingrepo.id)
+                            console.log('incomingreport id',incomingrepo.reportId)
                           
                             const patient=await thereports(incomingrepo.id,incomingrepo.reportId)
                             const myhistory=patient.histories
                             console.log('histories',myhistory)
                             const patientreport=patient.thereport
-    
+                            console.log('patientreport...',patientreport)
+                            
                             if (patientreport){
                                 const reportbody=document.querySelector('.modal-body')  
-                                report=patientreport.reports
+                                report=patientreport[0].reports
                                 console.log('patient reports ',report)
                                 const diseases=formatTextToHTML(report[0].Diagnosis[0].summary)
                                 console.log('unformatted..',report[0].Diagnosis[0].summary)
-                                console.log('diseases',diseases)
+                                console.log('diseases',diseases)    
                                 console.log('patient found..',patientreport)
-                                const age=getage(patientreport.birthdate)
-                                document.getElementById('reportDate').textContent = new Date(incomingrepo.sentdate).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+                                const age=getage(patientreport[0].birthdate)
+                                // document.getElementById('reportDate').textContent = new Date(incomingrepo.sentdate).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+                                const mysymptoms=report[0].Diagnosis?.[0].symptoms?report[0].Diagnosis[0].symptoms:"No symptoms recorded"
+                                const myassesment=report[0].nurse?.assesment?report[0].nurse.assesment:report[0].myassesment
 
                                 // const reportid=incomingrepo.reportId'
                                 
@@ -432,9 +483,9 @@ function displayreports(docreports){
                                 <!-- Patient Info -->
                                 <div class="section">
                                     <h3 style="align-self: center;display: flex;justify-content: center;align-items: center;">Patient Report</h3>
-                                    <p><strong>Name:</strong> ${patientreport.name}</p>
+                                    <p><strong>Name:</strong> ${patientreport[0].name}</p>
                                     <p><strong>Age:</strong> ${age}</p>
-                                    <p><strong>Gender:</strong> ${patientreport.gender}</p>
+                                    <p><strong>Gender:</strong> ${patientreport[0].gender}</p>
                                 </div>
                     
                                 <!-- Metrics -->
@@ -451,13 +502,13 @@ function displayreports(docreports){
                                 <!-- First Diagnosis -->
                                 <div class="section">
                                     <h3>Diagnosis</h3>
-                                    <p><strong>Symptoms:</strong> ${report[0].Diagnosis[0].symptoms}</p>
+                                    <p><strong>Symptoms:</strong> ${mysymptoms}</p>
                                     <p><strong>Possible Diseases:</strong>${diseases}</p>
                                      
                                 </div>
                                 <div class="section">
                                   <h3>Nurse Assesment</h3>
-                                   <p>${report[0].nurse.assesment} </p>
+                                   <p>${myassesment} </p>
                                 </div>
                     
                 
@@ -477,7 +528,7 @@ function displayreports(docreports){
                     
                                 <!-- Report Sent By -->
                                 <div class="section">
-                                    <p><strong>Report Sent by:</strong> Nurse ${report[0].nurse.name}</p>
+         
                                      <p><strong>Doctor to assess:</strong> Doctor ${report[0].doctor.name}</p>
                                 </div>
     
@@ -492,14 +543,15 @@ function displayreports(docreports){
     
                             document.getElementById('report-submit').addEventListener('click',async()=>{
                                 try{
-                                    const patientId=patientreport._id
+                                    const patientId=patientreport[0]._id
                                     const reportId=incomingrepo.reportId
                                     const sentdate=incomingrepo.sentdate
-                                    console.log('report to complete..',reportId)
+                                    
+                                    console.log('report to complete..',reportId + 'with patientId...',patientId)
                                     const docassessment=document.getElementById('doctorNotes').value
                                     const docrecommendation=document.getElementById('recommendations').value
                                     if(!docassessment || !docrecommendation){
-                                        alert('you must fill in all the analysis and recommendation part')
+                                        showCustomAlert('you must fill in all the analysis and recommendation part')
                                         return
                                     }
                                     const submittedrepo=await fetch('/doctors/finishreport',{
@@ -512,10 +564,10 @@ function displayreports(docreports){
                                     const submittedreport=await submittedrepo.json()
     
                                     if (submittedreport.success==true){
-                                        alert(submittedreport.message)
+                                        showCustomAlert(submittedreport.message)
                                         document.getElementById('reportModal').style.display='none'
                                     }else{
-                                        alert(submittedreport.error)
+                                        showCustomAlert(submittedreport.error)
                                     }
     
     
@@ -607,6 +659,7 @@ async function records(myhistory){
 
         console.log(myhistory)
         const histodiv=document.querySelector('.histories')
+        histodiv.innerHTML=''
         myhistory[0].histories.forEach((history)=>{
             const date=new Date(history.date).toISOString().split("T")[0]
             const summary=history.description.split(' ').slice(0, 7).join(' ')+'...'
@@ -640,7 +693,7 @@ async function records(myhistory){
 
 async function appointmentstatus(reqdecision,patient){
     try{
-        const cancelaccept=await fetch('/acceptcancel',{
+        const cancelaccept=await fetch('/doctors/acceptcancel',{
             method:'POST',
             headers:{
                 'Content-Type':'application/json'
@@ -648,10 +701,18 @@ async function appointmentstatus(reqdecision,patient){
             body:JSON.stringify({reqdecision,patient})
         
         })
+        const results=await cancelaccept.json()
+        if(results.success){
+
+            showCustomAlert(results.message)
+        }else{
+            showCustomAlert(results.error)
+        }
+    
 
     }catch(e){
         console.log('error in cancelling/acceepting request..',e)
-        alert('errror to cancel / accept reques..')
+        showCustomAlert('errror to cancel / accept reques..')
     }
 
 }
@@ -680,8 +741,9 @@ function todayappoints() {
         console.log('Today:', today);
     
         // Filter appointments where the date matches today
-        const todaysAppointments = patientappointment.filter(appointment =>new Date(appointment.date) === new Date (today));
-    
+        console.log(patientappointment)
+        const todaysAppointments = patientappointment.filter(appointment =>new Date(appointment.date).toISOString().split('T')[0] === new Date().toISOString().split('T')[0]);
+         console.log("todaysAppointments...",todaysAppointments )
         if (todaysAppointments.length > 0) {
             console.log("Today's Appointments:", todaysAppointments);
             mypatients(todaysAppointments);
@@ -730,9 +792,12 @@ function upcomingappoints(){
     //     }
         console.log('upcomings..',upcomings)
         if(upcomings.length>0){
-            const upcomingnumber=upcomings[0].patients.length
-            console.log(upcomingnumber)
-            document.getElementById('upcomingappoints').textContent=upcomingnumber
+            const totalPatients = upcomings.reduce((sum, appointment) => {
+                return sum + (appointment.patients ? appointment.patients.length : 0);
+            }, 0);
+            
+            console.log("Total Patients:", totalPatients);
+            document.getElementById('upcomingappoints').textContent=totalPatients
             mypatients(upcomings)
         }else{
             console.log('no appointment')
@@ -752,46 +817,46 @@ function upcomingappoints(){
 
 }
 
-function pendingappoints(){
-    console.log(patientappointment)
-    const pendings=patientappointment.map((appointment)=>{
-        if(!appointment.patients){
-            return null
-        }
-        const pendingpatients=appointment.patients.filter(patient=>patient.status==="pending")
-        if(pendingpatients.length>0){
-            return{
-                ...appointment,
-                patients:pendingpatients
-            }
-        }
+// function pendingappoints(){
+//     console.log(patientappointment)
+//     const pendings=patientappointment.map((appointment)=>{
+//         if(!appointment.patients){
+//             return null
+//         }
+//         const pendingpatients=appointment.patients.filter(patient=>patient.status==="pending")
+//         if(pendingpatients.length>0){
+//             return{
+//                 ...appointment,
+//                 patients:pendingpatients
+//             }
+//         }
         
-        return null
-    }).filter(appointment => appointment !== null); 
+//         return null
+//     }).filter(appointment => appointment !== null); 
 
 
-    console.log('pendings..',pendings)
+//     console.log('pendings..',pendings)
 
-    if(pendings.length>0){
-        mypatients(pendings)
-    }else{
-        console.log('no appointment')
-        const appoints=document.querySelector('.appointments')
-        // appoints.innerHTML=''
-        appoints.innerHTML=`<div id="no-appointment" style="display: flex; text-align: center;padding: 20px;background-color: #f8f9fa;border-radius: 10px;width: fit-content;margin: 40px auto;box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="100px" height="100px" viewBox="0 0 16 16"><script xmlns=""/>
-                                        <path d="M3.793 4.5l3.5 3.5-3.5 3.5.707.707 3.5-3.5 3.5 3.5.707-.707-3.5-3.5 3.5-3.5-.707-.707-3.5 3.5-3.5-3.5z" fill="gray" fill-rule="evenodd" font-family="sans-serif" font-weight="400" overflow="visible" style="line-height:normal;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;text-transform:none;text-orientation:mixed;shape-padding:0;isolation:auto;mix-blend-mode:normal" white-space="normal" color="#000000"/>
-                                    <script xmlns=""/></svg>
-                                    <p style="color: #555; font-size: 18px; font-weight: bold; margin-top: 10px;align-items: center;display: flex;">
-                                        No Pending appointments 
-                                    </p>
-                                </div>`
-   }
-
-
+//     if(pendings.length>0){
+//         mypatients(pendings)
+//     }else{
+//         console.log('no appointment')
+//         const appoints=document.querySelector('.appointments')
+//         // appoints.innerHTML=''
+//         appoints.innerHTML=`<div id="no-appointment" style="display: flex; text-align: center;padding: 20px;background-color: #f8f9fa;border-radius: 10px;width: fit-content;margin: 40px auto;box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);">
+//                                     <svg xmlns="http://www.w3.org/2000/svg" width="100px" height="100px" viewBox="0 0 16 16"><script xmlns=""/>
+//                                         <path d="M3.793 4.5l3.5 3.5-3.5 3.5.707.707 3.5-3.5 3.5 3.5.707-.707-3.5-3.5 3.5-3.5-.707-.707-3.5 3.5-3.5-3.5z" fill="gray" fill-rule="evenodd" font-family="sans-serif" font-weight="400" overflow="visible" style="line-height:normal;font-variant-ligatures:normal;font-variant-position:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-alternates:normal;font-feature-settings:normal;text-indent:0;text-align:start;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;text-transform:none;text-orientation:mixed;shape-padding:0;isolation:auto;mix-blend-mode:normal" white-space="normal" color="#000000"/>
+//                                     <script xmlns=""/></svg>
+//                                     <p style="color: #555; font-size: 18px; font-weight: bold; margin-top: 10px;align-items: center;display: flex;">
+//                                         No Pending appointments 
+//                                     </p>
+//                                 </div>`
+//    }
 
 
-}
+
+
+// }
 
 
 function mypatients(patientappointment){
@@ -872,74 +937,75 @@ function mypatients(patientappointment){
                               
                             const svgcontainer=document.createElement('div')
                             svgcontainer.classList.add('svg-class')
-                            if(patient.status=='pending'){
-                                const fsvg=document.createElement('div')
-                                fsvg.style.cursor='pointer'
-                                fsvg.innerHTML=`   <svg xmlns="http://www.w3.org/2000/svg" fill="rgb(82,150,196)" width="25px" height="25px" viewBox="0 0 24 24"><script xmlns=""/>
-                                                            <defs>
-                                                              <style>
-                                                                .cls-1 {
-                                                                  fill-rule: evenodd;
-                                                                }
-                                                              </style>
-                                                            </defs>
-                                                            <path id="accept" class="cls-1" d="M1008,120a12,12,0,1,1,12-12A12,12,0,0,1,1008,120Zm0-22a10,10,0,1,0,10,10A10,10,0,0,0,1008,98Zm-0.08,14.333a0.819,0.819,0,0,1-.22.391,0.892,0.892,0,0,1-.72.259,0.913,0.913,0,0,1-.94-0.655l-2.82-2.818a0.9,0.9,0,0,1,1.27-1.271l2.18,2.184,4.46-7.907a1,1,0,0,1,1.38-.385,1.051,1.051,0,0,1,.36,1.417Z" transform="translate(-996 -96)"/>
-                                                          <script xmlns=""/></svg>`
-                                fsvg.addEventListener('click',async()=>{
-                                    const reqdecision={
-                                        status:'accepted',
-                                        date:appointmentdate.date
-                                    }
-                                    await appointmentstatus(reqdecision,patient)
+                            // if(patient.status=='pending'){
+                            //     const fsvg=document.createElement('div')
+                            //     fsvg.classList.add('acceptappointment');
+
+
+                            //     fsvg.style.cursor='pointer'
+                            //     fsvg.innerHTML=`   <svg xmlns="http://www.w3.org/2000/svg" fill="rgb(82,150,196)" width="25px" height="25px" viewBox="0 0 24 24"><script xmlns=""/>
+                            //                                 <defs>
+                            //                                   <style>
+                            //                                     .cls-1 {
+                            //                                       fill-rule: evenodd;
+                            //                                     }
+                            //                                   </style>
+                            //                                 </defs>
+                            //                                 <path id="accept" class="cls-1" d="M1008,120a12,12,0,1,1,12-12A12,12,0,0,1,1008,120Zm0-22a10,10,0,1,0,10,10A10,10,0,0,0,1008,98Zm-0.08,14.333a0.819,0.819,0,0,1-.22.391,0.892,0.892,0,0,1-.72.259,0.913,0.913,0,0,1-.94-0.655l-2.82-2.818a0.9,0.9,0,0,1,1.27-1.271l2.18,2.184,4.46-7.907a1,1,0,0,1,1.38-.385,1.051,1.051,0,0,1,.36,1.417Z" transform="translate(-996 -96)"/>
+                            //                               <script xmlns=""/></svg>`
+                              
+                            //      svgcontainer.appendChild(fsvg)
+                            //      const secsvg=document.createElement('div')
+                            //      secsvg.classList.add('cancelappointment');
+                            //      secsvg.style.cursor='pointer'
+                            //      secsvg.innerHTML=`  <svg xmlns="http://www.w3.org/2000/svg" width="25px" height="25px" viewBox="0 0 1024 1024" fill="rgb(255, 0, 234)" class="icon" version="1.1"><script xmlns=""/><path d="M332 663.2c-9.6 9.6-9.6 25.6 0 35.2s25.6 9.6 35.2 0l349.6-356c9.6-9.6 9.6-25.6 0-35.2s-25.6-9.6-35.2 0L332 663.2z" fill=""/><path d="M681.6 698.4c9.6 9.6 25.6 9.6 35.2 0s9.6-25.6 0-35.2L367.2 307.2c-9.6-9.6-25.6-9.6-35.2 0s-9.6 25.6 0 35.2l349.6 356z" fill=""/><path d="M516.8 1014.4c-277.6 0-503.2-225.6-503.2-503.2S239.2 7.2 516.8 7.2s503.2 225.6 503.2 503.2-225.6 504-503.2 504z m0-959.2c-251.2 0-455.2 204.8-455.2 456s204 455.2 455.2 455.2 455.2-204 455.2-455.2-204-456-455.2-456z" fill=""/><script xmlns=""/>
+                            //                             </svg>`
+    
+                            //       secsvg.addEventListener('click',async()=>{
+                            //         const reqdecision={
+                            //             status:'cancelled',
+                            //             date:appointmentdate.date
+                            //         }
+                            //         await appointmentstatus(reqdecision,patient)
                                     
-                                })
-                                 svgcontainer.appendChild(fsvg)
-                                 const secsvg=document.createElement('div')
-                                 secsvg.style.cursor='pointer'
-                                 secsvg.innerHTML=`  <svg xmlns="http://www.w3.org/2000/svg" width="25px" height="25px" viewBox="0 0 1024 1024" fill="rgb(255, 0, 234)" class="icon" version="1.1"><script xmlns=""/><path d="M332 663.2c-9.6 9.6-9.6 25.6 0 35.2s25.6 9.6 35.2 0l349.6-356c9.6-9.6 9.6-25.6 0-35.2s-25.6-9.6-35.2 0L332 663.2z" fill=""/><path d="M681.6 698.4c9.6 9.6 25.6 9.6 35.2 0s9.6-25.6 0-35.2L367.2 307.2c-9.6-9.6-25.6-9.6-35.2 0s-9.6 25.6 0 35.2l349.6 356z" fill=""/><path d="M516.8 1014.4c-277.6 0-503.2-225.6-503.2-503.2S239.2 7.2 516.8 7.2s503.2 225.6 503.2 503.2-225.6 504-503.2 504z m0-959.2c-251.2 0-455.2 204.8-455.2 456s204 455.2 455.2 455.2 455.2-204 455.2-455.2-204-456-455.2-456z" fill=""/><script xmlns=""/>
-                                                        </svg>`
+                            //     })
+                            //     svgcontainer.appendChild(secsvg)
+                            // } else
+                            //  if(patient.status=='cancelled'){
+                            //     const cancelsvg=document.createElement('div')
+                            //     cancelsvg.innerHTML=`   <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000" height="30px" width="30px" version="1.1" id="Capa_1" viewBox="0 0 283.194 283.194" xml:space="preserve"><script xmlns=""/>
+                            //     <g>
+                            //         <path d="M141.597,32.222c-60.31,0-109.375,49.065-109.375,109.375s49.065,109.375,109.375,109.375s109.375-49.065,109.375-109.375   S201.907,32.222,141.597,32.222z M50.222,141.597c0-50.385,40.991-91.375,91.375-91.375c22.268,0,42.697,8.01,58.567,21.296   L71.517,200.164C58.232,184.293,50.222,163.865,50.222,141.597z M141.597,232.972c-21.648,0-41.558-7.572-57.232-20.2   L212.772,84.366c12.628,15.674,20.2,35.583,20.2,57.231C232.972,191.982,191.981,232.972,141.597,232.972z"/>
+                            //         <path d="M141.597,0C63.52,0,0,63.52,0,141.597s63.52,141.597,141.597,141.597s141.597-63.52,141.597-141.597S219.674,0,141.597,0z    M141.597,265.194C73.445,265.194,18,209.749,18,141.597S73.445,18,141.597,18s123.597,55.445,123.597,123.597   S209.749,265.194,141.597,265.194z"/>
+                            //     </g>
+                            //     <script xmlns=""/></svg>`   
+                            //     svgcontainer.appendChild(cancelsvg)
     
-                                  secsvg.addEventListener('click',async()=>{
-                                    const reqdecision={
-                                        status:'cancelled',
-                                        date:appointmentdate.date
-                                    }
-                                    await appointmentstatus(reqdecision,patient)
-                                    
-                                })
-                                svgcontainer.appendChild(secsvg)
-                            } else if(patient.status=='cancelled'){
-                                const cancelsvg=document.createElement('div')
-                                cancelsvg.innerHTML=`   <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000" height="30px" width="30px" version="1.1" id="Capa_1" viewBox="0 0 283.194 283.194" xml:space="preserve"><script xmlns=""/>
-                                <g>
-                                    <path d="M141.597,32.222c-60.31,0-109.375,49.065-109.375,109.375s49.065,109.375,109.375,109.375s109.375-49.065,109.375-109.375   S201.907,32.222,141.597,32.222z M50.222,141.597c0-50.385,40.991-91.375,91.375-91.375c22.268,0,42.697,8.01,58.567,21.296   L71.517,200.164C58.232,184.293,50.222,163.865,50.222,141.597z M141.597,232.972c-21.648,0-41.558-7.572-57.232-20.2   L212.772,84.366c12.628,15.674,20.2,35.583,20.2,57.231C232.972,191.982,191.981,232.972,141.597,232.972z"/>
-                                    <path d="M141.597,0C63.52,0,0,63.52,0,141.597s63.52,141.597,141.597,141.597s141.597-63.52,141.597-141.597S219.674,0,141.597,0z    M141.597,265.194C73.445,265.194,18,209.749,18,141.597S73.445,18,141.597,18s123.597,55.445,123.597,123.597   S209.749,265.194,141.597,265.194z"/>
-                                </g>
-                                <script xmlns=""/></svg>`   
-                                svgcontainer.appendChild(cancelsvg)
+                            //     const secsvg=document.createElement('div')
+                            //     secsvg.style.color='red'
+                            //     secsvg.innerHTML='Cancelled'
     
-                                const secsvg=document.createElement('div')
-                                secsvg.style.color='red'
-                                secsvg.innerHTML='Cancelled'
-    
-                                svgcontainer.appendChild(secsvg)
+                            //     svgcontainer.appendChild(secsvg)
     
     
-                            }else if(patient.status=='accepted'){
+                            // }else
+                             if(patient.status=='accepted'){
                                 const acceptedsvg=document.createElement('div')
-                                acceptedsvg.innerHTML=`   <svg xmlns="http://www.w3.org/2000/svg" width="30px" height="30px" viewBox="0 0 64 64" data-name="Layer 1" id="Layer_1"><script xmlns=""/><defs><style>.cls-1{fill:#0074ff;}.cls-2{fill:#ffb300;}</style></defs><title/><path class="cls-1" d="M28.75,55.5a23.5,23.5,0,1,1,14-42.38,2,2,0,0,1-2.38,3.21A19.51,19.51,0,1,0,48.25,32,19.65,19.65,0,0,0,48,28.93a2,2,0,1,1,4-.62A23.85,23.85,0,0,1,52.25,32,23.52,23.52,0,0,1,28.75,55.5Z"/><path class="cls-2" d="M31.25,39.5a2,2,0,0,1-1.41-.59l-9.5-9.5a2,2,0,0,1,2.82-2.82l8.09,8.08L55.34,10.59a2,2,0,0,1,2.82,2.82l-25.5,25.5A2,2,0,0,1,31.25,39.5Z"/><script xmlns=""/></svg>`   
+                                acceptedsvg.classList.add('completeappointment')
+                                acceptedsvg.innerHTML=`   <svg xmlns="http://www.w3.org/2000/svg" fill="#32CD32" width="27px" height="27px" viewBox="0 0 24 24" id="d9090658-f907-4d85-8bc1-743b70378e93" data-name="Livello 1"><script xmlns=""/><title>prime</title><path id="70fa6808-131f-4233-9c3a-fc089fd0c1c4" data-name="done circle" d="M12,0A12,12,0,1,0,24,12,12,12,0,0,0,12,0ZM11.52,17L6,12.79l1.83-2.37L11.14,13l4.51-5.08,2.24,2Z"/><script xmlns=""/></svg>
+                            `   
                                 svgcontainer.appendChild(acceptedsvg)
 
-                                const accept=document.createElement('div')
-                                accept.style.cursor='pointer'
-                                accept.style.color='blue'
-                                accept.innerHTML='complete '
+                                // const accept=document.createElement('div')
+                                // accept.style.cursor='pointer'
+                                // accept.style.color='blue'
+                                // accept.innerHTML='complete '
     
-                                accept.addEventListener('click',async()=>{
+                                acceptedsvg.addEventListener('click',async()=>{
                                     const today=new Date().toISOString().split('T')[0]
     
                                     if (new Date(appointmentdate.date) > new Date(today)) {
-                                        alert('Appointment date is not yet.');
+                                        showCustomAlert('Appointment date is not yet.');
                                         return
                                     }
     
@@ -947,9 +1013,10 @@ function mypatients(patientappointment){
                                         status:'completed',
                                         date:appointmentdate.date
                                     }
+                                    console.log('setting appointment complete...',reqdecision + ' ',patient)
                                     await appointmentstatus(reqdecision,patient)
                                 })
-                                svgcontainer.appendChild(accept)
+                                // svgcontainer.appendChild(accept)
                             }else{
                                 const secsvg=document.createElement('div')
                                 secsvg.style.color='green'
@@ -976,6 +1043,34 @@ function mypatients(patientappointment){
          
            console.log(events)
         }
+
+        document.querySelectorAll('.acceptappointment').forEach((accept,index)=>{
+            accept.addEventListener('click',async()=>{
+                const patient=patientappointment[index]
+                console.log(patient)
+
+                const reqdecision={
+                    status:'accepted',
+                    date:patientappointment[index][0].date
+                }
+                console.log(reqdecision.date)
+                await appointmentstatus(reqdecision,patient)
+
+            })
+        })
+
+        document.querySelectorAll('.cancelappointment').forEach((cancel,index)=>{
+            cancel.addEventListener('click',async()=>{
+                const patient=patientappointment[index][0].patients
+
+                const reqdecision={
+                    status:'cancelled',
+                    date:patientappointment[index][0].date
+                }
+                await appointmentstatus(reqdecision,patient)
+
+            })
+        })
     }catch(e){
         console.error('error in getting my patients..',e)
     }
@@ -1026,7 +1121,7 @@ addtime.addEventListener('click',()=>{
         document.getElementById('session-time').value=''
         console.log(settime)
     } else {
-        alert("You've already added the required number of times.");
+        showCustomAlert("You've already added the required number of times.");
     }
 
  
@@ -1073,9 +1168,9 @@ setdatebutton.addEventListener('click',async()=>{
                 console.log(data)
                 clickeddate=''
                 if(data.message){
-                    alert(data.message)
+                    showCustomAlert(data.message)
                 }
-                data.modifiedCount>0?alert('appointment session set successfully'):alert('appointment date not set, please reset')
+                data.modifiedCount>0?showCustomAlert('appointment session set successfully'):showCustomAlert('appointment date not set, please reset')
         }
                 
         )

@@ -26,19 +26,21 @@ save.addEventListener('click',async()=>{
             },
             body:JSON.stringify(message)
         })
+        const stored= await results.json()
+        if(stored.message){
+            showCustomAlert(stored.message)
+            return
+        }
 
-        
         console.log( "saved history results",results)
 
             save.style.color="green"  
             save.innerHTML="Saved" 
+            showCustomAlert('entry has been saved successfully')
         
         
 
-        // const results=await result.json()
-        // console.log(results)
-    
-        // save.innerHTML="Saved"
+        
         
 
     }catch(e){

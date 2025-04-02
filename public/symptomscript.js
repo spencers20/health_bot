@@ -39,6 +39,7 @@ let chatId;
 
 
 
+
 function formatTextToHTML(text) {
     if (typeof text !== 'string') {
         console.error("Expected a string but got:", typeof text, text);
@@ -180,6 +181,8 @@ async function getresponse(symptomvalue){
  
 }
 
+
+
 symptomtextarea.addEventListener('keydown',async(e)=>{
     try{
         if(e.key ==='Enter'){
@@ -317,6 +320,33 @@ symptominput.addEventListener('keydown' ,async( event)=>{
 })
 
 
+
+// Optionally, you can handle the Continue button behavior based on the value of addtorepo:
+document.getElementById('continue').addEventListener('click', () => {
+    if (addtorepo) {
+        console.log('Saving to the repository...');
+        // Add logic here to handle saving the search to the report
+    } else {
+        console.log('Not saving to the repository...');
+        // Add logic here to handle when not saving
+    }
+});
+
+let addtorepo = false;
+
+document.querySelectorAll('.confirmtometrix').forEach(confirm => {
+    confirm.addEventListener('change', function() {
+        if (this.value === 'yes') {
+            addtorepo = true;
+        } else {
+            addtorepo = false;
+        }
+        console.log('Add to repo:', addtorepo); // Debugging to check the value
+    });
+});
+
+
+//get symptoms
 checkbtn.addEventListener('click',async()=>{
     console.log ('checkbtn clicked')
     console.log (addedsymptoms) 
@@ -362,24 +392,7 @@ checkbtn.addEventListener('click',async()=>{
 
     const result=await response.json()
 
-//     const result=` I'd be happy to help with that. However, you haven't described the headache yet. Please provide more details about your headache, such as:
 
-// * How long you've been experiencing it
-// * The severity of the pain
-// * Any triggers or factors that make it worse
-// * Any other symptoms you're experiencing
-
-// Once I have more information, I can provide some related treatment options.
-
-// (Please keep in mind that I'm not a medical professional, and my responses should not be considered a substitute for professional medical advice.)
-
-// Please go ahead and describe your headache, and I'll do my best to provide some helpful information.
-
-// And remember, after considering the treatment options I provide, it's essential to consult a doctor for a proper diagnosis and personalized advice.
-
-// So, please describe your headache, and I'll get started.
-
-// And always, at the end of our conversation: **Please visit a doctor for proper evaluation and treatment.**`
      text=' MANAGING YOUR SYMPTOMS <br> <br>'+result 
 
     if(result){
