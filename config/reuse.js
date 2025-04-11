@@ -1,5 +1,4 @@
 const Groq=require('groq-sdk')
-
 function generatemyid(myname){
     let letters;
     const randomnumber=Math.floor(Math.random()*1e10).toString()
@@ -17,7 +16,6 @@ function generatemyid(myname){
     console.log('geneeratesd id..',myid)
     return myid
 }
-
 async function querymodel(instruction){
     const  groq = new Groq({api_key:process.env.GROQ_API_KEY})
     try{

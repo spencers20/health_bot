@@ -16,9 +16,8 @@ passport.use('google',new GoogleStrategy({
     scope: ["profile", "email","https://www.googleapis.com/auth/userinfo.profile"]
 }, 
 async  function (accessToken, refreshToken, profile, done){
-
     try{
-        //you can still make use of fetch , but in the headers add "accept":application/json
+            //you can still make use of fetch , but in the headers add "accept":application/json
         //axios automatically sets the accept
         //accessToken is automatically provided in the callback
         // const response=await axios.get(
@@ -53,17 +52,10 @@ async  function (accessToken, refreshToken, profile, done){
         //            new Intl.DateTimeFormat('en', { year: 'numeric' }).format(birthDate);
         // }
         //  const age=calculateAge(birthdate.year,birthdate.month,birthdate.day)
-        
-        
-
         const db=await getdb();
         const User =db.collection('users')
         const user= await User.findOne({googleId:profile.id})
         const data=db.collection('data')
-
-        
-        // console.log(userid)
-
         if (!user){
             const myname=profile.displayName
             let myid;
@@ -80,26 +72,15 @@ async  function (accessToken, refreshToken, profile, done){
                     name:profile.displayName,
                     email:profile.emails[0].value,
                     role:'PersonOfCare'
-                    // gender:gender,
-                    // age:age
-                    
                 }
     
                 const details=await User.insertOne(google_details)
                 console.log(details)
             }
-  
-            
-            // if (details.acknowledged){
-            //     console.log(details)
-            // }
-           
+
             const newuser=await User.findOne({googleId:profile.id})
             return done(null,newuser)
         }
-
-
-
         return done(null,user)
     }catch(e){
         return done(e,null)
